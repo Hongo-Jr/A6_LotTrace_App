@@ -2070,56 +2070,109 @@ namespace LotTraceApp.Services
 
         /// <summary>
         /// 複数タブのトレース結果から交点を検出
-        /// key: (ItemCode, LotNumber)
-        /// value: (タブ番号リスト, 代表ノード情報)
+        /// key: NodeIdentityKey
+        /// value: 対象タブごとの存在情報と代表ノード情報
         /// </summary>
         public List<CrossPointRecord> DetectCrossPoints(
             Dictionary<int, TraceResult> tabResults)
         {
-            // key = MaterialPair, value = (タブ番号リスト, 代表ノード)
-            var dict = new Dictionary<MaterialPair, (HashSet<int> Tabs, ProductionResultNode Node)>();
+            var dict = new Dictionary<string, CrossPointBuildEntry>(StringComparer.OrdinalIgnoreCase);
+
+            if (tabResults == null || tabResults.Count == 0)
+                return new List<CrossPointRecord>();
 
             foreach (var kv in tabResults)
             {
                 int tabNo = kv.Key;
                 var trace = kv.Value;
 
-                IEnumerable < ProductionResultNode > allNodes = trace.AllNodes;
+                if (trace == null || trace.AllNodes == null || trace.AllNodes.Count == 0)
+                    continue;
 
-                foreach (var node in allNodes)
+                var seenNodeKeysInTab = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var node in trace.AllNodes)
                 {
-                    if (string.IsNullOrWhiteSpace(node.ItemCode) || string.IsNullOrWhiteSpace(node.LotNumber))
+                    if (node == null)
                         continue;
 
-                    var key = new MaterialPair(node.ItemCode, node.LotNumber);
+                    string nodeKey = node.NodeIdentityKey;
+                    if (string.IsNullOrWhiteSpace(nodeKey))
+                        continue;
 
-                    if (!dict.TryGetValue(key, out var entry))
+                    if (!seenNodeKeysInTab.Add(nodeKey))
+                        continue;
+
+                    CrossPointBuildEntry entry;
+                    if (!dict.TryGetValue(nodeKey, out entry))
                     {
-                        entry = (new HashSet<int>(), node);
-                        dict[key] = entry;
+                        entry = new CrossPointBuildEntry
+                        {
+                            NodeKey = nodeKey,
+                            RepresentativeNode = node
+                        };
+                        dict[nodeKey] = entry;
                     }
 
                     entry.Tabs.Add(tabNo);
                 }
             }
 
-            // 交点の有無に関わらず全て列挙する場合：
             var records = new List<CrossPointRecord>();
-            foreach (var kv in dict)
+            foreach (var entry in dict.Values)
             {
-                var node = kv.Value.Node;
-                var tabNos = string.Join(",", kv.Value.Tabs.OrderBy(x => x));
+                var node = entry.RepresentativeNode;
+                if (node == null)
+                    continue;
+
                 records.Add(new CrossPointRecord
                 {
+                    NodeKey = entry.NodeKey,
+                    CrossPointFlag = entry.Tabs.Count >= 2 ? 1 : 0,
                     ProductionOrderNumber = node.ProductionOrderNumber,
-                    ItemName = node.ItemName,
-                    ItemCode = node.ItemCode,
                     LotNumber = node.LotNumber,
-                    TabNumbers = tabNos
+                    ItemName = node.ItemName,
+                    StartDateText = ResolveCrossPointStartDateText(node),
+                    Weight = node.Weight
                 });
+
+                var record = records[records.Count - 1];
+                foreach (int tabNo in tabResults.Keys.OrderBy(x => x))
+                {
+                    record.TabPresence[tabNo] = entry.Tabs.Contains(tabNo) ? 1 : 0;
+                }
             }
 
-            return records;
+            return records
+                .OrderByDescending(x => x.CrossPointFlag)
+                .ThenBy(x => x.ProductionOrderNumber, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.LotNumber, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.ItemName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.NodeKey, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private sealed class CrossPointBuildEntry
+        {
+            public string NodeKey { get; set; }
+            public ProductionResultNode RepresentativeNode { get; set; }
+            public HashSet<int> Tabs { get; private set; }
+
+            public CrossPointBuildEntry()
+            {
+                Tabs = new HashSet<int>();
+            }
+        }
+
+        private string ResolveCrossPointStartDateText(ProductionResultNode node)
+        {
+            if (node == null)
+                return null;
+
+            if (node.StartDate.HasValue)
+                return node.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss");
+
+            return node.StartDateLabel;
         }
 
         #endregion

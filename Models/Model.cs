@@ -891,11 +891,42 @@ namespace LotTraceApp.Models
     /// </summary>
     public class CrossPointRecord
     {
+        public CrossPointRecord()
+        {
+            TabPresence = new Dictionary<int, int>();
+        }
+
+        /// <summary>
+        /// NodeIdentityKey 由来のNode識別子。
+        /// 交点判定、通常グリッドのセル強調に使用する。
+        /// </summary>
+        public string NodeKey { get; set; }
+
+        /// <summary>
+        /// 複数の対象タブに存在する場合は 1、それ以外は 0。
+        /// CSV/Excel出力で扱いやすいよう数値で保持する。
+        /// </summary>
+        public int CrossPointFlag { get; set; }
+
         public string ProductionOrderNumber { get; set; }
-        public string ItemName { get; set; }
-        public string ItemCode { get; set; }
         public string LotNumber { get; set; }
-        public string TabNumbers { get; set; }
+        public string ItemName { get; set; }
+        public string StartDateText { get; set; }
+        public float? Weight { get; set; }
+
+        /// <summary>
+        /// 内部保持用。画面/CSV/Excelでは対象タブだけを列化し、
+        /// 値は必ず 1 または 0 とする。
+        /// </summary>
+        public Dictionary<int, int> TabPresence { get; private set; }
+
+        public int GetTabPresence(int tabNo)
+        {
+            int value;
+            return TabPresence != null && TabPresence.TryGetValue(tabNo, out value)
+                ? value
+                : 0;
+        }
     }
 
 /// <summary>
