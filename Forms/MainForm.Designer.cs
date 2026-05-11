@@ -72,16 +72,6 @@ namespace LotTraceApp
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.panel3 = new System.Windows.Forms.Panel();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.IntersectionTab = new System.Windows.Forms.TabPage();
-            this.btnBottleScreen = new System.Windows.Forms.Button();
-            this.btnDetectCrossPoints = new System.Windows.Forms.Button();
-            this.btnExcelOutput = new System.Windows.Forms.Button();
-            this.rdoTabNameItemCode = new System.Windows.Forms.RadioButton();
-            this.rdoTabNameOrder = new System.Windows.Forms.RadioButton();
-            this.btnLiquidScreen = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
@@ -282,6 +272,16 @@ namespace LotTraceApp
             this.dataGridView26 = new System.Windows.Forms.DataGridView();
             this.panel27 = new System.Windows.Forms.Panel();
             this.dataGridView27 = new System.Windows.Forms.DataGridView();
+            this.IntersectionTab = new System.Windows.Forms.TabPage();
+            this.btnBottleScreen = new System.Windows.Forms.Button();
+            this.btnDetectCrossPoints = new System.Windows.Forms.Button();
+            this.btnExcelOutput = new System.Windows.Forms.Button();
+            this.rdoTabNameItemCode = new System.Windows.Forms.RadioButton();
+            this.rdoTabNameOrder = new System.Windows.Forms.RadioButton();
+            this.btnLiquidScreen = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.TabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridStart)).BeginInit();
@@ -356,7 +356,7 @@ namespace LotTraceApp
             this.TabPage1.Location = new System.Drawing.Point(4, 34);
             this.TabPage1.Name = "TabPage1";
             this.TabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPage1.Size = new System.Drawing.Size(1892, 902);
+            this.TabPage1.Size = new System.Drawing.Size(1896, 902);
             this.TabPage1.TabIndex = 0;
             this.TabPage1.Text = "(01)_未設定";
             this.TabPage1.UseVisualStyleBackColor = true;
@@ -635,7 +635,7 @@ namespace LotTraceApp
             this.tabPage2.Location = new System.Drawing.Point(4, 34);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage2.Size = new System.Drawing.Size(1896, 902);
             this.tabPage2.TabIndex = 4;
             this.tabPage2.Text = "(02)_未設定";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -856,106 +856,6 @@ namespace LotTraceApp
             this.dataGridView3.Size = new System.Drawing.Size(520, 630);
             this.dataGridView3.TabIndex = 29;
             // 
-            // IntersectionTab
-            // 
-            this.IntersectionTab.Location = new System.Drawing.Point(4, 34);
-            this.IntersectionTab.Name = "IntersectionTab";
-            this.IntersectionTab.Padding = new System.Windows.Forms.Padding(3);
-            this.IntersectionTab.Size = new System.Drawing.Size(1896, 902);
-            this.IntersectionTab.TabIndex = 3;
-            this.IntersectionTab.Text = "交点検出結果";
-            this.IntersectionTab.UseVisualStyleBackColor = true;
-            // 
-            // btnBottleScreen
-            // 
-            this.btnBottleScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.btnBottleScreen.Location = new System.Drawing.Point(166, 14);
-            this.btnBottleScreen.Name = "btnBottleScreen";
-            this.btnBottleScreen.Size = new System.Drawing.Size(150, 40);
-            this.btnBottleScreen.TabIndex = 23;
-            this.btnBottleScreen.Text = "瓶設備";
-            this.btnBottleScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
-            // 
-            // btnDetectCrossPoints
-            // 
-            this.btnDetectCrossPoints.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnDetectCrossPoints.Location = new System.Drawing.Point(1732, 15);
-            this.btnDetectCrossPoints.Name = "btnDetectCrossPoints";
-            this.btnDetectCrossPoints.Size = new System.Drawing.Size(150, 50);
-            this.btnDetectCrossPoints.TabIndex = 21;
-            this.btnDetectCrossPoints.Text = "交点検出";
-            this.btnDetectCrossPoints.Click += new System.EventHandler(this.btnDetectCrossPoints_Click);
-            // 
-            // btnExcelOutput
-            // 
-            this.btnExcelOutput.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnExcelOutput.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnExcelOutput.Location = new System.Drawing.Point(1560, 15);
-            this.btnExcelOutput.Name = "btnExcelOutput";
-            this.btnExcelOutput.Size = new System.Drawing.Size(150, 50);
-            this.btnExcelOutput.TabIndex = 20;
-            this.btnExcelOutput.Text = "EXCEL出力";
-            this.btnExcelOutput.Click += new System.EventHandler(this.btnExcelOutput_Click);
-            // 
-            // rdoTabNameItemCode
-            // 
-            this.rdoTabNameItemCode.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoTabNameItemCode.Location = new System.Drawing.Point(1389, 48);
-            this.rdoTabNameItemCode.Name = "rdoTabNameItemCode";
-            this.rdoTabNameItemCode.Size = new System.Drawing.Size(110, 24);
-            this.rdoTabNameItemCode.TabIndex = 1;
-            this.rdoTabNameItemCode.Text = "品目コード";
-            // 
-            // rdoTabNameOrder
-            // 
-            this.rdoTabNameOrder.Checked = true;
-            this.rdoTabNameOrder.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoTabNameOrder.Location = new System.Drawing.Point(1389, 20);
-            this.rdoTabNameOrder.Name = "rdoTabNameOrder";
-            this.rdoTabNameOrder.Size = new System.Drawing.Size(110, 24);
-            this.rdoTabNameOrder.TabIndex = 0;
-            this.rdoTabNameOrder.TabStop = true;
-            this.rdoTabNameOrder.Text = "製造指図番号";
-            // 
-            // btnLiquidScreen
-            // 
-            this.btnLiquidScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.btnLiquidScreen.Location = new System.Drawing.Point(10, 15);
-            this.btnLiquidScreen.Name = "btnLiquidScreen";
-            this.btnLiquidScreen.Size = new System.Drawing.Size(150, 40);
-            this.btnLiquidScreen.TabIndex = 23;
-            this.btnLiquidScreen.Text = "液設備";
-            this.btnLiquidScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(12, 62);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 24;
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.label1.Location = new System.Drawing.Point(1265, 21);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(106, 21);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "タブ名称選択";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("游ゴシック", 20F);
-            this.label8.Location = new System.Drawing.Point(785, 7);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(285, 35);
-            this.label8.TabIndex = 1;
-            this.label8.Text = "液設備ロットトレース";
-            // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.radioButton3);
@@ -986,7 +886,7 @@ namespace LotTraceApp
             this.tabPage3.Location = new System.Drawing.Point(4, 34);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage3.Size = new System.Drawing.Size(1896, 902);
             this.tabPage3.TabIndex = 5;
             this.tabPage3.Text = "(01)_未設定";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1237,7 +1137,7 @@ namespace LotTraceApp
             this.tabPage4.Location = new System.Drawing.Point(4, 34);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage4.Size = new System.Drawing.Size(1896, 902);
             this.tabPage4.TabIndex = 6;
             this.tabPage4.Text = "(04)_未設定";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -1488,7 +1388,7 @@ namespace LotTraceApp
             this.tabPage5.Location = new System.Drawing.Point(4, 34);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage5.Size = new System.Drawing.Size(1896, 902);
             this.tabPage5.TabIndex = 7;
             this.tabPage5.Text = "(05)_未設定";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -1739,7 +1639,7 @@ namespace LotTraceApp
             this.tabPage6.Location = new System.Drawing.Point(4, 34);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage6.Size = new System.Drawing.Size(1896, 902);
             this.tabPage6.TabIndex = 8;
             this.tabPage6.Text = "(06)_未設定";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -1990,7 +1890,7 @@ namespace LotTraceApp
             this.tabPage7.Location = new System.Drawing.Point(4, 34);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage7.Size = new System.Drawing.Size(1896, 902);
             this.tabPage7.TabIndex = 9;
             this.tabPage7.Text = "(07)_未設定";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -2241,7 +2141,7 @@ namespace LotTraceApp
             this.tabPage8.Location = new System.Drawing.Point(4, 34);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage8.Size = new System.Drawing.Size(1896, 902);
             this.tabPage8.TabIndex = 10;
             this.tabPage8.Text = "(08)_未設定";
             this.tabPage8.UseVisualStyleBackColor = true;
@@ -2492,7 +2392,7 @@ namespace LotTraceApp
             this.tabPage9.Location = new System.Drawing.Point(4, 34);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage9.Size = new System.Drawing.Size(1896, 902);
             this.tabPage9.TabIndex = 11;
             this.tabPage9.Text = "(09)_未設定";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -2743,7 +2643,7 @@ namespace LotTraceApp
             this.tabPage10.Location = new System.Drawing.Point(4, 34);
             this.tabPage10.Name = "tabPage10";
             this.tabPage10.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage10.Size = new System.Drawing.Size(1892, 902);
+            this.tabPage10.Size = new System.Drawing.Size(1896, 902);
             this.tabPage10.TabIndex = 12;
             this.tabPage10.Text = "(10)_未設定";
             this.tabPage10.UseVisualStyleBackColor = true;
@@ -2963,6 +2863,106 @@ namespace LotTraceApp
             this.dataGridView27.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView27.Size = new System.Drawing.Size(520, 626);
             this.dataGridView27.TabIndex = 29;
+            // 
+            // IntersectionTab
+            // 
+            this.IntersectionTab.Location = new System.Drawing.Point(4, 34);
+            this.IntersectionTab.Name = "IntersectionTab";
+            this.IntersectionTab.Padding = new System.Windows.Forms.Padding(3);
+            this.IntersectionTab.Size = new System.Drawing.Size(1896, 902);
+            this.IntersectionTab.TabIndex = 3;
+            this.IntersectionTab.Text = "交点検出結果";
+            this.IntersectionTab.UseVisualStyleBackColor = true;
+            // 
+            // btnBottleScreen
+            // 
+            this.btnBottleScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.btnBottleScreen.Location = new System.Drawing.Point(166, 14);
+            this.btnBottleScreen.Name = "btnBottleScreen";
+            this.btnBottleScreen.Size = new System.Drawing.Size(150, 40);
+            this.btnBottleScreen.TabIndex = 23;
+            this.btnBottleScreen.Text = "瓶設備";
+            this.btnBottleScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
+            // 
+            // btnDetectCrossPoints
+            // 
+            this.btnDetectCrossPoints.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnDetectCrossPoints.Location = new System.Drawing.Point(1732, 15);
+            this.btnDetectCrossPoints.Name = "btnDetectCrossPoints";
+            this.btnDetectCrossPoints.Size = new System.Drawing.Size(150, 50);
+            this.btnDetectCrossPoints.TabIndex = 21;
+            this.btnDetectCrossPoints.Text = "交点検出";
+            this.btnDetectCrossPoints.Click += new System.EventHandler(this.btnDetectCrossPoints_Click);
+            // 
+            // btnExcelOutput
+            // 
+            this.btnExcelOutput.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnExcelOutput.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnExcelOutput.Location = new System.Drawing.Point(1560, 15);
+            this.btnExcelOutput.Name = "btnExcelOutput";
+            this.btnExcelOutput.Size = new System.Drawing.Size(150, 50);
+            this.btnExcelOutput.TabIndex = 20;
+            this.btnExcelOutput.Text = "EXCEL出力";
+            this.btnExcelOutput.Click += new System.EventHandler(this.btnExcelOutput_Click);
+            // 
+            // rdoTabNameItemCode
+            // 
+            this.rdoTabNameItemCode.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.rdoTabNameItemCode.Location = new System.Drawing.Point(1389, 48);
+            this.rdoTabNameItemCode.Name = "rdoTabNameItemCode";
+            this.rdoTabNameItemCode.Size = new System.Drawing.Size(110, 24);
+            this.rdoTabNameItemCode.TabIndex = 1;
+            this.rdoTabNameItemCode.Text = "品目コード";
+            // 
+            // rdoTabNameOrder
+            // 
+            this.rdoTabNameOrder.Checked = true;
+            this.rdoTabNameOrder.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.rdoTabNameOrder.Location = new System.Drawing.Point(1389, 20);
+            this.rdoTabNameOrder.Name = "rdoTabNameOrder";
+            this.rdoTabNameOrder.Size = new System.Drawing.Size(110, 24);
+            this.rdoTabNameOrder.TabIndex = 0;
+            this.rdoTabNameOrder.TabStop = true;
+            this.rdoTabNameOrder.Text = "製造指図番号";
+            // 
+            // btnLiquidScreen
+            // 
+            this.btnLiquidScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.btnLiquidScreen.Location = new System.Drawing.Point(10, 15);
+            this.btnLiquidScreen.Name = "btnLiquidScreen";
+            this.btnLiquidScreen.Size = new System.Drawing.Size(150, 40);
+            this.btnLiquidScreen.TabIndex = 23;
+            this.btnLiquidScreen.Text = "液設備";
+            this.btnLiquidScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(12, 62);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(15, 14);
+            this.checkBox1.TabIndex = 24;
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.label1.Location = new System.Drawing.Point(1265, 21);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(106, 21);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "タブ名称選択";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("游ゴシック", 20F);
+            this.label8.Location = new System.Drawing.Point(785, 7);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(285, 35);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "液設備ロットトレース";
             // 
             // MainForm
             // 
