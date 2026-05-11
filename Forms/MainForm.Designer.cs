@@ -273,6 +273,7 @@ namespace LotTraceApp
             this.panel27 = new System.Windows.Forms.Panel();
             this.dataGridView27 = new System.Windows.Forms.DataGridView();
             this.IntersectionTab = new System.Windows.Forms.TabPage();
+            this.dataGridIntersection = new System.Windows.Forms.DataGridView();
             this.btnBottleScreen = new System.Windows.Forms.Button();
             this.btnDetectCrossPoints = new System.Windows.Forms.Button();
             this.btnExcelOutput = new System.Windows.Forms.Button();
@@ -333,6 +334,8 @@ namespace LotTraceApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView25)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView26)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView27)).BeginInit();
+            this.IntersectionTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridIntersection)).BeginInit();
             this.SuspendLayout();
             // 
             // tabPage1
@@ -2875,6 +2878,7 @@ namespace LotTraceApp
             // 
             // IntersectionTab
             // 
+            this.IntersectionTab.Controls.Add(this.dataGridIntersection);
             this.IntersectionTab.Location = new System.Drawing.Point(4, 34);
             this.IntersectionTab.Name = "IntersectionTab";
             this.IntersectionTab.Padding = new System.Windows.Forms.Padding(3);
@@ -2882,6 +2886,18 @@ namespace LotTraceApp
             this.IntersectionTab.TabIndex = 3;
             this.IntersectionTab.Text = "交点検出結果";
             this.IntersectionTab.UseVisualStyleBackColor = true;
+            // 
+            // dataGridIntersection
+            // 
+            this.dataGridIntersection.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridIntersection.Location = new System.Drawing.Point(16, 16);
+            this.dataGridIntersection.Name = "dataGridIntersection";
+            this.dataGridIntersection.ReadOnly = true;
+            this.dataGridIntersection.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridIntersection.Size = new System.Drawing.Size(1864, 870);
+            this.dataGridIntersection.TabIndex = 0;
             // 
             // btnBottleScreen
             // 
@@ -3134,6 +3150,8 @@ namespace LotTraceApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView25)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView26)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView27)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridIntersection)).EndInit();
+            this.IntersectionTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -3176,6 +3194,7 @@ namespace LotTraceApp
         private Button btnLiquidScreen;
         private CheckBox check1;
         private TabPage IntersectionTab;
+        private DataGridView dataGridIntersection;
         private Label label1;
         private TabPage tabPage2;
         private RadioButton radioButton1;

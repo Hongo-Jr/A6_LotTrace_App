@@ -949,7 +949,15 @@ namespace LotTraceApp
             }
 
             //// 交点グリッド
-            //ConfigureGridDefault(IntersectionTab);
+            ConfigureGridDefault(dataGridIntersection);
+            ApplyGridColumnHeaderStyle(dataGridIntersection, _middleHeaderStyle);
+            if (dataGridIntersection != null)
+            {
+                dataGridIntersection.ScrollBars = ScrollBars.Both;
+                dataGridIntersection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+                dataGridIntersection.AutoGenerateColumns = true;
+                dataGridIntersection.DataSource = CreateCrossPointGridTable(null);
+            }
 
             dataGridMiddle.Scroll -= dataGridMiddle_Scroll;
             dataGridMiddle.Scroll += dataGridMiddle_Scroll;
@@ -980,7 +988,32 @@ namespace LotTraceApp
             grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         }
 
-       
+        private DataTable CreateCrossPointGridTable(IEnumerable<int> targetTabs)
+        {
+            var table = new DataTable();
+
+            table.Columns.Add("交点", typeof(int));
+            table.Columns.Add("製造指図番号", typeof(string));
+            table.Columns.Add("ロットNo.", typeof(string));
+            table.Columns.Add("品目名", typeof(string));
+            table.Columns.Add("開始日時", typeof(string));
+            table.Columns.Add("重量", typeof(float));
+
+            if (targetTabs != null)
+            {
+                foreach (int tabNo in targetTabs
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .OrderBy(x => x))
+                {
+                    table.Columns.Add("タブ" + tabNo, typeof(int));
+                }
+            }
+
+            return table;
+        }
+
+        
 
       
 
