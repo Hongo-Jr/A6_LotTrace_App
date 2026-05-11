@@ -2086,12 +2086,13 @@ namespace LotTraceApp.Services
                 int tabNo = kv.Key;
                 var trace = kv.Value;
 
-                if (trace == null || trace.AllNodes == null || trace.AllNodes.Count == 0)
+                var sourceNodes = EnumerateCrossPointSourceNodes(trace).ToList();
+                if (sourceNodes.Count == 0)
                     continue;
 
                 var seenNodeKeysInTab = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                foreach (var node in trace.AllNodes)
+                foreach (var node in sourceNodes)
                 {
                     if (node == null)
                         continue;
@@ -2150,6 +2151,36 @@ namespace LotTraceApp.Services
                 .ThenBy(x => x.ItemName, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(x => x.NodeKey, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+        }
+
+        private IEnumerable<ProductionResultNode> EnumerateCrossPointSourceNodes(TraceResult trace)
+        {
+            if (trace == null)
+                yield break;
+
+            if (trace.PathRows == null || trace.PathRows.Count == 0)
+                yield break;
+
+            foreach (var row in trace.PathRows)
+            {
+                if (row == null)
+                    continue;
+
+                if (row.StartNode != null)
+                    yield return row.StartNode;
+
+                if (row.MiddleNodes != null)
+                {
+                    foreach (var node in row.MiddleNodes)
+                    {
+                        if (node != null)
+                            yield return node;
+                    }
+                }
+
+                if (row.EndNode != null)
+                    yield return row.EndNode;
+            }
         }
 
         private sealed class CrossPointBuildEntry
