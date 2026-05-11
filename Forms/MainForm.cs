@@ -2188,59 +2188,40 @@ namespace LotTraceApp
 
         #region CSV出力 [10]
 
-        private void btnCsvOutput_Click(object sender, EventArgs e)
+        private void ExportCsvForTab(TraceTabContext tab)
         {
-            try
+            if (tab == null) return;
+
+            if (!HasAnyVisibleData(tab.GridStart) &&
+                !HasAnyVisibleData(tab.GridMiddle) &&
+                !HasAnyVisibleData(tab.GridEnd))
             {
-                if (!HasAnyVisibleDataForExcelExport())
-                {
-                    MessageBox.Show(
-                        this,
-                        "出力対象の表示データがありません。",
-                        "CSV出力",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                    return;
-                }
-
-
-
-                using (var dlg = new SaveFileDialog())
-                {
-                    dlg.Title = "CSV出力";
-                    dlg.Filter = "CSV ファイル (*.csv)|*.csv";
-                    dlg.DefaultExt = "csv";
-                    dlg.AddExtension = true;
-                    dlg.OverwritePrompt = true;
-                    dlg.RestoreDirectory = true;
-                    dlg.FileName = BuildCsvExportFileName();
-                    ApplyOutputInitialDirectory(dlg, DefaultCsvDirectoryIniKey);
-
-                    if (dlg.ShowDialog(this) != DialogResult.OK)
-                        return;
-
-                    CsvExportHelper.ExportCurrentGridsToCsv(
-                        dlg.FileName,
-                        dataGridStart,
-                        dataGridMiddle,
-                        dataGridEnd);
-
-                    MessageBox.Show(
-                        this,
-                        "CSV 出力が完了しました。\r\n" + dlg.FileName,
-                        "CSV出力",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                }
+                MessageBox.Show(this, "出力対象の表示データがありません。", "CSV出力",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-            catch (Exception ex)
+
+            using (var dlg = new SaveFileDialog())
             {
-                MessageBox.Show(
-                    this,
-                    "CSV 出力に失敗しました。\r\n" + ex.Message,
-                    "CSV出力エラー",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                dlg.Title = "CSV出力";
+                dlg.Filter = "CSV ファイル (*.csv)|*.csv";
+                dlg.DefaultExt = "csv";
+                dlg.AddExtension = true;
+                dlg.OverwritePrompt = true;
+                dlg.RestoreDirectory = true;
+                dlg.FileName = BuildCsvExportFileName();
+                ApplyOutputInitialDirectory(dlg, DefaultCsvDirectoryIniKey);
+
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+                CsvExportHelper.ExportCurrentGridsToCsv(
+                    dlg.FileName,
+                    tab.GridStart,
+                    tab.GridMiddle,
+                    tab.GridEnd);
+
+                MessageBox.Show(this, "CSV 出力が完了しました。\r\n" + dlg.FileName,
+                    "CSV出力", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -3935,7 +3916,7 @@ namespace LotTraceApp
             if (tab == null) return;
 
             // 既存の btnCsvOutput_Click の中身を「gridをtabから取る」だけに変えるのが最小
-            //ExportCsvForTab(tab);
+            ExportCsvForTab(tab);
         }
 
         private void SwichTab_SelectedIndexChanged(object sender, EventArgs e)
