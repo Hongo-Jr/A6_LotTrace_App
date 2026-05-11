@@ -957,6 +957,7 @@ namespace LotTraceApp
                 dataGridIntersection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
                 dataGridIntersection.AutoGenerateColumns = true;
                 dataGridIntersection.DataSource = CreateCrossPointGridTable(null);
+                ApplyCrossPointGridColumnWidths();
             }
 
             dataGridMiddle.Scroll -= dataGridMiddle_Scroll;
@@ -1011,6 +1012,49 @@ namespace LotTraceApp
             }
 
             return table;
+        }
+
+        private void ApplyCrossPointGridColumnWidths()
+        {
+            if (dataGridIntersection == null || dataGridIntersection.Columns.Count == 0)
+                return;
+
+            dataGridIntersection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+
+            foreach (DataGridViewColumn col in dataGridIntersection.Columns)
+            {
+                if (col == null)
+                    continue;
+
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                col.Resizable = DataGridViewTriState.True;
+
+                switch (col.Name)
+                {
+                    case "交点":
+                        col.Width = 50;
+                        break;
+                    case "製造指図番号":
+                    case "ロットNo.":
+                        col.Width = 120;
+                        break;
+                    case "品目名":
+                        col.Width = 360;
+                        break;
+                    case "開始日時":
+                        col.Width = 140;
+                        break;
+                    case "重量":
+                        col.Width = 80;
+                        break;
+                    default:
+                        if (col.Name.StartsWith("タブ", StringComparison.OrdinalIgnoreCase))
+                            col.Width = 55;
+                        break;
+                }
+
+                col.MinimumWidth = col.Width;
+            }
         }
 
         
