@@ -8,6 +8,8 @@ namespace LotTraceApp.Utils
 {
     public static class DisplayNameCsvLoader
     {
+
+
         /// <summary>
         /// Key,DisplayName 形式のCSVを読み込み、
         /// 内部名 -> 表示名 の辞書を返す。
@@ -22,7 +24,7 @@ namespace LotTraceApp.Utils
             if (!File.Exists(csvPath))
                 throw new FileNotFoundException("CSV file not found.", csvPath);
 
-            var lines = File.ReadAllLines(csvPath, Encoding.UTF8);
+            var lines = File.ReadAllLines(csvPath, Encoding.GetEncoding("shift-jis"));
             if (lines == null || lines.Length == 0)
                 return result;
 
