@@ -145,6 +145,297 @@ namespace LotTraceApp
             public Font GroupFont { get; set; }
             public Font ColumnFont { get; set; }
         }
+        // タブごとの表示テーブルも保持（切替時に再表示するため）
+        private readonly Dictionary<int, DataTable> _tabDisplayTables = new Dictionary<int, DataTable>();
+
+        private sealed class TraceTabContext
+        {
+            public int TabNo { get; set; }
+
+            public TextBox TxtOrder { get; set; }
+            public TextBox TxtItemName { get; set; }
+            public TextBox TxtItemCode { get; set; }
+            public TextBox TxtLot { get; set; }
+
+            public CheckBox ChkUseFrom { get; set; }
+            public DateTimePicker DtpFrom { get; set; }
+            public DateTimePicker DtpTo { get; set; }
+
+            public RadioButton RdoForward { get; set; }
+            public RadioButton RdoBackward { get; set; }
+
+            public Button BtnSearch { get; set; }
+            public Button BtnClear { get; set; }
+            public Button BtnCsv { get; set; }
+
+            public Panel PnlStartHeader { get; set; }
+            public Panel PnlMiddleHeader { get; set; }
+            public Panel PnlEndHeader { get; set; }
+
+            public DataGridView GridStart { get; set; }
+            public DataGridView GridMiddle { get; set; }
+            public DataGridView GridEnd { get; set; }
+        }
+
+        private int GetCurrentTraceTabNo()
+        {
+            int tabNo = this.swichTab.SelectedIndex + 1;   // 0-based -> 1-based
+            return (tabNo >= 1 && tabNo <= 10) ? tabNo : -1;
+        }
+
+        private TraceTabContext GetTabContext(int tabNo)
+        {
+            switch (tabNo)
+            {
+                case 1:
+                    return new TraceTabContext
+                    {
+                        TabNo = 1,
+                        TxtOrder = txtProductionOrderNumber,
+                        TxtItemName = txtItemName,
+                        TxtItemCode = txtItemCode,
+                        TxtLot = txtLotNumber,
+                        ChkUseFrom = chkUseFrom,
+                        DtpFrom = dtpFrom,
+                        DtpTo = dtpTo,
+                        RdoForward = rdoForward,
+                        RdoBackward = rdoBackward,
+                        BtnSearch = btnTraceSearch,
+                        BtnClear = btnClear,
+                        BtnCsv = btnCsvOutput,
+                        PnlStartHeader = panelStartHeader,
+                        PnlMiddleHeader = panelMiddleHeader,
+                        PnlEndHeader = panelEndHeader,
+                        GridStart = dataGridStart,
+                        GridMiddle = dataGridMiddle,
+                        GridEnd = dataGridEnd
+                    };
+
+                case 2:
+                    return new TraceTabContext
+                    {
+                        TabNo = 2,
+                        TxtOrder = textBox1,
+                        TxtItemName = textBox2,
+                        TxtItemCode = textBox3,
+                        TxtLot = textBox4,
+                        ChkUseFrom = checkBox2,
+                        DtpFrom = dateTimePicker1,
+                        DtpTo = dateTimePicker2,
+                        RdoForward = radioButton2,
+                        RdoBackward = radioButton1,
+                        BtnSearch = button3,
+                        BtnClear = button1,
+                        BtnCsv = button2,
+                        PnlStartHeader = panel1,
+                        PnlMiddleHeader = panel2,
+                        PnlEndHeader = panel3,
+                        GridStart = dataGridView1,
+                        GridMiddle = dataGridView2,
+                        GridEnd = dataGridView3
+                    };
+
+                case 3:
+                    return new TraceTabContext
+                    {
+                        TabNo = 3,
+                        TxtOrder = textBox5,
+                        TxtItemName = textBox6,
+                        TxtItemCode = textBox7,
+                        TxtLot = textBox8,
+                        ChkUseFrom = checkBox3,
+                        DtpFrom = dateTimePicker3,
+                        DtpTo = dateTimePicker4,
+                        RdoForward = radioButton4,
+                        RdoBackward = radioButton3,
+                        BtnSearch = button6,
+                        BtnClear = button4,
+                        BtnCsv = button5,
+                        PnlStartHeader = panel4,
+                        PnlMiddleHeader = panel5,
+                        PnlEndHeader = panel6,
+                        GridStart = dataGridView4,
+                        GridMiddle = dataGridView5,
+                        GridEnd = dataGridView6
+                    };
+
+                case 4:
+                    return new TraceTabContext
+                    {
+                        TabNo = 4,
+                        TxtOrder = textBox9,
+                        TxtItemName = textBox10,
+                        TxtItemCode = textBox11,
+                        TxtLot = textBox12,
+                        ChkUseFrom = checkBox4,
+                        DtpFrom = dateTimePicker5,
+                        DtpTo = dateTimePicker6,
+                        RdoForward = radioButton6,
+                        RdoBackward = radioButton5,
+                        BtnSearch = button9,
+                        BtnClear = button7,
+                        BtnCsv = button8,
+                        PnlStartHeader = panel7,
+                        PnlMiddleHeader = panel8,
+                        PnlEndHeader = panel9,
+                        GridStart = dataGridView7,
+                        GridMiddle = dataGridView8,
+                        GridEnd = dataGridView9
+                    };
+
+                case 5:
+                    return new TraceTabContext
+                    {
+                        TabNo = 5,
+                        TxtOrder = textBox13,
+                        TxtItemName = textBox14,
+                        TxtItemCode = textBox15,
+                        TxtLot = textBox16,
+                        ChkUseFrom = checkBox5,
+                        DtpFrom = dateTimePicker7,
+                        DtpTo = dateTimePicker8,
+                        RdoForward = radioButton8,
+                        RdoBackward = radioButton7,
+                        BtnSearch = button12,
+                        BtnClear = button10,
+                        BtnCsv = button11,
+                        PnlStartHeader = panel10,
+                        PnlMiddleHeader = panel11,
+                        PnlEndHeader = panel12,
+                        GridStart = dataGridView10,
+                        GridMiddle = dataGridView11,
+                        GridEnd = dataGridView12
+                    };
+
+                case 6:
+                    return new TraceTabContext
+                    {
+                        TabNo = 6,
+                        TxtOrder = textBox17,
+                        TxtItemName = textBox18,
+                        TxtItemCode = textBox19,
+                        TxtLot = textBox20,
+                        ChkUseFrom = checkBox6,
+                        DtpFrom = dateTimePicker9,
+                        DtpTo = dateTimePicker10,
+                        RdoForward = radioButton10,
+                        RdoBackward = radioButton9,
+                        BtnSearch = button15,
+                        BtnClear = button13,
+                        BtnCsv = button14,
+                        PnlStartHeader = panel13,
+                        PnlMiddleHeader = panel14,
+                        PnlEndHeader = panel15,
+                        GridStart = dataGridView13,
+                        GridMiddle = dataGridView14,
+                        GridEnd = dataGridView15
+                    };
+
+                case 7:
+                    return new TraceTabContext
+                    {
+                        TabNo = 7,
+                        TxtOrder = textBox21,
+                        TxtItemName = textBox22,
+                        TxtItemCode = textBox23,
+                        TxtLot = textBox24,
+                        ChkUseFrom = checkBox7,
+                        DtpFrom = dateTimePicker11,
+                        DtpTo = dateTimePicker12,
+                        RdoForward = radioButton12,
+                        RdoBackward = radioButton11,
+                        BtnSearch = button18,
+                        BtnClear = button16,
+                        BtnCsv = button17,
+                        PnlStartHeader = panel16,
+                        PnlMiddleHeader = panel17,
+                        PnlEndHeader = panel18,
+                        GridStart = dataGridView16,
+                        GridMiddle = dataGridView17,
+                        GridEnd = dataGridView18
+                    };
+
+                case 8:
+                    return new TraceTabContext
+                    {
+                        TabNo = 8,
+                        TxtOrder = textBox25,
+                        TxtItemName = textBox26,
+                        TxtItemCode = textBox27,
+                        TxtLot = textBox28,
+                        ChkUseFrom = checkBox8,
+                        DtpFrom = dateTimePicker13,
+                        DtpTo = dateTimePicker14,
+                        RdoForward = radioButton14,
+                        RdoBackward = radioButton13,
+                        BtnSearch = button21,
+                        BtnClear = button19,
+                        BtnCsv = button20,
+                        PnlStartHeader = panel19,
+                        PnlMiddleHeader = panel20,
+                        PnlEndHeader = panel21,
+                        GridStart = dataGridView19,
+                        GridMiddle = dataGridView20,
+                        GridEnd = dataGridView21
+                    };
+
+                case 9:
+                    return new TraceTabContext
+                    {
+                        TabNo = 9,
+                        TxtOrder = textBox29,
+                        TxtItemName = textBox30,
+                        TxtItemCode = textBox31,
+                        TxtLot = textBox32,
+                        ChkUseFrom = checkBox9,
+                        DtpFrom = dateTimePicker15,
+                        DtpTo = dateTimePicker16,
+                        RdoForward = radioButton16,
+                        RdoBackward = radioButton15,
+                        BtnSearch = button24,
+                        BtnClear = button22,
+                        BtnCsv = button23,
+                        PnlStartHeader = panel22,
+                        PnlMiddleHeader = panel23,
+                        PnlEndHeader = panel24,
+                        GridStart = dataGridView22,
+                        GridMiddle = dataGridView23,
+                        GridEnd = dataGridView24
+                    };
+
+                case 10:
+                    return new TraceTabContext
+                    {
+                        TabNo = 10,
+                        TxtOrder = textBox33,
+                        TxtItemName = textBox34,
+                        TxtItemCode = textBox35,
+                        TxtLot = textBox36,
+                        ChkUseFrom = checkBox10,
+                        DtpFrom = dateTimePicker17,
+                        DtpTo = dateTimePicker18,
+                        RdoForward = radioButton18,
+                        RdoBackward = radioButton17,
+                        BtnSearch = button27,
+                        BtnClear = button25,
+                        BtnCsv = button26,
+                        PnlStartHeader = panel25,
+                        PnlMiddleHeader = panel26,
+                        PnlEndHeader = panel27,
+                        GridStart = dataGridView25,
+                        GridMiddle = dataGridView26,
+                        GridEnd = dataGridView27
+                    };
+            }
+
+            return null;
+        }
+
+        private TraceTabContext GetCurrentTabContext()
+        {
+            int tabNo = GetCurrentTraceTabNo();
+            return tabNo > 0 ? GetTabContext(tabNo) : null;
+        }
 
         private Dictionary<string, NodeRenderRange> _nodeRenderRanges
      = new Dictionary<string, NodeRenderRange>(StringComparer.OrdinalIgnoreCase);
@@ -215,7 +506,7 @@ namespace LotTraceApp
 
 
             // ★ NodeKeyグループ文字色（後段上書き）
-            RegisterNodeKeyGroupForeColorFormatting();
+           RegisterNodeKeyGroupForeColorFormatting();
 
 
             dataGridStart.Scroll += Grid_ScrollSync;
@@ -239,7 +530,24 @@ namespace LotTraceApp
             dataGridMiddle.MouseLeave += Grid_ItemNameToolTipHideOnMouseLeave;
             dataGridEnd.MouseLeave += Grid_ItemNameToolTipHideOnMouseLeave;
 
-            
+            for (int tabNo = 1; tabNo <= 10; tabNo++)
+            {
+                var tab = GetTabContext(tabNo);
+                if (tab == null) continue;
+
+                tab.BtnSearch.Click -= TraceSearch_FromAnyTab_Click;
+                tab.BtnSearch.Click += TraceSearch_FromAnyTab_Click;
+
+                tab.BtnClear.Click -= Clear_FromAnyTab_Click;
+                tab.BtnClear.Click += Clear_FromAnyTab_Click;
+
+                tab.BtnCsv.Click -= Csv_FromAnyTab_Click;
+                tab.BtnCsv.Click += Csv_FromAnyTab_Click;
+            }
+
+            // タブ切替で「そのタブの結果」を再表示
+            swichTab.SelectedIndexChanged -= SwichTab_SelectedIndexChanged;
+            swichTab.SelectedIndexChanged += SwichTab_SelectedIndexChanged;
         }
 
         private void RegisterNodeKeyGroupForeColorFormatting()
@@ -1584,27 +1892,18 @@ namespace LotTraceApp
 
 
 
-        private TraceSearchParameters CollectSearchParametersFromControls()
+        private TraceSearchParameters CollectSearchParametersFromControls(TraceTabContext tab)
         {
             var p = new TraceSearchParameters();
-            p.ProductionOrderNumber = txtProductionOrderNumber.Text.Trim();
-            p.ItemName = txtItemName.Text.Trim();
-            p.ItemCode = txtItemCode.Text.Trim();
-            p.LotNumber = txtLotNumber.Text.Trim();
+            p.ProductionOrderNumber = tab.TxtOrder.Text.Trim();
+            p.ItemName = tab.TxtItemName.Text.Trim();
+            p.ItemCode = tab.TxtItemCode.Text.Trim();
+            p.LotNumber = tab.TxtLot.Text.Trim();
 
-            if (chkUseFrom.Checked)
-            {
-                p.From = dtpFrom.Value.Date;
-            }
-            //if (chkUseTo.Checked)
-            //{
-            //    // 日付の終端まで含めるため 23:59:59.999 にする
-            //    DateTime to = dtpTo.Value.Date.AddDays(1).AddMilliseconds(-1);
-            //    p.To = to;
-            //}
+            if (tab.ChkUseFrom.Checked)
+                p.From = tab.DtpFrom.Value.Date;
 
-            p.Direction = rdoForward.Checked ? TraceDirection.Forward : TraceDirection.Backward;
-
+            p.Direction = tab.RdoForward.Checked ? TraceDirection.Forward : TraceDirection.Backward;
             return p;
         }
 
@@ -1612,26 +1911,45 @@ namespace LotTraceApp
 
         #region トレース実行・表示
 
-        private void btnTraceSearch_Click(object sender, EventArgs e)
+        //private void btnTraceSearch_Click(object sender, EventArgs e)
+        //{
+        //    var p = CollectSearchParametersFromControls();
+
+        //    if (!HasAnySearchCondition(p))
+        //    {
+        //        MessageBox.Show(
+        //            "検索条件を1つ以上入力してください。\r\n" +
+        //            "全項目空欄の検索は負荷が高いため実行できません。",
+        //            "検索条件不足",
+        //            MessageBoxButtons.OK,
+        //            MessageBoxIcon.Warning);
+        //        return;
+        //    }
+
+        //    DoTrace(p);
+
+        //}
+        private void TraceSearch_FromAnyTab_Click(object sender, EventArgs e)
         {
-            var p = CollectSearchParametersFromControls();
+            var tab = GetCurrentTabContext();
+            if (tab == null) return;
+
+            var p = CollectSearchParametersFromControls(tab);
 
             if (!HasAnySearchCondition(p))
             {
                 MessageBox.Show(
-                    "検索条件を1つ以上入力してください。\r\n" +
-                    "全項目空欄の検索は負荷が高いため実行できません。",
+                    "検索条件を1つ以上入力してください。\r\n全項目空欄の検索は負荷が高いため実行できません。",
                     "検索条件不足",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
                 return;
             }
 
-            DoTrace(p);
-            
+            DoTrace(tab, p);
         }
 
-        private void DoTrace(TraceSearchParameters p)
+        private void DoTrace(TraceTabContext tab, TraceSearchParameters p)
         {
             try
             {
@@ -1646,7 +1964,15 @@ namespace LotTraceApp
                 // ★ 表示テーブルはサービス側の完成品をそのまま使う
                 var displayTable = _liquidService.BuildDisplayTable(result);
 
-               
+                int tabNo = tab.TabNo;
+
+                StoreDisplayArtifactsForTab(tabNo, result, displayResult);
+                _tabDisplayTables[tabNo] = displayTable;
+
+                // 今のタブに表示
+                ActivateTabDisplay(tabNo);
+
+
                 // ★ 線レンジはサービス側で確定済みのものをそのまま受け取る
                 if (displayResult != null)
                 {
@@ -1699,8 +2025,6 @@ namespace LotTraceApp
                 RefreshStartHeaderPanel();
                 RefreshMiddleHeaderPanel();
                 RefreshEndHeaderPanel();
-
-                int tabNo =1;
 
                 StoreDisplayArtifactsForTab(tabNo, result, displayResult);
 
@@ -1824,6 +2148,8 @@ namespace LotTraceApp
                         MessageBoxIcon.Information);
                     return;
                 }
+
+
 
                 using (var dlg = new SaveFileDialog())
                 {
@@ -2916,15 +3242,6 @@ namespace LotTraceApp
             return context;
         }
 
-        private int GetCurrentTraceTabNo()
-        {
-            Tag = 1;
-            int tabNo;
-            if (!int.TryParse(Tag.ToString(), out tabNo))
-                return -1;
-            return tabNo;
-        }
-
         private TraceGridDrawContext GetCurrentTraceGridDrawContext()
         {
             int tabNo = GetCurrentTraceTabNo();
@@ -3494,6 +3811,88 @@ namespace LotTraceApp
                 dataGridMiddle.Invalidate();
             }
         }
+       
 
+        private void Clear_FromAnyTab_Click(object sender, EventArgs e)
+        {
+            var tab = GetCurrentTabContext();
+            if (tab == null) return;
+
+            tab.TxtOrder.Clear();
+            tab.TxtItemName.Clear();
+            tab.TxtItemCode.Clear();
+            tab.TxtLot.Clear();
+            tab.ChkUseFrom.Checked = false;
+
+            tab.GridStart.DataSource = null;
+            tab.GridMiddle.DataSource = null;
+            tab.GridEnd.DataSource = null;
+
+            // 保持結果も消すならここで辞書からRemove（必要なら）
+            // _tabTraceResults.Remove(tab.TabNo); etc
+        }
+
+        private void Csv_FromAnyTab_Click(object sender, EventArgs e)
+        {
+            var tab = GetCurrentTabContext();
+            if (tab == null) return;
+
+            // 既存の btnCsvOutput_Click の中身を「gridをtabから取る」だけに変えるのが最小
+            //ExportCsvForTab(tab);
+        }
+
+        private void SwichTab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var tab = GetCurrentTabContext();
+            if (tab == null) return;
+
+            ActivateTabDisplay(tab.TabNo);
+        }
+        private void ActivateTabDisplay(int tabNo)
+        {
+            var tab = GetTabContext(tabNo);
+            if (tab == null) return;
+
+            DataTable table;
+            if (!_tabDisplayTables.TryGetValue(tabNo, out table))
+            {
+                // 未検索タブは空表示
+                tab.GridStart.DataSource = null;
+                tab.GridMiddle.DataSource = null;
+                tab.GridEnd.DataSource = null;
+                return;
+            }
+
+            TraceDisplayResult displayResult;
+            _tabDisplayResults.TryGetValue(tabNo, out displayResult);
+
+            _currentMaxDepth = displayResult == null ? 0 : displayResult.MaxMiddleDepth;
+
+            tab.GridStart.DataSource = null;
+            tab.GridMiddle.DataSource = null;
+            tab.GridEnd.DataSource = null;
+
+            SetupNodeGridColumns(tab.GridStart, "Start");
+            tab.GridStart.AutoGenerateColumns = false;
+            tab.GridStart.DataSource = table;
+
+            SetupMiddleGridColumns(tab.GridMiddle, _currentMaxDepth);
+            tab.GridMiddle.AutoGenerateColumns = false;
+            tab.GridMiddle.DataSource = table;
+
+            SetupNodeGridColumns(tab.GridEnd, "End");
+            tab.GridEnd.AutoGenerateColumns = false;
+            tab.GridEnd.DataSource = table;
+
+            // 既存の「グローバルキャッシュ方式」のまま、表示中タブの分を作り直す
+            _fixedGridLayoutApplied = false;
+            ApplyFixedGridLayoutOnce(); // ※ここが dataGridStart固定なら、後で tab版にする必要あり
+
+            RebuildGridPaintCaches();   // ※グローバル1個のままでも「今見てるタブ」だけなら成立
+
+            tab.GridStart.Invalidate();
+            tab.GridMiddle.Invalidate();
+            tab.GridEnd.Invalidate();
+        }
     }
 }

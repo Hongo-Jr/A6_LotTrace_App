@@ -21,7 +21,7 @@ namespace LotTraceApp
         {
             this.components = new System.ComponentModel.Container();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.TabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.rdoBackward = new System.Windows.Forms.RadioButton();
             this.rdoForward = new System.Windows.Forms.RadioButton();
             this.lblProductionOrderNumber = new System.Windows.Forms.Label();
@@ -279,11 +279,20 @@ namespace LotTraceApp
             this.rdoTabNameItemCode = new System.Windows.Forms.RadioButton();
             this.rdoTabNameOrder = new System.Windows.Forms.RadioButton();
             this.btnLiquidScreen = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.check1 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.check2 = new System.Windows.Forms.CheckBox();
+            this.check3 = new System.Windows.Forms.CheckBox();
+            this.check4 = new System.Windows.Forms.CheckBox();
+            this.check5 = new System.Windows.Forms.CheckBox();
+            this.check6 = new System.Windows.Forms.CheckBox();
+            this.check7 = new System.Windows.Forms.CheckBox();
+            this.check8 = new System.Windows.Forms.CheckBox();
+            this.check10 = new System.Windows.Forms.CheckBox();
+            this.check9 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
-            this.TabPage1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridMiddle)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridEnd)).BeginInit();
@@ -326,40 +335,40 @@ namespace LotTraceApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView27)).BeginInit();
             this.SuspendLayout();
             // 
-            // TabPage1
+            // tabPage1
             // 
-            this.TabPage1.Controls.Add(this.rdoBackward);
-            this.TabPage1.Controls.Add(this.rdoForward);
-            this.TabPage1.Controls.Add(this.lblProductionOrderNumber);
-            this.TabPage1.Controls.Add(this.txtProductionOrderNumber);
-            this.TabPage1.Controls.Add(this.txtItemName);
-            this.TabPage1.Controls.Add(this.txtItemCode);
-            this.TabPage1.Controls.Add(this.txtLotNumber);
-            this.TabPage1.Controls.Add(this.lblItemName);
-            this.TabPage1.Controls.Add(this.lblItemCode);
-            this.TabPage1.Controls.Add(this.lblLotNumber);
-            this.TabPage1.Controls.Add(this.lblTargetPeriod);
-            this.TabPage1.Controls.Add(this.chkUseFrom);
-            this.TabPage1.Controls.Add(this.dtpFrom);
-            this.TabPage1.Controls.Add(this.lblTilde);
-            this.TabPage1.Controls.Add(this.dtpTo);
-            this.TabPage1.Controls.Add(this.btnClear);
-            this.TabPage1.Controls.Add(this.btnCsvOutput);
-            this.TabPage1.Controls.Add(this.btnTraceSearch);
-            this.TabPage1.Controls.Add(this.panelStartHeader);
-            this.TabPage1.Controls.Add(this.dataGridStart);
-            this.TabPage1.Controls.Add(this.panelMiddleHeader);
-            this.TabPage1.Controls.Add(this.dataGridMiddle);
-            this.TabPage1.Controls.Add(this.panelEndHeader);
-            this.TabPage1.Controls.Add(this.dataGridEnd);
-            this.TabPage1.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.TabPage1.Location = new System.Drawing.Point(4, 34);
-            this.TabPage1.Name = "TabPage1";
-            this.TabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPage1.Size = new System.Drawing.Size(1896, 902);
-            this.TabPage1.TabIndex = 0;
-            this.TabPage1.Text = "(01)_未設定";
-            this.TabPage1.UseVisualStyleBackColor = true;
+            this.tabPage1.Controls.Add(this.rdoBackward);
+            this.tabPage1.Controls.Add(this.rdoForward);
+            this.tabPage1.Controls.Add(this.lblProductionOrderNumber);
+            this.tabPage1.Controls.Add(this.txtProductionOrderNumber);
+            this.tabPage1.Controls.Add(this.txtItemName);
+            this.tabPage1.Controls.Add(this.txtItemCode);
+            this.tabPage1.Controls.Add(this.txtLotNumber);
+            this.tabPage1.Controls.Add(this.lblItemName);
+            this.tabPage1.Controls.Add(this.lblItemCode);
+            this.tabPage1.Controls.Add(this.lblLotNumber);
+            this.tabPage1.Controls.Add(this.lblTargetPeriod);
+            this.tabPage1.Controls.Add(this.chkUseFrom);
+            this.tabPage1.Controls.Add(this.dtpFrom);
+            this.tabPage1.Controls.Add(this.lblTilde);
+            this.tabPage1.Controls.Add(this.dtpTo);
+            this.tabPage1.Controls.Add(this.btnClear);
+            this.tabPage1.Controls.Add(this.btnCsvOutput);
+            this.tabPage1.Controls.Add(this.btnTraceSearch);
+            this.tabPage1.Controls.Add(this.panelStartHeader);
+            this.tabPage1.Controls.Add(this.dataGridStart);
+            this.tabPage1.Controls.Add(this.panelMiddleHeader);
+            this.tabPage1.Controls.Add(this.dataGridMiddle);
+            this.tabPage1.Controls.Add(this.panelEndHeader);
+            this.tabPage1.Controls.Add(this.dataGridEnd);
+            this.tabPage1.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabPage1.Location = new System.Drawing.Point(4, 34);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1896, 902);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "(01)_未設定";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // rdoBackward
             // 
@@ -524,7 +533,7 @@ namespace LotTraceApp
             this.btnTraceSearch.Size = new System.Drawing.Size(150, 50);
             this.btnTraceSearch.TabIndex = 22;
             this.btnTraceSearch.Text = "トレース検索";
-            this.btnTraceSearch.Click += new System.EventHandler(this.btnTraceSearch_Click);
+            this.btnTraceSearch.Click += new System.EventHandler(this.TraceSearch_FromAnyTab_Click);
             // 
             // panelStartHeader
             // 
@@ -585,7 +594,7 @@ namespace LotTraceApp
             // 
             // swichTab
             // 
-            this.swichTab.Controls.Add(this.TabPage1);
+            this.swichTab.Controls.Add(this.tabPage1);
             this.swichTab.Controls.Add(this.tabPage2);
             this.swichTab.Controls.Add(this.tabPage3);
             this.swichTab.Controls.Add(this.tabPage4);
@@ -888,7 +897,7 @@ namespace LotTraceApp
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage3.Size = new System.Drawing.Size(1896, 902);
             this.tabPage3.TabIndex = 5;
-            this.tabPage3.Text = "(01)_未設定";
+            this.tabPage3.Text = "(03)_未設定";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // radioButton3
@@ -2908,7 +2917,7 @@ namespace LotTraceApp
             // rdoTabNameItemCode
             // 
             this.rdoTabNameItemCode.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoTabNameItemCode.Location = new System.Drawing.Point(1389, 48);
+            this.rdoTabNameItemCode.Location = new System.Drawing.Point(1389, 31);
             this.rdoTabNameItemCode.Name = "rdoTabNameItemCode";
             this.rdoTabNameItemCode.Size = new System.Drawing.Size(110, 24);
             this.rdoTabNameItemCode.TabIndex = 1;
@@ -2918,7 +2927,7 @@ namespace LotTraceApp
             // 
             this.rdoTabNameOrder.Checked = true;
             this.rdoTabNameOrder.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoTabNameOrder.Location = new System.Drawing.Point(1389, 20);
+            this.rdoTabNameOrder.Location = new System.Drawing.Point(1389, 7);
             this.rdoTabNameOrder.Name = "rdoTabNameOrder";
             this.rdoTabNameOrder.Size = new System.Drawing.Size(110, 24);
             this.rdoTabNameOrder.TabIndex = 0;
@@ -2935,20 +2944,20 @@ namespace LotTraceApp
             this.btnLiquidScreen.Text = "液設備";
             this.btnLiquidScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
             // 
-            // checkBox1
+            // check1
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(12, 62);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 24;
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.check1.AutoSize = true;
+            this.check1.Location = new System.Drawing.Point(12, 71);
+            this.check1.Name = "check1";
+            this.check1.Size = new System.Drawing.Size(15, 14);
+            this.check1.TabIndex = 24;
+            this.check1.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.label1.Location = new System.Drawing.Point(1265, 21);
+            this.label1.Location = new System.Drawing.Point(1265, 10);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(106, 21);
             this.label1.TabIndex = 1;
@@ -2964,12 +2973,102 @@ namespace LotTraceApp
             this.label8.TabIndex = 1;
             this.label8.Text = "液設備ロットトレース";
             // 
+            // check2
+            // 
+            this.check2.AutoSize = true;
+            this.check2.Location = new System.Drawing.Point(184, 71);
+            this.check2.Name = "check2";
+            this.check2.Size = new System.Drawing.Size(15, 14);
+            this.check2.TabIndex = 24;
+            this.check2.UseVisualStyleBackColor = true;
+            // 
+            // check3
+            // 
+            this.check3.AutoSize = true;
+            this.check3.Location = new System.Drawing.Point(358, 71);
+            this.check3.Name = "check3";
+            this.check3.Size = new System.Drawing.Size(15, 14);
+            this.check3.TabIndex = 24;
+            this.check3.UseVisualStyleBackColor = true;
+            // 
+            // check4
+            // 
+            this.check4.AutoSize = true;
+            this.check4.Location = new System.Drawing.Point(527, 71);
+            this.check4.Name = "check4";
+            this.check4.Size = new System.Drawing.Size(15, 14);
+            this.check4.TabIndex = 24;
+            this.check4.UseVisualStyleBackColor = true;
+            // 
+            // check5
+            // 
+            this.check5.AutoSize = true;
+            this.check5.Location = new System.Drawing.Point(699, 71);
+            this.check5.Name = "check5";
+            this.check5.Size = new System.Drawing.Size(15, 14);
+            this.check5.TabIndex = 24;
+            this.check5.UseVisualStyleBackColor = true;
+            // 
+            // check6
+            // 
+            this.check6.AutoSize = true;
+            this.check6.Location = new System.Drawing.Point(871, 71);
+            this.check6.Name = "check6";
+            this.check6.Size = new System.Drawing.Size(15, 14);
+            this.check6.TabIndex = 24;
+            this.check6.UseVisualStyleBackColor = true;
+            // 
+            // check7
+            // 
+            this.check7.AutoSize = true;
+            this.check7.Location = new System.Drawing.Point(1042, 71);
+            this.check7.Name = "check7";
+            this.check7.Size = new System.Drawing.Size(15, 14);
+            this.check7.TabIndex = 24;
+            this.check7.UseVisualStyleBackColor = true;
+            // 
+            // check8
+            // 
+            this.check8.AutoSize = true;
+            this.check8.Location = new System.Drawing.Point(1212, 71);
+            this.check8.Name = "check8";
+            this.check8.Size = new System.Drawing.Size(15, 14);
+            this.check8.TabIndex = 24;
+            this.check8.UseVisualStyleBackColor = true;
+            // 
+            // check10
+            // 
+            this.check10.AutoSize = true;
+            this.check10.Location = new System.Drawing.Point(1560, 71);
+            this.check10.Name = "check10";
+            this.check10.Size = new System.Drawing.Size(15, 14);
+            this.check10.TabIndex = 24;
+            this.check10.UseVisualStyleBackColor = true;
+            // 
+            // check9
+            // 
+            this.check9.AutoSize = true;
+            this.check9.Location = new System.Drawing.Point(1389, 71);
+            this.check9.Name = "check9";
+            this.check9.Size = new System.Drawing.Size(15, 14);
+            this.check9.TabIndex = 24;
+            this.check9.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1920, 1024);
             this.Controls.Add(this.swichTab);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.check10);
+            this.Controls.Add(this.check9);
+            this.Controls.Add(this.check8);
+            this.Controls.Add(this.check7);
+            this.Controls.Add(this.check6);
+            this.Controls.Add(this.check5);
+            this.Controls.Add(this.check4);
+            this.Controls.Add(this.check3);
+            this.Controls.Add(this.check2);
+            this.Controls.Add(this.check1);
             this.Controls.Add(this.rdoTabNameItemCode);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label1);
@@ -2984,8 +3083,8 @@ namespace LotTraceApp
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "液設備ロットトレース";
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
-            this.TabPage1.ResumeLayout(false);
-            this.TabPage1.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridStart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridMiddle)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridEnd)).EndInit();
@@ -3043,7 +3142,7 @@ namespace LotTraceApp
         #endregion
         private System.Windows.Forms.Panel panelMiddleHeaderInner;
         private BindingSource bindingSource1;
-        private TabPage TabPage1;
+        private TabPage tabPage1;
         private Label lblProductionOrderNumber;
         private TextBox txtProductionOrderNumber;
         private TextBox txtItemName;
@@ -3075,7 +3174,7 @@ namespace LotTraceApp
         private RadioButton rdoBackward;
         private RadioButton rdoForward;
         private Button btnLiquidScreen;
-        private CheckBox checkBox1;
+        private CheckBox check1;
         private TabPage IntersectionTab;
         private Label label1;
         private TabPage tabPage2;
@@ -3304,5 +3403,14 @@ namespace LotTraceApp
         private DataGridView dataGridView26;
         private Panel panel27;
         private DataGridView dataGridView27;
+        private CheckBox check2;
+        private CheckBox check3;
+        private CheckBox check4;
+        private CheckBox check5;
+        private CheckBox check6;
+        private CheckBox check7;
+        private CheckBox check8;
+        private CheckBox check9;
+        private CheckBox check10;
     }
 }
