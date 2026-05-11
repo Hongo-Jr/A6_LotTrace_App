@@ -23,7 +23,7 @@ namespace LotTraceApp
         private readonly BottleTraceService _bottleService;
         private readonly ResultService _resultService;
 
-
+        ///
         // タブ番号 → トレース結果（交点検出・EXCEL出力用）
         private readonly Dictionary<int, TraceResult> _tabTraceResults =
             new Dictionary<int, TraceResult>();
