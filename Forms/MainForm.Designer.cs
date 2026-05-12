@@ -279,7 +279,6 @@ namespace LotTraceApp
             this.btnExcelOutput = new System.Windows.Forms.Button();
             this.rdoTabNameItemCode = new System.Windows.Forms.RadioButton();
             this.rdoTabNameOrder = new System.Windows.Forms.RadioButton();
-            this.btnLiquidScreen = new System.Windows.Forms.Button();
             this.check1 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -2898,7 +2897,7 @@ namespace LotTraceApp
             // btnBottleScreen
             // 
             this.btnBottleScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.btnBottleScreen.Location = new System.Drawing.Point(166, 14);
+            this.btnBottleScreen.Location = new System.Drawing.Point(10, 15);
             this.btnBottleScreen.Name = "btnBottleScreen";
             this.btnBottleScreen.Size = new System.Drawing.Size(150, 40);
             this.btnBottleScreen.TabIndex = 23;
@@ -2945,16 +2944,6 @@ namespace LotTraceApp
             this.rdoTabNameOrder.TabIndex = 0;
             this.rdoTabNameOrder.TabStop = true;
             this.rdoTabNameOrder.Text = "製造指図番号";
-            // 
-            // btnLiquidScreen
-            // 
-            this.btnLiquidScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.btnLiquidScreen.Location = new System.Drawing.Point(10, 15);
-            this.btnLiquidScreen.Name = "btnLiquidScreen";
-            this.btnLiquidScreen.Size = new System.Drawing.Size(150, 40);
-            this.btnLiquidScreen.TabIndex = 23;
-            this.btnLiquidScreen.Text = "液設備";
-            this.btnLiquidScreen.Click += new System.EventHandler(this.btnBottleTrace_Click);
             // 
             // check1
             // 
@@ -3087,7 +3076,6 @@ namespace LotTraceApp
             this.Controls.Add(this.rdoTabNameOrder);
             this.Controls.Add(this.btnExcelOutput);
             this.Controls.Add(this.btnDetectCrossPoints);
-            this.Controls.Add(this.btnLiquidScreen);
             this.Controls.Add(this.btnBottleScreen);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -3187,7 +3175,6 @@ namespace LotTraceApp
         private TabControl swichTab;
         private RadioButton rdoBackward;
         private RadioButton rdoForward;
-        private Button btnLiquidScreen;
         private CheckBox check1;
         private TabPage IntersectionTab;
         private DataGridView dataGridIntersection;

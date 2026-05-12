@@ -20,7 +20,6 @@ namespace LotTraceApp
         private void InitializeComponent()
         {
             this.btnBackToLiquid = new System.Windows.Forms.Button();
-            this.btnBottleScreen = new System.Windows.Forms.Button();
             this.bottoleIntersectionTab = new System.Windows.Forms.TabPage();
             this.dataGridIntersection = new System.Windows.Forms.DataGridView();
             this.tabBottolePage2 = new System.Windows.Forms.TabPage();
@@ -313,15 +312,7 @@ namespace LotTraceApp
             this.btnBackToLiquid.Size = new System.Drawing.Size(150, 40);
             this.btnBackToLiquid.TabIndex = 24;
             this.btnBackToLiquid.Text = "液設備";
-            // 
-            // btnBottleScreen
-            // 
-            this.btnBottleScreen.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.btnBottleScreen.Location = new System.Drawing.Point(170, 15);
-            this.btnBottleScreen.Name = "btnBottleScreen";
-            this.btnBottleScreen.Size = new System.Drawing.Size(150, 40);
-            this.btnBottleScreen.TabIndex = 25;
-            this.btnBottleScreen.Text = "瓶設備";
+            this.btnBackToLiquid.Click += new System.EventHandler(this.btnBackToLiquid_Click);
             // 
             // bottoleIntersectionTab
             // 
@@ -2849,7 +2840,6 @@ namespace LotTraceApp
             this.Controls.Add(this.bottoleTitle);
             this.Controls.Add(this.swichBottleTab);
             this.Controls.Add(this.btnBackToLiquid);
-            this.Controls.Add(this.btnBottleScreen);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "BottleTraceForm";
@@ -2905,7 +2895,6 @@ namespace LotTraceApp
 
         #endregion
         private Button btnBackToLiquid;
-        private Button btnBottleScreen;
         private TabPage bottoleIntersectionTab;
         private DataGridView dataGridIntersection;
         private TabPage tabBottolePage2;

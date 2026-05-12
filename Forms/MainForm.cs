@@ -3522,11 +3522,16 @@ namespace LotTraceApp
 
         private void btnBottleTrace_Click(object sender, EventArgs e)
         {
+            Hide();
+
             using (var form = new BottleTraceForm(_bottleService))
             {
                 form.ShowDialog(this);
             }
+            this.Show();
+            this.Activate();
         }
+
 
         #endregion
 

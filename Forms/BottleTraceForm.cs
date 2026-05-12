@@ -133,9 +133,14 @@ namespace LotTraceApp
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private void btnBackToLiquid_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
         /// <summary>
         /// [37] 液設備ボタン クリック時：液設備画面へ戻る
         /// </summary>
-       
+
     }
 }
