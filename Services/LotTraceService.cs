@@ -541,8 +541,6 @@ namespace LotTraceApp.Services
         
         #endregion
 
-
-
         #region 表示結果変換・グリッド出力
 
         private sealed class DisplayLaneNode
@@ -1321,8 +1319,7 @@ namespace LotTraceApp.Services
         }
 
         #endregion
-
-      
+              
         #region 交点検出（仕様書 7.3）
 
         /// <summary>
@@ -1464,8 +1461,7 @@ namespace LotTraceApp.Services
         }
 
         #endregion
-
-        
+                
         #region 品目名解決
 
 
@@ -1527,14 +1523,6 @@ namespace LotTraceApp.Services
             }
         }
         #endregion
-
-
-        
-        
-
-        
-
-
 
         #region 表示レーンから経路行への変換
 
@@ -2534,8 +2522,6 @@ namespace LotTraceApp.Services
         
 
         #endregion
-
-
 
         #region フォワード表示レーン構築
 
