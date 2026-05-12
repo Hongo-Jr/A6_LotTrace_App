@@ -59,7 +59,7 @@ namespace LotTraceApp
             var liquidService = new LotTraceService(liquidRepo, customerItemRepo);
 
             var resultRepo = new ResultRepositories(connLiquid);
-            var resultService = new ResultService(resultRepo, customerItemRepo);
+            var resultService = new ResultService(resultRepo);
             
             var bottleRepo = new BottleTraceRepository(connBottle);
             var bottleService = new BottleTraceService(bottleRepo);

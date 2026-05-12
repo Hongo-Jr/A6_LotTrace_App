@@ -2137,30 +2137,6 @@ namespace LotTraceApp
 
 
 
-        private string GetPathKeyFromBoundRow(DataGridView grid, int rowIndex)
-        {
-            if (grid == null)
-                return null;
-
-            if (rowIndex < 0 || rowIndex >= grid.Rows.Count)
-                return null;
-
-            var boundItem = grid.Rows[rowIndex].DataBoundItem as DataRowView;
-            if (boundItem == null)
-                return null;
-
-            if (!boundItem.Row.Table.Columns.Contains("PathKey"))
-                return null;
-
-            object value = boundItem.Row["PathKey"];
-            if (value == null || value == DBNull.Value)
-                return null;
-
-            string pathKey = value.ToString();
-            return string.IsNullOrWhiteSpace(pathKey) ? null : pathKey;
-        }
-
-
         private Color GetColorFromKey(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -2472,41 +2448,6 @@ namespace LotTraceApp
                 Visible = false
             });
 
-            grid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = p + "ParentKey",
-                DataPropertyName = p + "ParentKey",
-                Visible = false
-            });
-
-            grid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = p + "DisplayParentNodeKey",
-                DataPropertyName = p + "DisplayParentNodeKey",
-                Visible = false
-            });
-
-            grid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = p + "IncomingLinkKey",
-                DataPropertyName = p + "IncomingLinkKey",
-                Visible = false
-            });
-
-            grid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = p + "UpstreamPathKey",
-                DataPropertyName = p + "UpstreamPathKey",
-                Visible = false
-            });
-
-            grid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                Name = p + "DownstreamPathKey",
-                DataPropertyName = p + "DownstreamPathKey",
-                Visible = false
-            });
-
             // 表示列
             grid.Columns.Add(new DataGridViewTextBoxColumn()
             {
@@ -2584,41 +2525,6 @@ namespace LotTraceApp
                 {
                     Name = prefix + "NodeKey",
                     DataPropertyName = prefix + "NodeKey",
-                    Visible = false
-                });
-
-                grid.Columns.Add(new DataGridViewTextBoxColumn()
-                {
-                    Name = prefix + "ParentKey",
-                    DataPropertyName = prefix + "ParentKey",
-                    Visible = false
-                });
-
-                grid.Columns.Add(new DataGridViewTextBoxColumn()
-                {
-                    Name = prefix + "DisplayParentNodeKey",
-                    DataPropertyName = prefix + "DisplayParentNodeKey",
-                    Visible = false
-                });
-
-                grid.Columns.Add(new DataGridViewTextBoxColumn()
-                {
-                    Name = prefix + "IncomingLinkKey",
-                    DataPropertyName = prefix + "IncomingLinkKey",
-                    Visible = false
-                });
-
-                grid.Columns.Add(new DataGridViewTextBoxColumn()
-                {
-                    Name = prefix + "UpstreamPathKey",
-                    DataPropertyName = prefix + "UpstreamPathKey",
-                    Visible = false
-                });
-
-                grid.Columns.Add(new DataGridViewTextBoxColumn()
-                {
-                    Name = prefix + "DownstreamPathKey",
-                    DataPropertyName = prefix + "DownstreamPathKey",
                     Visible = false
                 });
 

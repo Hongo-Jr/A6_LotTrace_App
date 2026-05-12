@@ -39,24 +39,6 @@ namespace LotTraceApp.Services
         private ForwardDisplayLaneBuildResult _currentForwardLaneBuildResult;
         private Dictionary<string, List<BackwardParentCandidate>> _currentBackwardCandidatesByChildNodeKey;
         private Dictionary<string, List<ChildCandidate>> _currentForwardCandidatesByParentNodeKey;
-        private sealed class ForwardChildBundle
-        {
-            public int Level { get; set; }
-            public string LotKey { get; set; }
-            public string ParentMergeKey { get; set; }
-
-            public List<ChildCandidate> Members { get; private set; }
-
-            public ChildCandidate Representative { get; set; }
-
-            public ForwardChildBundle()
-            {
-                Members = new List<ChildCandidate>();
-            }
-        }
-
-        
-
         public LotTraceService(LotTraceRepository repo, ICustomerItemMasterRepository customerItemMasterRepository)
         {
             if (repo == null) throw new ArgumentNullException("repo");
@@ -120,17 +102,7 @@ namespace LotTraceApp.Services
                 var row = new TraceDisplayRow
                 {
                     DisplayOrder = rowIndex,
-                    RootGroupKey = pathRow.RootGroupKey,
-                    RootNodeKey = pathRow.StartNode.NodeIdentityKey,
-                    PathKey = BuildPathKey(pathRow),
                     RouteSystem = ResolveRouteSystem(pathRow),
-                    StartTrunkGroupKey = pathRow.StartTrunkGroupKey,
-                    StartTrunkOrder = pathRow.StartTrunkOrder,
-                    FullPathSignature = pathRow.FullPathSignature,
-
-                    LotTraceKey = pathRow == null ? null : BuildLotTraceKey(pathRow),
-                    UpstreamLotOnlyKey = pathRow == null ? null : BuildUpstreamLotOnlyKey(pathRow),
-
                     IsDisplayTarget = true,
                     SuppressReason = null
                 };
@@ -167,8 +139,6 @@ namespace LotTraceApp.Services
                     endNodeIndex);
 
                 // Startグループ情報を引き継ぐ
-                row.StartRowOrderInGroup = pathRow.PathOrder;
-                row.IsFirstRowOfStartGroup = false;
                 row.IsLastRowOfStartGroup = false;
 
                 // Lotグループ情報もそのまま引き継ぐ
@@ -284,869 +254,6 @@ namespace LotTraceApp.Services
 
             return result;
         }
-
-
-        private string BuildStartTrunkGroupKey(ProductionResultNode startNode)
-        {
-            if (startNode == null)
-                return null;
-
-            // Lot優先
-            if (!string.IsNullOrWhiteSpace(startNode.LotNumber))
-            {
-                return "STARTLOT|" + startNode.LotNumber.Trim().ToUpperInvariant();
-            }
-
-            // fallback: NodeMergeKey
-            string mergeKey = startNode.NodeIdentityKey;
-            if (!string.IsNullOrWhiteSpace(mergeKey))
-            {
-                return "STARTNODE|" + mergeKey;
-            }
-
-            return null;
-        }
-
-        private sealed class DisplayLaneNode
-        {
-            public string DisplayNodeKey { get; set; }
-            public string MergeKey { get; set; }
-            public string ParentDisplayNodeKey { get; set; }
-
-            public ProductionResultNode SourceNode { get; set; }
-
-            // 論理座標
-            public int XLevel { get; set; }
-            public int YLane { get; set; }
-            public int ChildIndex { get; set; }
-
-            // 既存：内部計算用として当面残す
-            public int SubtreeLaneSpan { get; set; }
-
-            // 追加：意味を明示した高さ・占有情報
-            public int RootGroupHeight { get; set; }     // 同一始点LotグループのLv0高さ
-            public int ChildBranchHeight { get; set; }   // このNode直下の子枝総高さ
-            public int OccupiedFirstY { get; set; }      // このNode起点の占有開始Y
-            public int OccupiedLastY { get; set; }       // このNode起点の占有終了Y
-
-            public List<DisplayLaneEdge> OutgoingEdges { get; private set; }
-            public bool IsLotGroupRepresentative { get; set; }
-            public bool IsLotGroupNonRepresentative { get; set; }
-
-            public string LotGroupKey { get; set; }
-            public string RepresentativeNodeKey { get; set; }
-
-
-            public DisplayLaneNode()
-            {
-                OutgoingEdges = new List<DisplayLaneEdge>();
-
-                SubtreeLaneSpan = 1;
-
-                RootGroupHeight = 1;
-                ChildBranchHeight = 0;
-                OccupiedFirstY = -1;
-                OccupiedLastY = -1;
-            }
-        }
-
-        private sealed class DisplayLaneEdge
-        {
-            public string EdgeIdentityKey { get; set; }
-
-            public string ParentDisplayNodeKey { get; set; }
-            public string ChildDisplayNodeKey { get; set; }
-
-            public string ParentMergeKey { get; set; }
-            public string ChildMergeKey { get; set; }
-
-            public int FromXLevel { get; set; }
-            public int ToXLevel { get; set; }
-
-            public int FromYLane { get; set; }
-            public int ToYLane { get; set; }
-
-            public int ChildIndex { get; set; }
-            public string LotGroupKey { get; set; }
-
-            // 将来拡張用
-            public List<List<string>> EdgeContextMatrix { get; private set; }
-
-            public DisplayLaneEdge()
-            {
-                EdgeContextMatrix = new List<List<string>>();
-            }
-        }
-
-
-        private DataTable BuildDisplayTableFromDisplayResult(
-            TraceDisplayResult displayResult,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var table = new DataTable();
-
-            if (displayResult == null)
-                return table;
-
-            int maxMiddleDepth = displayResult.MaxMiddleDepth < 0
-                ? 0
-                : displayResult.MaxMiddleDepth;
-
-            AddDisplayTableCommonColumns(table);
-            AddDisplayTableStartColumns(table);
-
-            for (int level = 1; level <= maxMiddleDepth; level++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                AddDisplayTableMiddleColumns(table, level);
-            }
-
-            AddDisplayTableEndColumns(table);
-
-            if (displayResult.Rows == null || displayResult.Rows.Count == 0)
-                return table;
-
-            for (int rowIndex = 0; rowIndex < displayResult.Rows.Count; rowIndex++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var displayRow = displayResult.Rows[rowIndex];
-                if (displayRow == null)
-                    continue;
-
-                var dr = table.NewRow();
-
-                FillDisplayTableCommonColumns(dr, displayRow, rowIndex);
-                FillDisplayTableStartColumns(dr, displayRow.Start);
-
-                for (int level = 1; level <= maxMiddleDepth; level++)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var middleCell = GetMiddleCell(displayRow, level);
-                    FillDisplayTableMiddleColumns(dr, level, middleCell);
-                }
-
-                FillDisplayTableEndColumns(dr, displayRow.End);
-
-                table.Rows.Add(dr);
-            }
-
-            return table;
-        }
-
-        private void AddDisplayTableCommonColumns(DataTable table)
-        {
-            if (table == null)
-                return;
-
-            table.Columns.Add("RowIndex", typeof(int));
-            table.Columns.Add("DisplayOrder", typeof(int));
-
-            table.Columns.Add("RootGroupKey", typeof(string));
-            table.Columns.Add("RootNodeKey", typeof(string));
-            table.Columns.Add("PathKey", typeof(string));
-            table.Columns.Add("RouteSystem", typeof(string));
-
-            table.Columns.Add("StartTrunkGroupKey", typeof(string));
-            table.Columns.Add("StartTrunkOrder", typeof(int));
-            table.Columns.Add("StartRowOrderInGroup", typeof(int));
-            table.Columns.Add("IsFirstRowOfStartGroup", typeof(bool));
-            table.Columns.Add("IsLastRowOfStartGroup", typeof(bool));
-
-            table.Columns.Add("IsFirstRowOfRootGroup", typeof(bool));
-            table.Columns.Add("IsLastRowOfRootGroup", typeof(bool));
-
-            table.Columns.Add("FullPathSignature", typeof(string));
-            table.Columns.Add("LotTraceKey", typeof(string));
-            table.Columns.Add("UpstreamLotOnlyKey", typeof(string));
-
-            table.Columns.Add("IsDisplayTarget", typeof(bool));
-            table.Columns.Add("SuppressReason", typeof(string));
-            table.Columns.Add("IsPruned", typeof(bool));
-            table.Columns.Add("PruneReason", typeof(string));
-        }
-
-        private void AddDisplayTableStartColumns(DataTable table)
-        {
-            if (table == null)
-                return;
-
-            table.Columns.Add("Start_Exists", typeof(bool));
-
-            table.Columns.Add("Start_NodeKey", typeof(string));
-            table.Columns.Add("Start_MasterKey", typeof(string));
-            table.Columns.Add("Start_ParentKey", typeof(string));
-            table.Columns.Add("Start_DisplayParentNodeKey", typeof(string));
-            table.Columns.Add("Start_IncomingLinkKey", typeof(string));
-            table.Columns.Add("Start_UpstreamPathKey", typeof(string));
-            table.Columns.Add("Start_DownstreamPathKey", typeof(string));
-
-            table.Columns.Add("Start_Order", typeof(string));
-            table.Columns.Add("Start_Lot", typeof(string));
-            table.Columns.Add("Start_ItemCode", typeof(string));
-            table.Columns.Add("Start_ItemName", typeof(string));
-            table.Columns.Add("Start_StartTime", typeof(string));
-            table.Columns.Add("Start_StartDateLabel", typeof(string));
-            table.Columns.Add("Start_Weight", typeof(decimal));
-
-            table.Columns.Add("Start_LotGroupKey", typeof(string));
-            table.Columns.Add("Start_IsRepresentativeInLotGroup", typeof(bool));
-            table.Columns.Add("Start_BranchSignature", typeof(string));
-        }
-
-
-        private void AddDisplayTableMiddleColumns(DataTable table, int level)
-        {
-            if (table == null || level <= 0)
-                return;
-
-            string prefix = "Lv" + level + "_";
-
-            table.Columns.Add(prefix + "Exists", typeof(bool));
-
-            table.Columns.Add(prefix + "NodeKey", typeof(string));
-            table.Columns.Add(prefix + "MasterKey", typeof(string));
-            table.Columns.Add(prefix + "ParentKey", typeof(string));
-            table.Columns.Add(prefix + "DisplayParentNodeKey", typeof(string));
-            table.Columns.Add(prefix + "IncomingLinkKey", typeof(string));
-            table.Columns.Add(prefix + "UpstreamPathKey", typeof(string));
-            table.Columns.Add(prefix + "DownstreamPathKey", typeof(string));
-
-            table.Columns.Add(prefix + "Order", typeof(string));
-            table.Columns.Add(prefix + "Lot", typeof(string));
-            table.Columns.Add(prefix + "ItemCode", typeof(string));
-            table.Columns.Add(prefix + "ItemName", typeof(string));
-            table.Columns.Add(prefix + "StartTime", typeof(string));
-            table.Columns.Add(prefix + "StartDateLabel", typeof(string));
-            table.Columns.Add(prefix + "Weight", typeof(decimal));
-
-            table.Columns.Add(prefix + "LotGroupKey", typeof(string));
-            table.Columns.Add(prefix + "IsRepresentativeInLotGroup", typeof(bool));
-            table.Columns.Add(prefix + "BranchSignature", typeof(string));
-        }
-
-        private void AddDisplayTableEndColumns(DataTable table)
-        {
-            if (table == null)
-                return;
-
-            table.Columns.Add("End_Exists", typeof(bool));
-
-            table.Columns.Add("End_NodeKey", typeof(string));
-            table.Columns.Add("End_MasterKey", typeof(string));
-            table.Columns.Add("End_ParentKey", typeof(string));
-            table.Columns.Add("End_DisplayParentNodeKey", typeof(string));
-            table.Columns.Add("End_IncomingLinkKey", typeof(string));
-            table.Columns.Add("End_UpstreamPathKey", typeof(string));
-            table.Columns.Add("End_DownstreamPathKey", typeof(string));
-
-            table.Columns.Add("End_Order", typeof(string));
-            table.Columns.Add("End_Lot", typeof(string));
-            table.Columns.Add("End_ItemCode", typeof(string));
-            table.Columns.Add("End_ItemName", typeof(string));
-            table.Columns.Add("End_StartTime", typeof(string));
-            table.Columns.Add("End_StartDateLabel", typeof(string));
-            table.Columns.Add("End_Weight", typeof(decimal));
-
-            table.Columns.Add("End_LotGroupKey", typeof(string));
-            table.Columns.Add("End_IsRepresentativeInLotGroup", typeof(bool));
-            table.Columns.Add("End_BranchSignature", typeof(string));
-
-            // ★追加
-            table.Columns.Add("End_IsDuplicate", typeof(bool));
-            table.Columns.Add("End_DuplicateDisplayGroupIndex", typeof(int));
-        }
-
-        private void FillDisplayTableCommonColumns(DataRow row, TraceDisplayRow displayRow, int rowIndex)
-        {
-            if (row == null || displayRow == null)
-                return;
-
-            row["RowIndex"] = rowIndex;
-            row["DisplayOrder"] = displayRow.DisplayOrder;
-
-            SetValue(row, "RootGroupKey", displayRow.RootGroupKey);
-            SetValue(row, "RootNodeKey", displayRow.RootNodeKey);
-            SetValue(row, "PathKey", displayRow.PathKey);
-            SetValue(row, "RouteSystem", displayRow.RouteSystem);
-
-            SetValue(row, "StartTrunkGroupKey", displayRow.StartTrunkGroupKey);
-            row["StartTrunkOrder"] = displayRow.StartTrunkOrder;
-            row["StartRowOrderInGroup"] = displayRow.StartRowOrderInGroup;
-            row["IsFirstRowOfStartGroup"] = displayRow.IsFirstRowOfStartGroup;
-            row["IsLastRowOfStartGroup"] = displayRow.IsLastRowOfStartGroup;
-
-            row["IsFirstRowOfRootGroup"] = displayRow.IsFirstRowOfRootGroup;
-            row["IsLastRowOfRootGroup"] = displayRow.IsLastRowOfRootGroup;
-
-            SetValue(row, "FullPathSignature", displayRow.FullPathSignature);
-            SetValue(row, "LotTraceKey", displayRow.LotTraceKey);
-            SetValue(row, "UpstreamLotOnlyKey", displayRow.UpstreamLotOnlyKey);
-
-            row["IsDisplayTarget"] = displayRow.IsDisplayTarget;
-            SetValue(row, "SuppressReason", displayRow.SuppressReason);
-            row["IsPruned"] = displayRow.IsPruned;
-            SetValue(row, "PruneReason", displayRow.PruneReason);
-        }
-
-        private void FillDisplayTableStartColumns(DataRow row, TraceDisplayCell cell)
-        {
-            FillDisplayTableCell(row, "Start_", cell);
-        }
-
-        private void FillDisplayTableMiddleColumns(DataRow row, int level, TraceDisplayCell cell)
-        {
-            FillDisplayTableCell(row, "Lv" + level + "_", cell);
-        }
-
-        private void FillDisplayTableEndColumns(DataRow row, TraceDisplayCell cell)
-        {
-            FillDisplayTableCell(row, "End_", cell);
-
-            if (row == null || cell == null)
-                return;
-
-            row["End_IsDuplicate"] = cell.EndIsDuplicate;
-            SetValue(row, "End_DuplicateDisplayGroupIndex", cell.EndDuplicateDisplayGroupIndex);
-        }
-
-        private void FillDisplayTableCell(DataRow row, string prefix, TraceDisplayCell cell)
-        {
-            if (row == null || string.IsNullOrWhiteSpace(prefix))
-                return;
-
-            bool exists = cell != null;
-            row[prefix + "Exists"] = exists;
-
-            if (!exists)
-            {
-                return;
-            }
-
-            SetValue(row, prefix + "NodeKey", cell.NodeKey);
-            SetValue(row, prefix + "MasterKey", cell.MasterKey);
-            SetValue(row, prefix + "ParentKey", cell.ParentKey);
-            SetValue(row, prefix + "DisplayParentNodeKey", cell.DisplayParentNodeKey);
-            SetValue(row, prefix + "IncomingLinkKey", cell.IncomingLinkKey);
-            SetValue(row, prefix + "UpstreamPathKey", cell.UpstreamPathKey);
-            SetValue(row, prefix + "DownstreamPathKey", cell.DownstreamPathKey);
-
-            SetValue(row, prefix + "Order", cell.ProductionOrderNumber);
-            SetValue(row, prefix + "Lot", cell.LotNumber);
-            SetValue(row, prefix + "ItemCode", cell.ItemCode);
-            SetValue(row, prefix + "ItemName", cell.ItemName);
-
-            if (cell.StartDate.HasValue)
-            {
-                row[prefix + "StartTime"] = cell.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss");
-            }
-            else if(!cell.StartDate.HasValue)
-            {
-                row[prefix + "StartTime"] = cell.StartDateLabel;
-            }
-
-            SetValue(row, prefix + "StartDateLabel", cell.StartDateLabel);
-
-            if (cell.Weight.HasValue)
-            {
-                row[prefix + "Weight"] = cell.Weight.Value;
-            }
-
-            SetValue(row, prefix + "LotGroupKey", cell.LotGroupKey);
-            row[prefix + "IsRepresentativeInLotGroup"] = cell.IsRepresentativeInLotGroup;
-            SetValue(row, prefix + "BranchSignature", cell.BranchSignature);
-        }
-
-        private void SetValue(DataRow row, string columnName, object value)
-        {
-            if (row == null || row.Table == null)
-                return;
-
-            if (string.IsNullOrWhiteSpace(columnName))
-                return;
-
-            if (!row.Table.Columns.Contains(columnName))
-                return;
-
-            row[columnName] = value ?? DBNull.Value;
-        }
-
-
-        private TraceDisplayCell GetMiddleCell(TraceDisplayRow row, int level)
-        {
-            if (row == null)
-                return null;
-
-            if (level <= 0)
-                return null;
-
-            if (row.Middles == null)
-                return null;
-
-            int index = level - 1;
-            if (index < 0 || index >= row.Middles.Count)
-                return null;
-
-            return row.Middles[index];
-        }
-
-
-        private void AppendNodeAndLot(List<string> parts, ProductionResultNode node, bool isEnd = false)
-        {
-            if (parts == null || node == null)
-                return;
-
-            // ------------------------------------------------------------
-            // 1) Node表現
-            // ------------------------------------------------------------
-            string nodePart;
-            if (IsBSystemNode(node))
-            {
-                // B系統：Node ID = MasterKey
-                nodePart = "N|B|" + Safe(node.ControlMasterKey);
-            }
-            else
-            {
-                // A系統：Node ID = MasterKey + SlotNo
-                int slotNo = GetASlotNumber(node);
-                string slotPart = slotNo > 0 ? slotNo.ToString() : "?";
-
-                nodePart = "N|A|" + Safe(node.ControlMasterKey) + "|S" + slotPart;
-            }
-
-            parts.Add(nodePart);
-
-            // ------------------------------------------------------------
-            // 2) Lot接続表現
-            // ------------------------------------------------------------
-            string lot = NormalizeLot(node.LotNumber);
-            if (!string.IsNullOrEmpty(lot))
-            {
-                parts.Add("L|" + lot);
-                return;
-            }
-
-            // ------------------------------------------------------------
-            // 3) Lotなし表現
-            // ------------------------------------------------------------
-            if (node.IsTraceTerminal)
-            {
-                parts.Add(isEnd ? "END|NO_LOT|T" : "NO_LOT|T");
-                return;
-            }
-
-            if (isEnd)
-            {
-                parts.Add("END|NO_LOT");
-            }
-        }
-
-        private string NormalizeLot(string lot)
-        {
-            if (string.IsNullOrWhiteSpace(lot))
-                return null;
-
-            return lot.Trim();
-        }
-
-        private string Safe(string value)
-        {
-            return string.IsNullOrWhiteSpace(value) ? "?" : value.Trim();
-        }
-
-        private bool IsBSystemNode(ProductionResultNode node)
-        {
-            if (node == null)
-                return false;
-
-            return string.Equals(node.RouteSystem, "B", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private int GetASlotNumber(ProductionResultNode node)
-        {
-            if (node == null)
-                return 0;
-
-            return node.InputSlotNo ?? 0;
-        }
-
-        private TraceDisplayCell CreateDisplayCell(
-    TracePathRow pathRow,
-    ProductionResultNode node,
-    TraceDisplayColumnKind columnKind,
-    int level,
-    int nodeIndexInPath)
-        {
-            if (node == null)
-                return null;
-
-            var lotGroupInfo = FindLotGroupInfo(pathRow, columnKind, level);
-
-            return new TraceDisplayCell
-            {
-                // DAG上の元Node
-                Node = node,
-
-                // 表示キー
-                MasterKey = node.ControlMasterKey,
-                NodeKey = node.NodeIdentityKey,
-
-                // 旧互換
-                ParentKey = GetParentKeyFromPathRow(pathRow, nodeIndexInPath),
-                ParentMasterKey = node.ParentMasterKey,
-
-                // 線描画・経路識別
-                DisplayParentNodeKey = GetDisplayParentNodeKeyFromPathRow(pathRow, nodeIndexInPath),
-                IncomingLinkKey = GetIncomingLinkKeyFromPathRow(pathRow, nodeIndexInPath),
-                UpstreamPathKey = GetUpstreamPathKeyFromPathRow(pathRow, nodeIndexInPath),
-                DownstreamPathKey = GetDownstreamPathKeyFromPathRow(pathRow, nodeIndexInPath),
-
-                // 座標情報
-                ColumnKind = columnKind,
-                Level = level,
-
-                // 表示値
-                ProductionOrderNumber = node.ProductionOrderNumber,
-                LotNumber = node.LotNumber,
-                ItemCode = node.ItemCode,
-                ItemName = node.ItemName,
-                StartDate = node.StartDate,
-                StartDateLabel = node.StartDateLabel,
-                Weight = node.Weight.HasValue ? (decimal?)Convert.ToDecimal(node.Weight.Value) : null,
-
-                // フォワードLotグループ情報
-                LotGroupKey = lotGroupInfo == null ? null : lotGroupInfo.GroupKey,
-                IsRepresentativeInLotGroup = lotGroupInfo != null && lotGroupInfo.IsRepresentative,
-                BranchSignature = lotGroupInfo == null ? null : lotGroupInfo.DownstreamBranchSignature,
-
-                // End重複表示情報
-                EndIsDuplicate =
-                    columnKind == TraceDisplayColumnKind.End &&
-                    pathRow != null &&
-                    pathRow.EndIsDuplicate,
-
-                EndDuplicateDisplayGroupIndex =
-                    columnKind == TraceDisplayColumnKind.End && pathRow != null
-                        ? pathRow.EndDuplicateDisplayGroupIndex
-                        : null,
-
-                // 表示対象
-                IsVisible = true,
-                SuppressReason = null
-            };
-        }
-
-        
-        private TraceLotGroupInfo FindLotGroupInfo(TracePathRow pathRow, TraceDisplayColumnKind columnKind, int level)
-        {
-            if (pathRow == null || pathRow.LevelLotGroups == null || pathRow.LevelLotGroups.Count == 0)
-                return null;
-
-            if (columnKind == TraceDisplayColumnKind.Start)
-            {
-                return pathRow.LevelLotGroups
-                    .FirstOrDefault(g => g != null && g.Axis == TraceGroupAxis.Start && g.Level == 0);
-            }
-
-            if (columnKind == TraceDisplayColumnKind.Middle)
-            {
-                return pathRow.LevelLotGroups
-                    .FirstOrDefault(g => g != null && g.Axis == TraceGroupAxis.Middle && g.Level == level);
-            }
-
-            return null;
-        }
-
-        private List<TracePathRow> MergeSortByStartExists(List<TracePathRow> source)
-        {
-            if (source == null)
-                return new List<TracePathRow>();
-
-            if (source.Count <= 1)
-                return new List<TracePathRow>(source);
-
-            int mid = source.Count / 2;
-
-            var left = MergeSortByStartExists(source.GetRange(0, mid));
-            var right = MergeSortByStartExists(source.GetRange(mid, source.Count - mid));
-
-            return MergeByStartExists(left, right);
-        }
-
-        private List<TracePathRow> MergeByStartExists(List<TracePathRow> left, List<TracePathRow> right)
-        {
-            var result = new List<TracePathRow>(left.Count + right.Count);
-
-            int i = 0;
-            int j = 0;
-
-            while (i < left.Count && j < right.Count)
-            {
-                int leftValue = GetStartExistsSortValue(left[i]);
-                int rightValue = GetStartExistsSortValue(right[j]);
-
-                if (leftValue <= rightValue)
-                {
-                    result.Add(left[i]);
-                    i++;
-                }
-                else
-                {
-                    result.Add(right[j]);
-                    j++;
-                }
-            }
-
-            while (i < left.Count)
-            {
-                result.Add(left[i]);
-                i++;
-            }
-
-            while (j < right.Count)
-            {
-                result.Add(right[j]);
-                j++;
-            }
-
-            return result;
-        }
-
-        private int GetStartExistsSortValue(TracePathRow row)
-        {
-            // 実体ありを上にする
-            return (row != null && row.StartNode != null) ? 0 : 1;
-        }
-
-        
-        private void BuildPathRowsRecursiveCore(
-    List<TracePathRow> pathRows,
-    ProductionResultNode node,
-    string rootGroupKey,
-    List<ProductionResultNode> currentPathNodes,
-    List<ProductionResultLink> currentPathLinks,
-    HashSet<string> visitedLinks)
-        {
-            if (pathRows == null || node == null)
-                return;
-
-            currentPathNodes.Add(node);
-
-            var outgoingLinks = node.ChildLinks == null
-                ? new List<ProductionResultLink>()
-                : node.ChildLinks
-                    .Where(l => l != null
-                             && l.ParentNode != null
-                             && l.ChildNode != null
-                             && object.ReferenceEquals(l.ParentNode, node))
-                    .ToList();
-
-            if (outgoingLinks.Count == 0)
-            {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
-
-                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
-
-                pathRows.Add(pathRow); // ← ここ変更
-
-                currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
-                return;
-            }
-
-            foreach (var link in outgoingLinks)
-            {
-                string linkKey = GetPathLinkKey(link);
-
-                if (string.IsNullOrWhiteSpace(linkKey))
-                    continue;
-
-                if (visitedLinks.Contains(linkKey))
-                    continue;
-
-                visitedLinks.Add(linkKey);
-                currentPathLinks.Add(link);
-
-                BuildPathRowsRecursiveCore(
-                    pathRows,
-                    link.ChildNode,
-                    rootGroupKey,
-                    currentPathNodes,
-                    currentPathLinks,
-                    visitedLinks);
-
-                currentPathLinks.RemoveAt(currentPathLinks.Count - 1);
-                visitedLinks.Remove(linkKey);
-            }
-
-            currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
-        }
-
-        private void BuildPathRowsRecursive(
-    TraceResult result,
-    ProductionResultNode node,
-    string rootGroupKey,
-    List<ProductionResultNode> currentPathNodes,
-    List<ProductionResultLink> currentPathLinks,
-    HashSet<string> visitedLinks)
-        {
-            if (result == null || node == null)
-                return;
-
-            currentPathNodes.Add(node);
-
-            var outgoingLinks = node.ChildLinks == null
-                ? new List<ProductionResultLink>()
-                : node.ChildLinks
-                    .Where(l => l != null
-                             && l.ParentNode != null
-                             && l.ChildNode != null
-                             && object.ReferenceEquals(l.ParentNode, node))
-                    .ToList();
-
-            
-
-            if (outgoingLinks.Count == 0)
-            {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
-
-                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
-                result.PathRows.Add(pathRow);
-
-                currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
-                return;
-            }
-
-            bool traversedAnyChild = false;
-
-            foreach (var link in outgoingLinks)
-            {
-                string linkKey = GetPathLinkKey(link);
-
-                if (string.IsNullOrWhiteSpace(linkKey))
-                {
-                    continue;
-                }
-
-                if (visitedLinks.Contains(linkKey))
-                {
-                   continue;
-                }
-
-                visitedLinks.Add(linkKey);
-                currentPathLinks.Add(link);          
-                traversedAnyChild = true;
-
-                BuildPathRowsRecursive(
-                    result,
-                    link.ChildNode,
-                    rootGroupKey,
-                    currentPathNodes,
-                    currentPathLinks,
-                    visitedLinks);
-
-                currentPathLinks.RemoveAt(currentPathLinks.Count - 1);
-                visitedLinks.Remove(linkKey);
-
-            }
-
-            if (!traversedAnyChild)
-            {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
-
-                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
-                result.PathRows.Add(pathRow);
-            }
-
-            currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
-        }
-
-        /// <summary>
-        /// 手投入表示補完メソッド。今はトレースバックだけだけど、後でフォワードにも適用
-        /// </summary>
-        /// <param name="displayNodes"></param>
-        private void ResolveStartDateLabelsForDisplayLaneNodes(List<DisplayLaneNode> displayNodes)
-        {
-            if (displayNodes == null || displayNodes.Count == 0)
-                return;
-
-            foreach (var displayNode in displayNodes)
-            {
-                if (displayNode == null || displayNode.SourceNode == null)
-                    continue;
-
-                var node = displayNode.SourceNode;
-
-                // 既に表示ラベルが入っているものは尊重
-                if (!string.IsNullOrWhiteSpace(node.StartDateLabel))
-                    continue;
-
-                // 開始日時があるなら表示ラベル補完は不要
-                if (node.StartDate.HasValue)
-                    continue;
-
-                // A系(MaterialTableA相当)の開始日時なしは「補完」
-                if (string.Equals(node.RouteSystem, "A", StringComparison.OrdinalIgnoreCase))
-                {
-                    switch (node.InputSourceType)
-                    {
-                        case "ManualInput":
-                            node.StartDateLabel = "手投入";
-                            break;
-                        case "Drumcan":
-                            node.StartDateLabel = "ドラム缶";
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// TraceFowardで暫定で使う。
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="candidate"></param>
-        /// <returns></returns>
-        private string ResolveStartDateLabel(ProductionResultNode node, ChildCandidate candidate)
-        {
-            if (node == null)
-                return null;
-
-            if (!string.IsNullOrWhiteSpace(node.StartDateLabel))
-                return node.StartDateLabel;
-
-            if (node.RouteSystem != "A")
-                return null;
-
-            return node.StartDate.HasValue ? null : "手投入";
-        }
-
-
-        
-        private void EnsureNodeRegistered(TraceResult result, ProductionResultNode node)
-        {
-            if (result == null || node == null)
-                return;
-
-            if (!result.AllNodes.Contains(node))
-            {
-                result.AllNodes.Add(node);
-            }
-        }
-
 
         #endregion
 
@@ -1434,9 +541,664 @@ namespace LotTraceApp.Services
         
         #endregion
 
-        #region 経路展開
+
+
+        #region 表示結果変換・グリッド出力
+
+        private sealed class DisplayLaneNode
+        {
+            public string DisplayNodeKey { get; set; }
+            public string MergeKey { get; set; }
+            public string ParentDisplayNodeKey { get; set; }
+
+            public ProductionResultNode SourceNode { get; set; }
+
+            // 論理座標
+            public int XLevel { get; set; }
+            public int YLane { get; set; }
+            public int ChildIndex { get; set; }
+
+            public int OccupiedFirstY { get; set; }      // このNode起点の占有開始Y
+            public int OccupiedLastY { get; set; }       // このNode起点の占有終了Y
+
+            public bool IsLotGroupRepresentative { get; set; }
+
+            public string LotGroupKey { get; set; }
+            public string RepresentativeNodeKey { get; set; }
+
+
+            public DisplayLaneNode()
+            {
+                OccupiedFirstY = -1;
+                OccupiedLastY = -1;
+            }
+        }
+
+        private DataTable BuildDisplayTableFromDisplayResult(
+            TraceDisplayResult displayResult,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var table = new DataTable();
+
+            if (displayResult == null)
+                return table;
+
+            int maxMiddleDepth = displayResult.MaxMiddleDepth < 0
+                ? 0
+                : displayResult.MaxMiddleDepth;
+
+            AddDisplayTableCommonColumns(table);
+            AddDisplayTableStartColumns(table);
+
+            for (int level = 1; level <= maxMiddleDepth; level++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                AddDisplayTableMiddleColumns(table, level);
+            }
+
+            AddDisplayTableEndColumns(table);
+
+            if (displayResult.Rows == null || displayResult.Rows.Count == 0)
+                return table;
+
+            for (int rowIndex = 0; rowIndex < displayResult.Rows.Count; rowIndex++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var displayRow = displayResult.Rows[rowIndex];
+                if (displayRow == null)
+                    continue;
+
+                var dr = table.NewRow();
+
+                FillDisplayTableCommonColumns(dr, displayRow, rowIndex);
+                FillDisplayTableStartColumns(dr, displayRow.Start);
+
+                for (int level = 1; level <= maxMiddleDepth; level++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var middleCell = GetMiddleCell(displayRow, level);
+                    FillDisplayTableMiddleColumns(dr, level, middleCell);
+                }
+
+                FillDisplayTableEndColumns(dr, displayRow.End);
+
+                table.Rows.Add(dr);
+            }
+
+            return table;
+        }
+
+        private void AddDisplayTableCommonColumns(DataTable table)
+        {
+            if (table == null)
+                return;
+
+            table.Columns.Add("RowIndex", typeof(int));
+            table.Columns.Add("DisplayOrder", typeof(int));
+
+            table.Columns.Add("RouteSystem", typeof(string));
+
+            table.Columns.Add("IsLastRowOfStartGroup", typeof(bool));
+
+            table.Columns.Add("IsDisplayTarget", typeof(bool));
+            table.Columns.Add("SuppressReason", typeof(string));
+            table.Columns.Add("IsPruned", typeof(bool));
+            table.Columns.Add("PruneReason", typeof(string));
+        }
+
+        private void AddDisplayTableStartColumns(DataTable table)
+        {
+            if (table == null)
+                return;
+
+            table.Columns.Add("Start_Exists", typeof(bool));
+
+            table.Columns.Add("Start_NodeKey", typeof(string));
+            table.Columns.Add("Start_MasterKey", typeof(string));
+            table.Columns.Add("Start_Order", typeof(string));
+            table.Columns.Add("Start_Lot", typeof(string));
+            table.Columns.Add("Start_ItemCode", typeof(string));
+            table.Columns.Add("Start_ItemName", typeof(string));
+            table.Columns.Add("Start_StartTime", typeof(string));
+            table.Columns.Add("Start_StartDateLabel", typeof(string));
+            table.Columns.Add("Start_Weight", typeof(decimal));
+
+            table.Columns.Add("Start_LotGroupKey", typeof(string));
+            table.Columns.Add("Start_IsRepresentativeInLotGroup", typeof(bool));
+            table.Columns.Add("Start_BranchSignature", typeof(string));
+        }
+
+
+        private void AddDisplayTableMiddleColumns(DataTable table, int level)
+        {
+            if (table == null || level <= 0)
+                return;
+
+            string prefix = "Lv" + level + "_";
+
+            table.Columns.Add(prefix + "Exists", typeof(bool));
+
+            table.Columns.Add(prefix + "NodeKey", typeof(string));
+            table.Columns.Add(prefix + "MasterKey", typeof(string));
+            table.Columns.Add(prefix + "Order", typeof(string));
+            table.Columns.Add(prefix + "Lot", typeof(string));
+            table.Columns.Add(prefix + "ItemCode", typeof(string));
+            table.Columns.Add(prefix + "ItemName", typeof(string));
+            table.Columns.Add(prefix + "StartTime", typeof(string));
+            table.Columns.Add(prefix + "StartDateLabel", typeof(string));
+            table.Columns.Add(prefix + "Weight", typeof(decimal));
+
+            table.Columns.Add(prefix + "LotGroupKey", typeof(string));
+            table.Columns.Add(prefix + "IsRepresentativeInLotGroup", typeof(bool));
+            table.Columns.Add(prefix + "BranchSignature", typeof(string));
+        }
+
+        private void AddDisplayTableEndColumns(DataTable table)
+        {
+            if (table == null)
+                return;
+
+            table.Columns.Add("End_Exists", typeof(bool));
+
+            table.Columns.Add("End_NodeKey", typeof(string));
+            table.Columns.Add("End_MasterKey", typeof(string));
+            table.Columns.Add("End_Order", typeof(string));
+            table.Columns.Add("End_Lot", typeof(string));
+            table.Columns.Add("End_ItemCode", typeof(string));
+            table.Columns.Add("End_ItemName", typeof(string));
+            table.Columns.Add("End_StartTime", typeof(string));
+            table.Columns.Add("End_StartDateLabel", typeof(string));
+            table.Columns.Add("End_Weight", typeof(decimal));
+
+            table.Columns.Add("End_LotGroupKey", typeof(string));
+            table.Columns.Add("End_IsRepresentativeInLotGroup", typeof(bool));
+            table.Columns.Add("End_BranchSignature", typeof(string));
+
+            // ★追加
+            table.Columns.Add("End_IsDuplicate", typeof(bool));
+            table.Columns.Add("End_DuplicateDisplayGroupIndex", typeof(int));
+        }
+
+        private void FillDisplayTableCommonColumns(DataRow row, TraceDisplayRow displayRow, int rowIndex)
+        {
+            if (row == null || displayRow == null)
+                return;
+
+            row["RowIndex"] = rowIndex;
+            row["DisplayOrder"] = displayRow.DisplayOrder;
+
+            SetValue(row, "RouteSystem", displayRow.RouteSystem);
+
+            row["IsLastRowOfStartGroup"] = displayRow.IsLastRowOfStartGroup;
+
+            row["IsDisplayTarget"] = displayRow.IsDisplayTarget;
+            SetValue(row, "SuppressReason", displayRow.SuppressReason);
+            row["IsPruned"] = displayRow.IsPruned;
+            SetValue(row, "PruneReason", displayRow.PruneReason);
+        }
+
+        private void FillDisplayTableStartColumns(DataRow row, TraceDisplayCell cell)
+        {
+            FillDisplayTableCell(row, "Start_", cell);
+        }
+
+        private void FillDisplayTableMiddleColumns(DataRow row, int level, TraceDisplayCell cell)
+        {
+            FillDisplayTableCell(row, "Lv" + level + "_", cell);
+        }
+
+        private void FillDisplayTableEndColumns(DataRow row, TraceDisplayCell cell)
+        {
+            FillDisplayTableCell(row, "End_", cell);
+
+            if (row == null || cell == null)
+                return;
+
+            row["End_IsDuplicate"] = cell.EndIsDuplicate;
+            SetValue(row, "End_DuplicateDisplayGroupIndex", cell.EndDuplicateDisplayGroupIndex);
+        }
+
+        private void FillDisplayTableCell(DataRow row, string prefix, TraceDisplayCell cell)
+        {
+            if (row == null || string.IsNullOrWhiteSpace(prefix))
+                return;
+
+            bool exists = cell != null;
+            row[prefix + "Exists"] = exists;
+
+            if (!exists)
+            {
+                return;
+            }
+
+            SetValue(row, prefix + "NodeKey", cell.NodeKey);
+            SetValue(row, prefix + "MasterKey", cell.MasterKey);
+            SetValue(row, prefix + "Order", cell.ProductionOrderNumber);
+            SetValue(row, prefix + "Lot", cell.LotNumber);
+            SetValue(row, prefix + "ItemCode", cell.ItemCode);
+            SetValue(row, prefix + "ItemName", cell.ItemName);
+
+            if (cell.StartDate.HasValue)
+            {
+                row[prefix + "StartTime"] = cell.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss");
+            }
+            else if(!cell.StartDate.HasValue)
+            {
+                row[prefix + "StartTime"] = cell.StartDateLabel;
+            }
+
+            SetValue(row, prefix + "StartDateLabel", cell.StartDateLabel);
+
+            if (cell.Weight.HasValue)
+            {
+                row[prefix + "Weight"] = cell.Weight.Value;
+            }
+
+            SetValue(row, prefix + "LotGroupKey", cell.LotGroupKey);
+            row[prefix + "IsRepresentativeInLotGroup"] = cell.IsRepresentativeInLotGroup;
+            SetValue(row, prefix + "BranchSignature", cell.BranchSignature);
+        }
+
+        private void SetValue(DataRow row, string columnName, object value)
+        {
+            if (row == null || row.Table == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(columnName))
+                return;
+
+            if (!row.Table.Columns.Contains(columnName))
+                return;
+
+            row[columnName] = value ?? DBNull.Value;
+        }
+
+
+        private TraceDisplayCell GetMiddleCell(TraceDisplayRow row, int level)
+        {
+            if (row == null)
+                return null;
+
+            if (level <= 0)
+                return null;
+
+            if (row.Middles == null)
+                return null;
+
+            int index = level - 1;
+            if (index < 0 || index >= row.Middles.Count)
+                return null;
+
+            return row.Middles[index];
+        }
+
+
+        private TraceDisplayCell CreateDisplayCell(
+    TracePathRow pathRow,
+    ProductionResultNode node,
+    TraceDisplayColumnKind columnKind,
+    int level,
+    int nodeIndexInPath)
+        {
+            if (node == null)
+                return null;
+
+            var lotGroupInfo = FindLotGroupInfo(pathRow, columnKind, level);
+
+            return new TraceDisplayCell
+            {
+                // DAG上の元Node
+                Node = node,
+
+                // 表示キー
+                MasterKey = node.ControlMasterKey,
+                NodeKey = node.NodeIdentityKey,
+
+                ParentMasterKey = node.ParentMasterKey,
+
+                // 座標情報
+                ColumnKind = columnKind,
+                Level = level,
+
+                // 表示値
+                ProductionOrderNumber = node.ProductionOrderNumber,
+                LotNumber = node.LotNumber,
+                ItemCode = node.ItemCode,
+                ItemName = node.ItemName,
+                StartDate = node.StartDate,
+                StartDateLabel = node.StartDateLabel,
+                Weight = node.Weight.HasValue ? (decimal?)Convert.ToDecimal(node.Weight.Value) : null,
+
+                // フォワードLotグループ情報
+                LotGroupKey = lotGroupInfo == null ? null : lotGroupInfo.GroupKey,
+                IsRepresentativeInLotGroup = lotGroupInfo != null && lotGroupInfo.IsRepresentative,
+                BranchSignature = lotGroupInfo == null ? null : lotGroupInfo.DownstreamBranchSignature,
+
+                // End重複表示情報
+                EndIsDuplicate =
+                    columnKind == TraceDisplayColumnKind.End &&
+                    pathRow != null &&
+                    pathRow.EndIsDuplicate,
+
+                EndDuplicateDisplayGroupIndex =
+                    columnKind == TraceDisplayColumnKind.End && pathRow != null
+                        ? pathRow.EndDuplicateDisplayGroupIndex
+                        : null,
+
+                // 表示対象
+                IsVisible = true,
+                SuppressReason = null
+            };
+        }
 
         
+        private TraceLotGroupInfo FindLotGroupInfo(TracePathRow pathRow, TraceDisplayColumnKind columnKind, int level)
+        {
+            if (pathRow == null || pathRow.LevelLotGroups == null || pathRow.LevelLotGroups.Count == 0)
+                return null;
+
+            if (columnKind == TraceDisplayColumnKind.Start)
+            {
+                return pathRow.LevelLotGroups
+                    .FirstOrDefault(g => g != null && g.Axis == TraceGroupAxis.Start && g.Level == 0);
+            }
+
+            if (columnKind == TraceDisplayColumnKind.Middle)
+            {
+                return pathRow.LevelLotGroups
+                    .FirstOrDefault(g => g != null && g.Axis == TraceGroupAxis.Middle && g.Level == level);
+            }
+
+            return null;
+        }
+
+        private List<TracePathRow> MergeSortByStartExists(List<TracePathRow> source)
+        {
+            if (source == null)
+                return new List<TracePathRow>();
+
+            if (source.Count <= 1)
+                return new List<TracePathRow>(source);
+
+            int mid = source.Count / 2;
+
+            var left = MergeSortByStartExists(source.GetRange(0, mid));
+            var right = MergeSortByStartExists(source.GetRange(mid, source.Count - mid));
+
+            return MergeByStartExists(left, right);
+        }
+
+        private List<TracePathRow> MergeByStartExists(List<TracePathRow> left, List<TracePathRow> right)
+        {
+            var result = new List<TracePathRow>(left.Count + right.Count);
+
+            int i = 0;
+            int j = 0;
+
+            while (i < left.Count && j < right.Count)
+            {
+                int leftValue = GetStartExistsSortValue(left[i]);
+                int rightValue = GetStartExistsSortValue(right[j]);
+
+                if (leftValue <= rightValue)
+                {
+                    result.Add(left[i]);
+                    i++;
+                }
+                else
+                {
+                    result.Add(right[j]);
+                    j++;
+                }
+            }
+
+            while (i < left.Count)
+            {
+                result.Add(left[i]);
+                i++;
+            }
+
+            while (j < right.Count)
+            {
+                result.Add(right[j]);
+                j++;
+            }
+
+            return result;
+        }
+
+        private int GetStartExistsSortValue(TracePathRow row)
+        {
+            // 実体ありを上にする
+            return (row != null && row.StartNode != null) ? 0 : 1;
+        }
+
+        
+        private void BuildPathRowsRecursiveCore(
+    List<TracePathRow> pathRows,
+    ProductionResultNode node,
+    string rootGroupKey,
+    List<ProductionResultNode> currentPathNodes,
+    List<ProductionResultLink> currentPathLinks,
+    HashSet<string> visitedLinks)
+        {
+            if (pathRows == null || node == null)
+                return;
+
+            currentPathNodes.Add(node);
+
+            var outgoingLinks = node.ChildLinks == null
+                ? new List<ProductionResultLink>()
+                : node.ChildLinks
+                    .Where(l => l != null
+                             && l.ParentNode != null
+                             && l.ChildNode != null
+                             && object.ReferenceEquals(l.ParentNode, node))
+                    .ToList();
+
+            if (outgoingLinks.Count == 0)
+            {
+                var pathRow = new TracePathRow();
+
+                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
+
+                pathRows.Add(pathRow); // ← ここ変更
+
+                currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
+                return;
+            }
+
+            foreach (var link in outgoingLinks)
+            {
+                string linkKey = GetPathLinkKey(link);
+
+                if (string.IsNullOrWhiteSpace(linkKey))
+                    continue;
+
+                if (visitedLinks.Contains(linkKey))
+                    continue;
+
+                visitedLinks.Add(linkKey);
+                currentPathLinks.Add(link);
+
+                BuildPathRowsRecursiveCore(
+                    pathRows,
+                    link.ChildNode,
+                    rootGroupKey,
+                    currentPathNodes,
+                    currentPathLinks,
+                    visitedLinks);
+
+                currentPathLinks.RemoveAt(currentPathLinks.Count - 1);
+                visitedLinks.Remove(linkKey);
+            }
+
+            currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
+        }
+
+        private void BuildPathRowsRecursive(
+    TraceResult result,
+    ProductionResultNode node,
+    string rootGroupKey,
+    List<ProductionResultNode> currentPathNodes,
+    List<ProductionResultLink> currentPathLinks,
+    HashSet<string> visitedLinks)
+        {
+            if (result == null || node == null)
+                return;
+
+            currentPathNodes.Add(node);
+
+            var outgoingLinks = node.ChildLinks == null
+                ? new List<ProductionResultLink>()
+                : node.ChildLinks
+                    .Where(l => l != null
+                             && l.ParentNode != null
+                             && l.ChildNode != null
+                             && object.ReferenceEquals(l.ParentNode, node))
+                    .ToList();
+
+            
+
+            if (outgoingLinks.Count == 0)
+            {
+                var pathRow = new TracePathRow();
+
+                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
+                result.PathRows.Add(pathRow);
+
+                currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
+                return;
+            }
+
+            bool traversedAnyChild = false;
+
+            foreach (var link in outgoingLinks)
+            {
+                string linkKey = GetPathLinkKey(link);
+
+                if (string.IsNullOrWhiteSpace(linkKey))
+                {
+                    continue;
+                }
+
+                if (visitedLinks.Contains(linkKey))
+                {
+                   continue;
+                }
+
+                visitedLinks.Add(linkKey);
+                currentPathLinks.Add(link);          
+                traversedAnyChild = true;
+
+                BuildPathRowsRecursive(
+                    result,
+                    link.ChildNode,
+                    rootGroupKey,
+                    currentPathNodes,
+                    currentPathLinks,
+                    visitedLinks);
+
+                currentPathLinks.RemoveAt(currentPathLinks.Count - 1);
+                visitedLinks.Remove(linkKey);
+
+            }
+
+            if (!traversedAnyChild)
+            {
+                var pathRow = new TracePathRow();
+
+                FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
+                result.PathRows.Add(pathRow);
+            }
+
+            currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
+        }
+
+        /// <summary>
+        /// 手投入表示補完メソッド。今はトレースバックだけだけど、後でフォワードにも適用
+        /// </summary>
+        /// <param name="displayNodes"></param>
+        private void ResolveStartDateLabelsForDisplayLaneNodes(List<DisplayLaneNode> displayNodes)
+        {
+            if (displayNodes == null || displayNodes.Count == 0)
+                return;
+
+            foreach (var displayNode in displayNodes)
+            {
+                if (displayNode == null || displayNode.SourceNode == null)
+                    continue;
+
+                var node = displayNode.SourceNode;
+
+                // 既に表示ラベルが入っているものは尊重
+                if (!string.IsNullOrWhiteSpace(node.StartDateLabel))
+                    continue;
+
+                // 開始日時があるなら表示ラベル補完は不要
+                if (node.StartDate.HasValue)
+                    continue;
+
+                // A系(MaterialTableA相当)の開始日時なしは「補完」
+                if (string.Equals(node.RouteSystem, "A", StringComparison.OrdinalIgnoreCase))
+                {
+                    switch (node.InputSourceType)
+                    {
+                        case "ManualInput":
+                            node.StartDateLabel = "手投入";
+                            break;
+                        case "Drumcan":
+                            node.StartDateLabel = "ドラム缶";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// TraceFowardで暫定で使う。
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="candidate"></param>
+        /// <returns></returns>
+        private string ResolveStartDateLabel(ProductionResultNode node, ChildCandidate candidate)
+        {
+            if (node == null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(node.StartDateLabel))
+                return node.StartDateLabel;
+
+            if (node.RouteSystem != "A")
+                return null;
+
+            return node.StartDate.HasValue ? null : "手投入";
+        }
+
+
+        
+        private void EnsureNodeRegistered(TraceResult result, ProductionResultNode node)
+        {
+            if (result == null || node == null)
+                return;
+
+            if (!result.AllNodes.Contains(node))
+            {
+                result.AllNodes.Add(node);
+            }
+        }
+
+
+        #endregion
+
+        #region 経路行補助
+
         private void FillPathRowNodesAndLinks(
     TracePathRow pathRow,
     List<ProductionResultNode> currentPathNodes,
@@ -1509,177 +1271,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region　メタ・経路キー
-
-        private ProductionResultNode GetNodeFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath < 0)
-                return null;
-
-            if (nodeIndexInPath == 0)
-                return pathRow.StartNode;
-
-            int middleCount = pathRow.MiddleNodes == null ? 0 : pathRow.MiddleNodes.Count;
-
-            if (nodeIndexInPath >= 1 && nodeIndexInPath <= middleCount)
-            {
-                return pathRow.MiddleNodes[nodeIndexInPath - 1];
-            }
-
-            if (nodeIndexInPath == middleCount + 1)
-                return pathRow.EndNode;
-
-            return null;
-        }
-
-        private string GetDisplayParentNodeKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null || link.ParentNode == null)
-                return null;
-
-            // ★描画接続用：NodeIdentityKeyではなくMergeKeyを使用
-            // ※Node同一性の正規判定に合わせる
-            string parentMergeKey = link.ParentNode.NodeIdentityKey;
-            return string.IsNullOrWhiteSpace(parentMergeKey) ? null : parentMergeKey;
-        }
-
-        private string GetIncomingLinkKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null)
-                return null;
-
-            return GetPathLinkKey(link);
-        }
-
-        private string GetParentKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null || link.ParentNode == null)
-                return null;
-
-            // ★旧互換ParentKeyだが、値はMergeKeyベースへ正規化する
-            // ※NodeIdentityKeyは使用しない
-            string parentMergeKey = link.ParentNode.NodeIdentityKey;
-            return string.IsNullOrWhiteSpace(parentMergeKey) ? null : parentMergeKey;
-        }
-
-        private string GetUpstreamPathKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            var parts = new List<string>();
-
-            var startNode = GetNodeFromPathRow(pathRow, 0);
-            if (startNode == null)
-                return null;
-
-            parts.Add("N:" + startNode.NodeIdentityKey);
-
-            if (nodeIndexInPath <= 0)
-            {
-                return string.Join("->", parts);
-            }
-
-            if (pathRow.PathLinks == null || pathRow.PathLinks.Count == 0)
-                return string.Join("->", parts);
-
-            int maxLinkIndex = Math.Min(nodeIndexInPath - 1, pathRow.PathLinks.Count - 1);
-
-            for (int i = 0; i <= maxLinkIndex; i++)
-            {
-                var link = pathRow.PathLinks[i];
-                if (link == null)
-                    continue;
-
-                parts.Add("L:" + GetPathLinkKey(link));
-
-                var childNode = link.ChildNode;
-                if (childNode != null)
-                {
-                    parts.Add("N:" + childNode.NodeIdentityKey);
-                }
-            }
-
-            return string.Join("->", parts);
-        }
-
-        private string GetDownstreamPathKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            var currentNode = GetNodeFromPathRow(pathRow, nodeIndexInPath);
-            if (currentNode == null)
-                return null;
-
-            var parts = new List<string>();
-            parts.Add("N:" + currentNode.NodeIdentityKey);
-
-            if (pathRow.PathLinks == null || pathRow.PathLinks.Count == 0)
-                return string.Join("->", parts);
-
-            for (int i = nodeIndexInPath; i < pathRow.PathLinks.Count; i++)
-            {
-                var link = pathRow.PathLinks[i];
-                if (link == null)
-                    continue;
-
-                parts.Add("L:" + GetPathLinkKey(link));
-
-                var childNode = link.ChildNode;
-                if (childNode != null)
-                {
-                    parts.Add("N:" + childNode.NodeIdentityKey);
-                }
-            }
-
-            return string.Join("->", parts);
-        }
+        #region 経路メタ情報
 
         private string GetPathLinkKey(ProductionResultLink link)
         {
@@ -1703,124 +1295,6 @@ namespace LotTraceApp.Services
                 + link.SlotNo.ToString()
                 + "|"
                 + (string.IsNullOrWhiteSpace(link.ParentLotNumber) ? string.Empty : link.ParentLotNumber.Trim().ToUpperInvariant());
-        }
-
-        private string BuildPathKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return string.Empty;
-
-            var parts = new List<string>();
-
-            if (pathRow.StartNode != null)
-                parts.Add("N:" + pathRow.StartNode.NodeIdentityKey);
-
-            if (pathRow.PathLinks != null)
-            {
-                foreach (var link in pathRow.PathLinks)
-                {
-                    parts.Add("L:" + GetPathLinkKey(link));
-
-                    if (link != null && link.ChildNode != null)
-                    {
-                        parts.Add("N:" + link.ChildNode.NodeIdentityKey);
-                    }
-                }
-            }
-            else
-            {
-                if (pathRow.MiddleNodes != null)
-                {
-                    foreach (var node in pathRow.MiddleNodes)
-                    {
-                        parts.Add("N:" + node.NodeIdentityKey);
-                    }
-                }
-
-                if (pathRow.EndNode != null)
-                    parts.Add("N:" + pathRow.EndNode.NodeIdentityKey);
-            }
-
-            return string.Join("->", parts);
-        }
-
-        private string BuildLotTraceKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return null;
-
-            var parts = new List<string>();
-
-            // Start
-            AppendNodeAndLot(parts, pathRow.StartNode, isEnd: false);
-
-            // Middle
-            if (pathRow.MiddleNodes != null)
-            {
-                foreach (var node in pathRow.MiddleNodes)
-                {
-                    AppendNodeAndLot(parts, node, isEnd: false);
-                }
-            }
-
-            // End
-            AppendNodeAndLot(parts, pathRow.EndNode, isEnd: true);
-
-            return parts.Count == 0
-                ? null
-                : string.Join("->", parts);
-        }
-
-        private string BuildUpstreamLotOnlyKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return null;
-
-            // 行単位キーなので、その行の到達先（EndNode）を自Nodeとみなす
-            var selfNode = pathRow.EndNode ?? pathRow.StartNode;
-            if (selfNode == null)
-                return null;
-
-            var parts = new List<string>();
-
-            // 1) 自Node識別だけは持たせる
-            parts.Add(selfNode.NodeIdentityKey);
-
-            // 2) そこに至るまでの接続Lotだけを積む
-            if (pathRow.PathLinks != null)
-            {
-                foreach (var link in pathRow.PathLinks)
-                {
-                    string lot = GetLinkLotNumber(link);
-                    if (!string.IsNullOrEmpty(lot))
-                    {
-                        parts.Add("L|" + lot);
-                    }
-                    else
-                    {
-                        parts.Add("L|NO_LOT");
-                    }
-                }
-            }
-
-            return parts.Count == 0
-                ? null
-                : string.Join("<=", parts);
-        }
-
-        
-
-        private string GetLinkLotNumber(ProductionResultLink link)
-        {
-            if (link == null)
-                return null;
-
-            // 今回の「接続要素としてのLot」はまず ParentLotNumber を正採用
-            string lot = NormalizeLot(link.ParentLotNumber);
-            if (!string.IsNullOrEmpty(lot))
-                return lot;
-
-            return null;
         }
 
         private string ResolveRouteSystem(TracePathRow pathRow)
@@ -1992,7 +1466,7 @@ namespace LotTraceApp.Services
         #endregion
 
         
-        #region 品目名処理群
+        #region 品目名解決
 
 
         private void ResolveItemNamesDisplayNodes(List<DisplayLaneNode> displayNodes)
@@ -2062,7 +1536,7 @@ namespace LotTraceApp.Services
 
 
 
-        #region 枝構造関数群
+        #region 表示レーンから経路行への変換
 
 
         //枝構造をPathRowに流し込む
@@ -2124,13 +1598,6 @@ namespace LotTraceApp.Services
                     row.MiddleNodes[middleIndex] = displayNode.SourceNode;
                 }
 
-                //row.RootGroupKey = row.StartNode == null
-                //    ? null
-                //    : BuildStartTrunkGroupKey(row.StartNode);
-
-                row.StartTrunkGroupKey = row.RootGroupKey;
-                row.StartTrunkOrder = row.PathOrder;
-
                 result.PathRows.Add(row);
             }
         }
@@ -2164,105 +1631,13 @@ namespace LotTraceApp.Services
             }
         }
 
-        private string ResolvePathRowRootGroupKey(
-            ProductionResultNode startBasisNode,
-            List<DisplayLaneNode> laneNodes)
-        {
-            if (startBasisNode != null)
-            {
-                string key = startBasisNode.NodeIdentityKey;
-                if (!string.IsNullOrWhiteSpace(key))
-                    return key;
-            }
-
-            if (laneNodes == null || laneNodes.Count == 0)
-                return null;
-
-            var firstNode = laneNodes.FirstOrDefault(x => x != null && x.SourceNode != null);
-            if (firstNode == null || firstNode.SourceNode == null)
-                return null;
-
-            return firstNode.SourceNode.NodeIdentityKey;
-        }
-
-        private string BuildPathRowFullPathSignature(TracePathRow row)
-        {
-            if (row == null)
-                return null;
-
-            var parts = new List<string>();
-
-            if (row.StartNode != null)
-            {
-                parts.Add("S:" + (row.StartNode.NodeIdentityKey ?? string.Empty));
-            }
-
-            if (row.MiddleNodes != null && row.MiddleNodes.Count > 0)
-            {
-                for (int i = 0; i < row.MiddleNodes.Count; i++)
-                {
-                    var node = row.MiddleNodes[i];
-                    if (node == null)
-                    {
-                        parts.Add("M" + i.ToString() + ":");
-                    }
-                    else
-                    {
-                        parts.Add("M" + i.ToString() + ":" + (node.NodeIdentityKey ?? string.Empty));
-                    }
-                }
-            }
-
-            if (row.EndNode != null)
-            {
-                parts.Add("E:" + (row.EndNode.NodeIdentityKey ?? string.Empty));
-            }
-
-            return string.Join("|", parts);
-        }
-
-        
-
-        
-       
-        
-
-        private sealed class BranchSortMetric
-        {
-            public int LongestEdgeCountToTerminal { get; set; }
-            public int LongestNodeCountToTerminal { get; set; }
-            public int MaxTerminalXLevel { get; set; }
-            public int SubtreeLeafCount { get; set; }
-        }
-
-        private sealed class BranchLaneRange
-        {
-            public int FirstY { get; set; }
-            public int LastY { get; set; }
-            public int LaneSpan { get; set; }
-        }
-
-
-        
         private sealed class EndDisplayNodeInfo
         {
             public string DisplayNodeKey { get; set; }
-            public string MergeKey { get; set; }
 
-            public string EndGroupKey { get; set; }
-            public int EndGroupIndex { get; set; }
-            public bool IsFirstOfGroup { get; set; }
             public bool IsDuplicate { get; set; }
 
-            // ★追加
             public int? DuplicateDisplayIndex { get; set; }
-
-            public int OriginalXLevel { get; set; }
-            public int EndXLevel { get; set; }
-            public int YLane { get; set; }
-
-            public string LotNumber { get; set; }
-            public string ControlMasterKey { get; set; }
         }
 
         private sealed class ForwardDisplayLaneBuildResult
@@ -2304,7 +1679,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新罫線メソッド群
+        #region 罫線・占有範囲
 
 
         private void PopulateOccupiedRange(List<DisplayLaneNode> nodes)
@@ -2479,7 +1854,6 @@ namespace LotTraceApp.Services
                 if (row == null)
                     continue;
 
-                row.IsFirstRowOfStartGroup = false;
                 row.IsLastRowOfStartGroup = false;
             }
 
@@ -2502,7 +1876,6 @@ namespace LotTraceApp.Services
                     var firstRow = rows[firstY];
                     if (firstRow != null)
                     {
-                        firstRow.IsFirstRowOfStartGroup = true;
                     }
                 }
 
@@ -3164,7 +2537,7 @@ namespace LotTraceApp.Services
 
 
 
-        #region 新トレースフォワード関連群
+        #region フォワード表示レーン構築
 
 
         private List<ChildCandidate> GetNextLevelCandidates(
@@ -3370,7 +2743,6 @@ namespace LotTraceApp.Services
                 .ThenBy(g => g.Key ?? string.Empty)
                 .ToList();
 
-            int groupIndex = 1;
             int nextDuplicateDisplayIndex = 1;
 
             foreach (var group in grouped)
@@ -3391,21 +2763,11 @@ namespace LotTraceApp.Services
                     output.Add(new EndDisplayNodeInfo
                     {
                         DisplayNodeKey = node.DisplayNodeKey,
-                        MergeKey = node.SourceNode.NodeIdentityKey,
-                        EndGroupKey = group.Key ?? string.Empty,
-                        EndGroupIndex = groupIndex,
-                        IsFirstOfGroup = (i == 0),
                         IsDuplicate = (i > 0),
-                        OriginalXLevel = endXLevel,
-                        EndXLevel = endXLevel,
-                        YLane = node.YLane,
-                        LotNumber = node.SourceNode.LotNumber,
-                        ControlMasterKey = node.SourceNode.ControlMasterKey,
                         DuplicateDisplayIndex = (i > 0) ? duplicateDisplayIndex : null
                     });
                 }
 
-                groupIndex++;
             }
 
             return output;
@@ -3752,7 +3114,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新トレースバック関連群
+        #region バックワード表示レーン構築
 
 
         private ForwardDisplayLaneBuildResult BuildBackwardDisplayLaneNodes(
@@ -3823,9 +3185,6 @@ namespace LotTraceApp.Services
                 XLevel = xLevel,
                 YLane = trunkY,
                 ChildIndex = 0,
-                SubtreeLaneSpan = 1,
-                RootGroupHeight = 1,
-                ChildBranchHeight = 0,
                 OccupiedFirstY = trunkY,
                 OccupiedLastY = trunkY
             };
@@ -3918,10 +3277,8 @@ namespace LotTraceApp.Services
                 ? 0
                 : currentDisplayNode.ChildIndex;
 
-            currentDisplayNode.ChildBranchHeight = createdChildCount;
             currentDisplayNode.OccupiedFirstY = minY;
             currentDisplayNode.OccupiedLastY = maxY;
-            currentDisplayNode.SubtreeLaneSpan = Math.Max(1, maxY - minY + 1);
 
             return currentDisplayNode;
         }
@@ -4094,13 +3451,6 @@ namespace LotTraceApp.Services
                 // STEP2:
                 // 行の代表情報を最低限埋める
                 // ------------------------------------------------------------
-                var firstNode = laneNodes.FirstOrDefault(x => x != null && x.SourceNode != null);
-                var startBasisNode = row.StartNode ?? (firstNode == null ? null : firstNode.SourceNode);
-
-                row.RootGroupKey = ResolvePathRowRootGroupKey(startBasisNode, laneNodes);
-                row.StartTrunkGroupKey = BuildStartTrunkGroupKey(row.StartNode);
-                row.StartTrunkOrder = row.PathOrder;
-
                 // ------------------------------------------------------------
                 // STEP3:
                 // EndInfos を使って End を確定する
@@ -4146,12 +3496,6 @@ namespace LotTraceApp.Services
                 // ------------------------------------------------------------
                 TrimTrailingNullMiddleNodes(row);
 
-                // ------------------------------------------------------------
-                // STEP5:
-                // 署名確定
-                // ------------------------------------------------------------
-                row.FullPathSignature = BuildPathRowFullPathSignature(row);
-
                 result.PathRows.Add(row);
             }
 
@@ -4196,7 +3540,6 @@ namespace LotTraceApp.Services
                 .ThenBy(g => g.Key ?? string.Empty, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            int groupIndex = 1;
             int nextDuplicateDisplayIndex = 1;
 
             foreach (var group in grouped)
@@ -4219,7 +3562,6 @@ namespace LotTraceApp.Services
                     if (node == null)
                         continue;
 
-                    int oldXLevel = node.XLevel;
                     string oldDisplayNodeKey = node.DisplayNodeKey;
 
                     node.XLevel = endXLevel;
@@ -4236,21 +3578,11 @@ namespace LotTraceApp.Services
                     output.Add(new EndDisplayNodeInfo
                     {
                         DisplayNodeKey = node.DisplayNodeKey,
-                        MergeKey = node.MergeKey,
-                        EndGroupKey = group.Key ?? string.Empty,
-                        EndGroupIndex = groupIndex,
-                        IsFirstOfGroup = (i == 0),
                         IsDuplicate = (i > 0),
-                        OriginalXLevel = oldXLevel,
-                        EndXLevel = endXLevel,
-                        YLane = node.YLane,
-                        LotNumber = node.SourceNode == null ? null : node.SourceNode.LotNumber,
-                        ControlMasterKey = node.SourceNode == null ? null : node.SourceNode.ControlMasterKey,
                         DuplicateDisplayIndex = (i > 0) ? duplicateDisplayIndex : null
                     });
                 }
 
-                groupIndex++;
             }
 
             return output;
@@ -4324,7 +3656,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新トレースバック枝剪定関連群
+        #region バックワード枝剪定
 
         private sealed class BackwardPruneGroup
         {
@@ -4667,7 +3999,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region デバッグ群
+        #region デバッグCSV出力
 
         
 
