@@ -652,7 +652,7 @@ namespace LotTraceApp
             // 
             // panelEndBottole
             // 
-            this.panelEndBottole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(245)))), ((int)(((byte)(236)))));
+            this.panelEndBottole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.panelEndBottole.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelEndBottole.Location = new System.Drawing.Point(966, 194);
             this.panelEndBottole.Name = "panelEndBottole";
@@ -1807,7 +1807,7 @@ namespace LotTraceApp
             // 
             // panelEndBottole_7
             // 
-            this.panelEndBottole_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(245)))), ((int)(((byte)(236)))));
+            this.panelEndBottole_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.panelEndBottole_7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelEndBottole_7.Location = new System.Drawing.Point(966, 194);
             this.panelEndBottole_7.Name = "panelEndBottole_7";
@@ -2038,7 +2038,7 @@ namespace LotTraceApp
             // 
             // panelEndBottole_8
             // 
-            this.panelEndBottole_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(245)))), ((int)(((byte)(236)))));
+            this.panelEndBottole_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.panelEndBottole_8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelEndBottole_8.Location = new System.Drawing.Point(966, 194);
             this.panelEndBottole_8.Name = "panelEndBottole_8";
@@ -2269,7 +2269,7 @@ namespace LotTraceApp
             // 
             // panelEndBottole_9
             // 
-            this.panelEndBottole_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(245)))), ((int)(((byte)(236)))));
+            this.panelEndBottole_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.panelEndBottole_9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelEndBottole_9.Location = new System.Drawing.Point(966, 194);
             this.panelEndBottole_9.Name = "panelEndBottole_9";
