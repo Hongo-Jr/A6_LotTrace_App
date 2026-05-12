@@ -597,18 +597,80 @@ AND SUBSTRING(
 
             foreach (var candidate in candidates)
             {
-
-                bool exists = result.Any(x =>
-                                x.PearentNode.NodeIdentityKey == candidate.PearentNode.NodeIdentityKey &&
-                                x.ChildNode.NodeIdentityKey == candidate.ChildNode.NodeIdentityKey);
-
-                if (!exists)
+                if (candidate == null ||
+                    candidate.PearentNode == null ||
+                    candidate.ChildNode == null)
                 {
-                    result.Add(candidate);
+                    continue;
                 }
+
+                string key = BuildCandidateNodePairKey(
+                    candidate.PearentNode,
+                    candidate.ChildNode);
+
+                if (string.IsNullOrWhiteSpace(key))
+                    continue;
+
+                if (!seen.Add(key))
+                    continue;
+
+                result.Add(candidate);
             }
 
             return result;
+        }
+
+        private List<BackwardParentCandidate> RemoveDuplicateBackwardParentCandidates(
+    IEnumerable<BackwardParentCandidate> candidates)
+        {
+            var result = new List<BackwardParentCandidate>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (candidates == null)
+                return result;
+
+            foreach (var candidate in candidates)
+            {
+                if (candidate == null ||
+                    candidate.Node == null ||
+                    candidate.ChildNode == null)
+                {
+                    continue;
+                }
+
+                string key = BuildCandidateNodePairKey(
+                    candidate.Node,
+                    candidate.ChildNode);
+
+                if (string.IsNullOrWhiteSpace(key))
+                    continue;
+
+                if (!seen.Add(key))
+                    continue;
+
+                result.Add(candidate);
+            }
+
+            return result;
+        }
+
+        private string BuildCandidateNodePairKey(
+    ProductionResultNode parentNode,
+    ProductionResultNode childNode)
+        {
+            if (parentNode == null || childNode == null)
+                return null;
+
+            string parentKey = parentNode.NodeIdentityKey;
+            string childKey = childNode.NodeIdentityKey;
+
+            if (string.IsNullOrWhiteSpace(parentKey) ||
+                string.IsNullOrWhiteSpace(childKey))
+            {
+                return null;
+            }
+
+            return parentKey + "=>" + childKey;
         }
 
         private void AppendForwardStartNodes(
@@ -2006,6 +2068,12 @@ WHERE mb.LotNumber = @ChildLotNumber
                 return parentCandidates;
             }
 
+            if (string.Equals(current.RouteSystem, "A", StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(current.InputSourceType, "Drumcan", StringComparison.OrdinalIgnoreCase))
+            {
+                return parentCandidates;
+            }
+
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
             {
@@ -2684,7 +2752,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                 current.IsTraceTerminal = true;
             }
 
-            return parents;
+            return RemoveDuplicateBackwardParentCandidates(parents);
         }
 
 

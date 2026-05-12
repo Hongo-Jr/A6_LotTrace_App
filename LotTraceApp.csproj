@@ -90,6 +90,9 @@
     <Compile Include="Forms\BottleTraceForm.Designer.cs">
       <DependentUpon>BottleTraceForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

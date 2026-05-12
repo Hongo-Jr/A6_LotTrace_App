@@ -8,6 +8,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -22,6 +24,7 @@ namespace LotTraceApp
         private readonly LotTraceService _liquidService;
         private readonly BottleTraceService _bottleService;
         private readonly ResultService _resultService;
+        private CommandLineOptions _commandLineStartupOptions;
 
         
         // タブ番号 → トレース結果（交点検出・EXCEL出力用）
@@ -176,6 +179,13 @@ namespace LotTraceApp
                 selectionBackColor = RowGroupSelectionBackColors[rowIndex, groupIndex];
                 return true;
             }
+        }
+
+        private sealed class TraceSearchWorkResult
+        {
+            public TraceResult Result { get; set; }
+            public TraceDisplayResult DisplayResult { get; set; }
+            public DataTable DisplayTable { get; set; }
         }
         private readonly GridPaintCache _gridPaintCache = new GridPaintCache();
 
@@ -588,6 +598,9 @@ namespace LotTraceApp
 
                 tab.BtnCsv.Click -= Csv_FromAnyTab_Click;
                 tab.BtnCsv.Click += Csv_FromAnyTab_Click;
+                tab.GridStart.CellMouseClick += dataGridStart_CellMouseClick;
+                tab.GridMiddle.CellMouseClick += dataGridMiddle_CellMouseClick;
+                tab.GridEnd.CellMouseClick += dataGridEnd_CellMouseClick;
             }
 
             RegisterTraceTargetCheckBoxes();
@@ -599,6 +612,68 @@ namespace LotTraceApp
             // タブ切替で「そのタブの結果」を再表示
             swichTab.SelectedIndexChanged -= SwichTab_SelectedIndexChanged;
             swichTab.SelectedIndexChanged += SwichTab_SelectedIndexChanged;
+
+            Shown -= MainForm_Shown;
+            Shown += MainForm_Shown;
+        }
+
+       
+
+        public void SetCommandLineStartup(CommandLineOptions options)
+        {
+            _commandLineStartupOptions = options;
+        }
+
+        public string ExecuteCommandLineHeadless(CommandLineOptions options)
+        {
+            if (options == null) throw new ArgumentNullException("options");
+
+            var tab = GetTabContext(1);
+            if (tab == null)
+                throw new InvalidOperationException("検索タブを初期化できませんでした。");
+
+            SetSearchParametersToControls(tab, options.SearchParameters);
+            TraceSearchWorkResult workResult = ExecuteTraceWork(
+                options.SearchParameters,
+                null,
+                CancellationToken.None);
+
+            return ExportTraceWorkResultToDefaultCsv(workResult);
+        }
+
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            var options = _commandLineStartupOptions;
+            if (options == null)
+                return;
+
+            _commandLineStartupOptions = null;
+
+            var tab = GetTabContext(1);
+            if (tab == null)
+                return;
+
+            SetSearchParametersToControls(tab, options.SearchParameters);
+
+            bool traceSucceeded = await DoTraceAsync(tab, options.SearchParameters);
+            if (!traceSucceeded)
+                return;
+
+            if (options.ExportsCsv)
+            {
+                try
+                {
+                    ExportCsvForTabToDefaultFile(tab);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this,
+                        "CSV 出力に失敗しました。\r\n" + ex.Message,
+                        "CSV出力",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void RegisterTracePeriodEvents()
@@ -783,6 +858,9 @@ namespace LotTraceApp
 
             grid.Scroll -= Grid_ScrollSync;
             grid.Scroll += Grid_ScrollSync;
+
+            grid.MouseWheel -= Grid_MouseWheelScrollSync;
+            grid.MouseWheel += Grid_MouseWheelScrollSync;
 
             grid.CellMouseEnter -= Grid_CellMouseEnter_ToolTip;
             grid.CellMouseEnter += Grid_CellMouseEnter_ToolTip;
@@ -1212,6 +1290,8 @@ namespace LotTraceApp
                 ApplyGridColumnHeaderStyle(tab.GridStart, _startHeaderStyle);
                 ApplyGridColumnHeaderStyle(tab.GridMiddle, _middleHeaderStyle);
                 ApplyGridColumnHeaderStyle(tab.GridEnd, _endHeaderStyle);
+
+                
 
                 if (tab.GridStart != null)
                     tab.GridStart.ScrollBars = ScrollBars.None;
@@ -2139,6 +2219,25 @@ namespace LotTraceApp
             grid.CellBorderStyle = DataGridViewCellBorderStyle.Single;
             grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             grid.ShowCellToolTips = false;
+            grid.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+
+            grid.KeyDown -= Grid_KeyDown_CopyCurrentCell;
+            grid.KeyDown += Grid_KeyDown_CopyCurrentCell;
+        }
+
+        private void Grid_KeyDown_CopyCurrentCell(object sender, KeyEventArgs e)
+        {
+            if (e == null || !e.Control || e.KeyCode != Keys.C)
+                return;
+
+            var grid = sender as DataGridView;
+            if (grid == null || grid.CurrentCell == null)
+                return;
+
+            object value = grid.CurrentCell.FormattedValue;
+            Clipboard.SetText(value == null ? string.Empty : Convert.ToString(value));
+            e.Handled = true;
+            e.SuppressKeyPress = true;
         }
 
         private void ConfigureGridForMiddle(DataGridView grid)
@@ -2148,7 +2247,7 @@ namespace LotTraceApp
 
             ConfigureGridDefault(grid);
 
-            // 中は横スクロールだけ
+            // 縦スクロールバーは右グリッドだけに出し、中間は横スクロールのみ表示する
             grid.ScrollBars = ScrollBars.Horizontal;
         }
 
@@ -2175,6 +2274,113 @@ namespace LotTraceApp
                 int rowIndex = source.FirstDisplayedScrollingRowIndex;
                 if (rowIndex < 0)
                     return;
+
+                SyncGridScrollRow(tab.GridStart, rowIndex);
+                SyncGridScrollRow(tab.GridMiddle, rowIndex);
+                SyncGridScrollRow(tab.GridEnd, rowIndex);
+            }
+            finally
+            {
+                _syncingScroll = false;
+            }
+        }
+
+        private void Grid_MouseWheelScrollSync(object sender, MouseEventArgs e)
+        {
+            if (_syncingScroll)
+                return;
+
+            var source = sender as DataGridView;
+            if (source == null)
+                return;
+
+            var tab = GetTabContextByGrid(source);
+            if (tab == null)
+                return;
+
+            if (!ReferenceEquals(source, tab.GridEnd))
+            {
+                int rowIndex = CalculateMouseWheelTargetRowIndex(source, e);
+                SyncTraceGridVerticalScroll(tab, rowIndex);
+                return;
+            }
+
+            if (IsHandleCreated && !IsDisposed)
+            {
+                BeginInvoke(new Action(delegate
+                {
+                    SyncTraceGridVerticalScroll(source);
+                }));
+            }
+            else
+            {
+                SyncTraceGridVerticalScroll(source);
+            }
+        }
+
+        private int CalculateMouseWheelTargetRowIndex(DataGridView source, MouseEventArgs e)
+        {
+            if (source == null || source.RowCount == 0)
+                return -1;
+
+            int currentIndex;
+            try
+            {
+                currentIndex = source.FirstDisplayedScrollingRowIndex;
+            }
+            catch
+            {
+                currentIndex = 0;
+            }
+
+            int lines = SystemInformation.MouseWheelScrollLines;
+            if (lines <= 0)
+                lines = 3;
+
+            int direction = e.Delta > 0 ? -1 : 1;
+            int targetIndex = currentIndex + (direction * lines);
+
+            if (targetIndex < 0)
+                targetIndex = 0;
+            if (targetIndex >= source.RowCount)
+                targetIndex = source.RowCount - 1;
+
+            return targetIndex;
+        }
+
+        private void SyncTraceGridVerticalScroll(DataGridView source)
+        {
+            if (source == null)
+                return;
+
+            var tab = GetTabContextByGrid(source);
+            if (tab == null)
+                return;
+
+            try
+            {
+                _syncingScroll = true;
+
+                int rowIndex = source.FirstDisplayedScrollingRowIndex;
+                if (rowIndex < 0)
+                    return;
+
+                SyncTraceGridVerticalScroll(tab, rowIndex);
+            }
+            finally
+            {
+                _syncingScroll = false;
+            }
+        }
+
+        private void SyncTraceGridVerticalScroll(TraceTabContext tab, int rowIndex)
+        {
+            if (tab == null || rowIndex < 0)
+                return;
+
+            try
+            {
+                _syncingScroll = true;
 
                 SyncGridScrollRow(tab.GridStart, rowIndex);
                 SyncGridScrollRow(tab.GridMiddle, rowIndex);
@@ -2543,6 +2749,34 @@ namespace LotTraceApp
             return p;
         }
 
+        private void SetSearchParametersToControls(TraceTabContext tab, TraceSearchParameters p)
+        {
+            if (tab == null || p == null)
+                return;
+
+            tab.TxtOrder.Text = p.ProductionOrderNumber ?? string.Empty;
+            tab.TxtItemName.Text = p.ItemName ?? string.Empty;
+            tab.TxtItemCode.Text = p.ItemCode ?? string.Empty;
+            tab.TxtLot.Text = p.LotNumber ?? string.Empty;
+
+            if (p.From.HasValue)
+            {
+                tab.ChkUseFrom.Checked = true;
+                tab.DtpFrom.Value = p.From.Value;
+            }
+            else
+            {
+                tab.ChkUseFrom.Checked = false;
+            }
+
+            if (p.Direction == TraceDirection.Backward)
+                tab.RdoBackward.Checked = true;
+            else
+                tab.RdoForward.Checked = true;
+
+            RefreshTracePeriodControls();
+        }
+
         #endregion
 
         #region トレース実行・表示
@@ -2565,7 +2799,7 @@ namespace LotTraceApp
         //    DoTrace(p);
 
         //}
-        private void TraceSearch_FromAnyTab_Click(object sender, EventArgs e)
+        private async void TraceSearch_FromAnyTab_Click(object sender, EventArgs e)
         {
             var tab = GetCurrentTabContext();
             if (tab == null) return;
@@ -2582,35 +2816,64 @@ namespace LotTraceApp
                 return;
             }
 
-            DoTrace(tab, p);
+            await DoTraceAsync(tab, p);
         }
 
-        private void DoTrace(TraceTabContext tab, TraceSearchParameters p)
+        private async Task<bool> DoTraceAsync(
+            TraceTabContext tab,
+            TraceSearchParameters p,
+            bool showProgress = true,
+            bool showErrors = true)
         {
+            LotTraceApp.Forms.ProgressForm progressForm = null;
+            CancellationTokenSource cancellation = null;
+            IProgress<TraceProgressState> progress =
+                new Progress<TraceProgressState>(state =>
+                {
+                    if (state == null || progressForm == null)
+                        return;
+
+                    progressForm.SetProgress(state.Message, state.Percent);
+                });
+
             try
             {
-                TraceResult result;
+                if (showProgress)
+                {
+                    cancellation = new CancellationTokenSource();
+                    progressForm = new LotTraceApp.Forms.ProgressForm("トレース検索中");
+                    progressForm.CancelRequested += delegate
+                    {
+                        cancellation.Cancel();
+                    };
+                    progressForm.SetProgress("検索条件を確認しています...", 5);
+                    progressForm.Show(this);
+                    Enabled = false;
+                    progressForm.BringToFront();
+                }
 
-                // 通常トレース実行
-                result = _liquidService.ExecuteTrace(p);
+                var workResult = await Task.Run(() =>
+                    ExecuteTraceWork(
+                        p,
+                        showProgress ? progress : null,
+                        cancellation == null ? CancellationToken.None : cancellation.Token));
 
-                var displayResult = _liquidService.BuildDisplayResult(result);
-                _currentMaxDepth = displayResult == null ? 0 : displayResult.MaxMiddleDepth;
+                if (showProgress)
+                    progress.Report(new TraceProgressState("グリッドへ反映しています...", 90));
 
-                // ★ 表示テーブルはサービス側の完成品をそのまま使う
-                var displayTable = _liquidService.BuildDisplayTable(result);
+                ApplyTraceWorkResult(tab, workResult, showProgress ? progress : null);
 
-                int tabNo = tab.TabNo;
+                if (showProgress)
+                    progress.Report(new TraceProgressState("完了しました。", 100));
 
-                StoreDisplayArtifactsForTab(tabNo, result, displayResult);
-                _tabDisplayTables[tabNo] = displayTable;
-                ClearCrossPointNodeKeysForTab(tabNo);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                if (showProgress && progressForm != null && !progressForm.IsDisposed)
+                    progressForm.SetMessage("キャンセルしました。");
 
-                // 今のタブに表示
-                ActivateTabDisplay(tabNo);
-
-
-                RegisterNodeKeyGroupForeColorFormatting();
+                return false;
             }
             catch (Exception ex)
             {
@@ -2620,6 +2883,9 @@ namespace LotTraceApp
 
                 WriteAppLog(logMessage.ToString(), ex);
 
+                if (!showErrors)
+                    throw;
+
                 MessageBox.Show(
                     "トレース処理中にエラーが発生しました。\r\n" +
                     "詳細は Logs フォルダのログを確認してください。\r\n\r\n" +
@@ -2627,7 +2893,89 @@ namespace LotTraceApp
                     "トレースエラー",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+
+                return false;
             }
+            finally
+            {
+                if (showProgress)
+                {
+                    Enabled = true;
+                    if (progressForm != null && !progressForm.IsDisposed)
+                        progressForm.Close();
+                    if (progressForm != null)
+                        progressForm.Dispose();
+                    if (cancellation != null)
+                        cancellation.Dispose();
+                    Activate();
+                }
+            }
+        }
+
+        private TraceSearchWorkResult ExecuteTraceWork(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (progress != null)
+                progress.Report(new TraceProgressState("製造実績を取得しています...", 10));
+
+            TraceResult result = _liquidService.ExecuteTrace(p, progress, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (progress != null)
+                progress.Report(new TraceProgressState("表示行を構築しています...", 66));
+
+            TraceDisplayResult displayResult = _liquidService.BuildDisplayResult(
+                result,
+                null,
+                progress,
+                cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (progress != null)
+                progress.Report(new TraceProgressState("グリッド用データを作成しています...", 78));
+
+            DataTable displayTable = _liquidService.BuildDisplayTable(
+                displayResult,
+                progress,
+                cancellationToken);
+
+            return new TraceSearchWorkResult
+            {
+                Result = result,
+                DisplayResult = displayResult,
+                DisplayTable = displayTable
+            };
+        }
+
+        private void ApplyTraceWorkResult(
+            TraceTabContext tab,
+            TraceSearchWorkResult workResult,
+            IProgress<TraceProgressState> progress)
+        {
+            if (tab == null || workResult == null)
+                return;
+
+            if (progress != null)
+                progress.Report(new TraceProgressState("グリッドへ反映しています...", 90));
+
+            _currentMaxDepth = workResult.DisplayResult == null ? 0 : workResult.DisplayResult.MaxMiddleDepth;
+
+            int tabNo = tab.TabNo;
+
+            StoreDisplayArtifactsForTab(tabNo, workResult.Result, workResult.DisplayResult);
+            _tabDisplayTables[tabNo] = workResult.DisplayTable;
+            ClearCrossPointNodeKeysForTab(tabNo);
+
+            ActivateTabDisplay(tabNo);
+
+            RegisterNodeKeyGroupForeColorFormatting();
+            FitGridAndHeaderToColumns(tab.GridStart, tab.PnlStartHeader);
         }
 
         private void RebuildGridPaintCaches()
@@ -2760,6 +3108,186 @@ namespace LotTraceApp
                 MessageBox.Show(this, "CSV 出力が完了しました。\r\n" + dlg.FileName,
                     "CSV出力", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private string ExportCsvForTabToDefaultFile(TraceTabContext tab)
+        {
+            if (tab == null)
+                throw new ArgumentNullException("tab");
+
+            if (!HasAnyVisibleData(tab.GridStart) &&
+                !HasAnyVisibleData(tab.GridMiddle) &&
+                !HasAnyVisibleData(tab.GridEnd))
+            {
+                throw new InvalidOperationException("出力対象の表示データがありません。");
+            }
+
+            string directory = GetCsvOutputDirectoryOrExecutableDirectory();
+            string filePath = Path.Combine(directory, BuildCsvExportFileName());
+
+            CsvExportHelper.ExportCurrentGridsToCsv(
+                filePath,
+                tab.GridStart,
+                tab.GridMiddle,
+                tab.GridEnd);
+
+            return filePath;
+        }
+
+        private string ExportTraceWorkResultToDefaultCsv(TraceSearchWorkResult workResult)
+        {
+            if (workResult == null)
+                throw new ArgumentNullException("workResult");
+
+            if (workResult.DisplayTable == null || workResult.DisplayTable.Rows.Count == 0)
+                throw new InvalidOperationException("出力対象の表示データがありません。");
+
+            string directory = GetCsvOutputDirectoryOrExecutableDirectory();
+            string filePath = Path.Combine(directory, BuildCsvExportFileName());
+
+            ExportDisplayTableToCsv(
+                filePath,
+                workResult.DisplayTable,
+                workResult.DisplayResult == null ? 0 : workResult.DisplayResult.MaxMiddleDepth);
+
+            return filePath;
+        }
+
+        private void ExportDisplayTableToCsv(string filePath, DataTable table, int maxMiddleDepth)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("filePath is null or empty.", "filePath");
+
+            if (table == null)
+                throw new ArgumentNullException("table");
+
+            var columns = BuildTraceCsvColumnPlans(table, maxMiddleDepth);
+            var lines = new List<string>();
+
+            lines.Add(BuildCsvLine(columns.Select(x => x.HeaderText).ToList()));
+
+            foreach (DataRow row in table.Rows)
+            {
+                var values = new List<string>();
+
+                foreach (var column in columns)
+                {
+                    object value = row.Table.Columns.Contains(column.ColumnName)
+                        ? row[column.ColumnName]
+                        : null;
+
+                    values.Add(value == null || value == DBNull.Value ? string.Empty : Convert.ToString(value));
+                }
+
+                lines.Add(BuildCsvLine(values));
+            }
+
+            File.WriteAllLines(filePath, lines, new UTF8Encoding(true));
+        }
+
+        private List<TraceCsvColumnPlan> BuildTraceCsvColumnPlans(DataTable table, int maxMiddleDepth)
+        {
+            var columns = new List<TraceCsvColumnPlan>();
+
+            AddTraceCsvNodeColumns(columns, table, "Start_", "指図番号", "ロットNo.", "品目名", "開始日時", "重量");
+
+            for (int level = 1; level <= maxMiddleDepth; level++)
+            {
+                string prefix = "Lv" + level.ToString() + "_";
+                AddTraceCsvNodeColumns(columns, table, prefix, " 指図番号", " ロットNo.", " 品目名", " 開始日時", " 重量");
+            }
+
+            AddTraceCsvNodeColumns(columns, table, "End_", "指図番号", "ロットNo.", "品目名", "開始日時", "重量");
+
+            return columns;
+        }
+
+        private void AddTraceCsvNodeColumns(
+            List<TraceCsvColumnPlan> columns,
+            DataTable table,
+            string prefix,
+            string orderHeader,
+            string lotHeader,
+            string itemNameHeader,
+            string startTimeHeader,
+            string weightHeader)
+        {
+            AddTraceCsvColumn(columns, table, prefix + "Order", orderHeader);
+            AddTraceCsvColumn(columns, table, prefix + "Lot", lotHeader);
+            AddTraceCsvColumn(columns, table, prefix + "ItemName", itemNameHeader);
+            AddTraceCsvColumn(columns, table, prefix + "StartTime", startTimeHeader);
+            AddTraceCsvColumn(columns, table, prefix + "Weight", weightHeader);
+        }
+
+        private void AddTraceCsvColumn(
+            List<TraceCsvColumnPlan> columns,
+            DataTable table,
+            string columnName,
+            string headerText)
+        {
+            if (columns == null || table == null)
+                return;
+
+            if (!table.Columns.Contains(columnName))
+                return;
+
+            columns.Add(new TraceCsvColumnPlan
+            {
+                ColumnName = columnName,
+                HeaderText = headerText
+            });
+        }
+
+        private string BuildCsvLine(List<string> values)
+        {
+            if (values == null || values.Count == 0)
+                return string.Empty;
+
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+
+                sb.Append(EscapeCsvValue(values[i]));
+            }
+
+            return sb.ToString();
+        }
+
+        private string EscapeCsvValue(string value)
+        {
+            if (value == null)
+                return string.Empty;
+
+            bool shouldQuote =
+                value.IndexOf(',') >= 0 ||
+                value.IndexOf('"') >= 0 ||
+                value.IndexOf('\r') >= 0 ||
+                value.IndexOf('\n') >= 0;
+
+            if (!shouldQuote)
+                return value;
+
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
+        }
+
+        private sealed class TraceCsvColumnPlan
+        {
+            public string ColumnName { get; set; }
+            public string HeaderText { get; set; }
+        }
+
+        private string GetCsvOutputDirectoryOrExecutableDirectory()
+        {
+            string directory = GetOutputInitialDirectory(DefaultCsvDirectoryIniKey);
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            return directory;
         }
 
         private string BuildCsvExportFileName()
@@ -2933,23 +3461,34 @@ namespace LotTraceApp
             if (string.IsNullOrWhiteSpace(iniKey))
                 return null;
 
-            string iniPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LotTraceApp.ini");
-            if (!File.Exists(iniPath))
-                return null;
-
-            var ini = new IniFile(iniPath);
-            string directory = ini.GetString(OutputIniSection, iniKey, null);
-            if (string.IsNullOrWhiteSpace(directory))
-                return null;
-
-            directory = Environment.ExpandEnvironmentVariables(directory.Trim());
-            if (!Path.IsPathRooted(directory))
+            try
             {
-                directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, directory);
-            }
+                string iniPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LotTraceApp.ini");
+                if (!File.Exists(iniPath))
+                    return null;
 
-            Directory.CreateDirectory(directory);
-            return directory;
+                var ini = new IniFile(iniPath);
+                string directory = ini.GetString(OutputIniSection, iniKey, null);
+                if (string.IsNullOrWhiteSpace(directory))
+                    return null;
+
+                directory = Environment.ExpandEnvironmentVariables(directory.Trim());
+                if (directory.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                    return null;
+
+                if (!Path.IsPathRooted(directory))
+                {
+                    directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, directory);
+                }
+
+                directory = Path.GetFullPath(directory);
+                Directory.CreateDirectory(directory);
+                return directory;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion
@@ -3694,7 +4233,14 @@ namespace LotTraceApp
             var lineCache = GetOrCreateGridLinePaintCache(tab.GridEnd);
             int endXOffset = GetVisibleColumnsTotalWidth(tab.GridEnd);
 
-            foreach (var line in drawInfo.HorizontalLines)
+            var preferredLines = drawInfo.HorizontalLines
+                .Where(x => x != null)
+                .GroupBy(x => x.StartRowIndex)
+                .Select(g => ResolvePreferredEndHorizontalLine(g.ToList()))
+                .Where(x => x != null)
+                .ToList();
+
+            foreach (var line in preferredLines)
             {
                 if (line == null)
                     continue;
@@ -4000,6 +4546,49 @@ namespace LotTraceApp
             return firstBranch;
         }
 
+        private EndHorizontalLineDrawInfo ResolvePreferredEndHorizontalLine(
+            List<EndHorizontalLineDrawInfo> lines)
+        {
+            if (lines == null || lines.Count == 0)
+                return null;
+
+            EndHorizontalLineDrawInfo firstStart = null;
+            EndHorizontalLineDrawInfo firstTrunk = null;
+            EndHorizontalLineDrawInfo firstBranch = null;
+
+            foreach (var line in lines)
+            {
+                if (line == null)
+                    continue;
+
+                switch (line.LineKind)
+                {
+                    case "Trunk":
+                        if (firstTrunk == null)
+                            firstTrunk = line;
+                        break;
+
+                    case "Branch":
+                        if (firstBranch == null)
+                            firstBranch = line;
+                        break;
+
+                    case "Start":
+                        if (firstStart == null)
+                            firstStart = line;
+                        break;
+                }
+            }
+
+            if (firstStart != null)
+                return firstStart;
+
+            if (firstTrunk != null)
+                return firstTrunk;
+
+            return firstBranch;
+        }
+
         
         private Color ResolveMiddleLineColor(string lineKind)
         {
@@ -4090,7 +4679,53 @@ namespace LotTraceApp
 
         private int GetMiddleGridBottom(DataGridView grid)
         {
-            return grid.DisplayRectangle.Bottom;
+            if (grid == null)
+                return 0;
+
+            int bottom = GetLastDisplayedDataRowBottom(grid);
+            if (bottom <= grid.DisplayRectangle.Top)
+                return grid.DisplayRectangle.Top;
+
+            return Math.Min(bottom, grid.DisplayRectangle.Bottom);
+        }
+
+        private int GetLastDisplayedDataRowBottom(DataGridView grid)
+        {
+            if (grid == null || grid.Rows == null || grid.Rows.Count == 0)
+                return 0;
+
+            for (int rowIndex = grid.Rows.Count - 1; rowIndex >= 0; rowIndex--)
+            {
+                var row = grid.Rows[rowIndex];
+                if (row == null || row.IsNewRow || !row.Visible)
+                    continue;
+
+                var rowRectangle = grid.GetRowDisplayRectangle(row.Index, true);
+                if (rowRectangle.Height > 0)
+                    return rowRectangle.Bottom;
+
+                return grid.DisplayRectangle.Top + GetVisibleRowsHeightThroughIndex(grid, row.Index);
+            }
+
+            return 0;
+        }
+
+        private int GetVisibleRowsHeightThroughIndex(DataGridView grid, int endRowIndex)
+        {
+            if (grid == null || endRowIndex < 0)
+                return 0;
+
+            int height = 0;
+            for (int rowIndex = 0; rowIndex <= endRowIndex && rowIndex < grid.Rows.Count; rowIndex++)
+            {
+                var row = grid.Rows[rowIndex];
+                if (row == null || row.IsNewRow || !row.Visible)
+                    continue;
+
+                height += row.Height;
+            }
+
+            return height;
         }
 
         #endregion
@@ -4608,11 +5243,14 @@ namespace LotTraceApp
             if (e.Button != MouseButtons.Right) return;
 
             // 右クリックした行を選択
-            dataGridStart.ClearSelection();
-            dataGridStart.CurrentCell = dataGridStart.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            dataGridStart.Rows[e.RowIndex].Selected = true;
 
-            var drv = dataGridStart.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            var tab = GetCurrentTabContext();
+
+            tab.GridStart.ClearSelection();
+            tab.GridStart.CurrentCell = tab.GridStart.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            tab.GridStart.Rows[e.RowIndex].Selected = true;
+
+            var drv = tab.GridStart.Rows[e.RowIndex].DataBoundItem as DataRowView;
             if (drv == null) return;
 
             DataRow r = drv.Row;
@@ -4633,21 +5271,23 @@ namespace LotTraceApp
         }
         private void dataGridMiddle_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            var tab = GetCurrentTabContext();
+
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             if (e.Button != MouseButtons.Right) return;
 
             // 右クリックした行を選択（Startと同じ）
-            dataGridMiddle.ClearSelection();
-            dataGridMiddle.CurrentCell = dataGridMiddle.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            dataGridMiddle.Rows[e.RowIndex].Selected = true;
+            tab.GridMiddle.ClearSelection();
+            tab.GridMiddle.CurrentCell = tab.GridMiddle.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            tab.GridMiddle.Rows[e.RowIndex].Selected = true;
 
-            var drv = dataGridMiddle.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            var drv = tab.GridMiddle.Rows[e.RowIndex].DataBoundItem as DataRowView;
             if (drv == null) return;
 
             DataRow r = drv.Row;
 
             // クリック列からLvを推定（Lv3_Order など）
-            string colName = dataGridMiddle.Columns[e.ColumnIndex].Name;
+            string colName = tab.GridMiddle.Columns[e.ColumnIndex].Name;
             int lv = GetMiddleHeaderLevelFromColumnName(colName) ?? 0;
 
             string productionOrderNumber = GetRowString(r, $"Lv{lv}_Order");
@@ -4677,12 +5317,14 @@ namespace LotTraceApp
             // ★右クリック以外は開かない
             if (e.Button != MouseButtons.Right) return;
 
-            // 右クリックした行を選択（Startと同じ）
-            dataGridEnd.ClearSelection();
-            dataGridEnd.CurrentCell = dataGridEnd.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            dataGridEnd.Rows[e.RowIndex].Selected = true;
+            var tab = GetCurrentTabContext();
 
-            var drv = dataGridEnd.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            // 右クリックした行を選択（Startと同じ）
+            tab.GridEnd.ClearSelection();
+            tab.GridEnd.CurrentCell = tab.GridEnd.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            tab.GridEnd.Rows[e.RowIndex].Selected = true;
+
+            var drv = tab.GridEnd.Rows[e.RowIndex].DataBoundItem as DataRowView;
             if (drv == null) return;
 
             DataRow r = drv.Row;
@@ -4742,12 +5384,49 @@ namespace LotTraceApp
             tab.TxtLot.Clear();
             tab.ChkUseFrom.Checked = false;
 
-            tab.GridStart.DataSource = null;
-            tab.GridMiddle.DataSource = null;
-            tab.GridEnd.DataSource = null;
-
             ClearStoredTraceArtifactsForTab(tab.TabNo);
+            ClearTraceTabGrids(tab);
             RefreshHeaderPanels(tab);
+            InvalidateTraceGrids(tab);
+        }
+
+        private void ClearTraceTabGrids(TraceTabContext tab)
+        {
+            if (tab == null)
+                return;
+
+            ClearTraceGrid(tab.GridStart);
+            ClearTraceGrid(tab.GridMiddle);
+            ClearTraceGrid(tab.GridEnd);
+            RestoreMiddleGridHeight(tab);
+
+            if (tab.MiddleHeaderInnerPanel != null)
+            {
+                tab.MiddleHeaderInnerPanel.Controls.Clear();
+                tab.MiddleHeaderLevelLabels.Clear();
+                tab.MiddleHeaderInnerPanel.Width = 0;
+                tab.MiddleHeaderInnerPanel.Left = 0;
+            }
+        }
+
+        private void ClearTraceGrid(DataGridView grid)
+        {
+            if (grid == null)
+                return;
+
+            grid.DataSource = null;
+            grid.Rows.Clear();
+            grid.Columns.Clear();
+            grid.ClearSelection();
+        }
+
+        private void RestoreMiddleGridHeight(TraceTabContext tab)
+        {
+            if (tab == null || tab.GridStart == null || tab.GridMiddle == null)
+                return;
+
+            if (tab.GridStart.Height > 0 && tab.GridMiddle.Height != tab.GridStart.Height)
+                tab.GridMiddle.Height = tab.GridStart.Height;
         }
 
         private void ClearStoredTraceArtifactsForTab(int tabNo)
@@ -4761,6 +5440,7 @@ namespace LotTraceApp
             _tabDisplayTables.Remove(tabNo);
             ClearCrossPointNodeKeysForTab(tabNo);
             ClearGridBackColorCachesForTab(tabNo);
+            _gridPaintCache.Clear();
         }
 
         private void ClearCrossPointNodeKeysForTab(int tabNo)

@@ -10,9 +10,6 @@ namespace LotTraceApp
 {
     internal static class Program
     {
-        // 仕様書 7.7 の出力先例
-        private const string ExportDirectory = @"C:\FA-Server\DB_TRACE\Export";
-
         [STAThread]
         private static void Main(string[] args)
         {
@@ -67,97 +64,216 @@ namespace LotTraceApp
             var bottleRepo = new BottleTraceRepository(connBottle);
             var bottleService = new BottleTraceService(bottleRepo);
 
-            // コマンドライン引数がある場合は、液設備側で検索→CSV出力のみを行う
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            CommandLineOptions options;
+            string parseError;
             if (args != null && args.Length > 0)
             {
-                RunCommandLine(args, liquidService);
+                if (!CommandLineOptions.TryParse(args, out options, out parseError))
+                {
+                    MessageBox.Show(parseError, "コマンドライン引数エラー",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var form = new MainForm(liquidService, bottleService, resultService);
+
+                if (options.Mode == 2)
+                {
+                    RunHeadlessCommandLine(form, options);
+                    return;
+                }
+
+                form.SetCommandLineStartup(options);
+                Application.Run(form);
                 return;
             }
 
-            // 通常起動（GUI）
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm(liquidService, bottleService, resultService));
         }
 
-        /// <summary>
-        /// コマンドライン起動用：液設備のロットトレースを実行し、CSV を出力して終了
-        /// </summary>
-        private static void RunCommandLine(string[] args, LotTraceService liquidService)
+        private static void RunHeadlessCommandLine(MainForm form, CommandLineOptions options)
         {
-            var p = new TraceSearchParameters();
-            int mode = 1; // 1,2,3 を想定（この例ではすべて CSV 出力して終了）
-
-            // 簡易パラメータ解析
-            foreach (string raw in args)
-            {
-                if (string.IsNullOrEmpty(raw)) continue;
-
-                if (raw.Equals("-F", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.Direction = TraceDirection.Forward;
-                }
-                else if (raw.Equals("-B", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.Direction = TraceDirection.Backward;
-                }
-                else if (raw.StartsWith("-S:", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.ProductionOrderNumber = raw.Substring(3);
-                }
-                else if (raw.StartsWith("-N:", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.ItemName = raw.Substring(3);
-                }
-                else if (raw.StartsWith("-C:", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.ItemCode = raw.Substring(3);
-                }
-                else if (raw.StartsWith("-L:", StringComparison.OrdinalIgnoreCase))
-                {
-                    p.LotNumber = raw.Substring(3);
-                }
-                else if (raw.StartsWith("-M:", StringComparison.OrdinalIgnoreCase))
-                {
-                    int m;
-                    if (int.TryParse(raw.Substring(3), out m))
-                    {
-                        mode = m;
-                    }
-                }
-            }
-
-            // 検索実行
-            TraceResult result = liquidService.ExecuteTrace(p);
-
-            // 出力ディレクトリ作成
             try
             {
-                if (!Directory.Exists(ExportDirectory))
-                {
-                    Directory.CreateDirectory(ExportDirectory);
-                }
+                string exportedPath = form.ExecuteCommandLineHeadless(options);
+                Console.WriteLine("CSV exported: " + exportedPath);
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("出力フォルダ作成に失敗しました: " + ex.Message);
+                Console.Error.WriteLine("コマンドライン処理に失敗しました: " + ex.Message);
+            }
+            finally
+            {
+                form.Dispose();
+            }
+        }
+    }
+
+    public sealed class CommandLineOptions
+    {
+        public int Mode { get; private set; }
+        public TraceSearchParameters SearchParameters { get; private set; }
+
+        private CommandLineOptions()
+        {
+            Mode = 1;
+            SearchParameters = new TraceSearchParameters();
+        }
+
+        public bool ExportsCsv
+        {
+            get { return Mode == 1 || Mode == 2; }
+        }
+
+        public static bool TryParse(string[] args, out CommandLineOptions options, out string errorMessage)
+        {
+            options = new CommandLineOptions();
+            errorMessage = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                string raw = args[i];
+                if (string.IsNullOrWhiteSpace(raw))
+                    continue;
+
+                string flag;
+                string value;
+                SplitArgument(raw, out flag, out value);
+
+                if (flag.Equals("-F", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.SearchParameters.Direction = TraceDirection.Forward;
+                }
+                else if (flag.Equals("-B", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.SearchParameters.Direction = TraceDirection.Backward;
+                }
+                else if (flag.Equals("-S", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parsedValue;
+                    if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
+                        return false;
+
+                    options.SearchParameters.ProductionOrderNumber = parsedValue;
+                }
+                else if (flag.Equals("-N", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parsedValue;
+                    if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
+                        return false;
+
+                    options.SearchParameters.ItemName = parsedValue;
+                }
+                else if (flag.Equals("-C", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parsedValue;
+                    if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
+                        return false;
+
+                    options.SearchParameters.ItemCode = parsedValue;
+                }
+                else if (flag.Equals("-L", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parsedValue;
+                    if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
+                        return false;
+
+                    options.SearchParameters.LotNumber = parsedValue;
+                }
+                else if (flag.Equals("-M", StringComparison.OrdinalIgnoreCase))
+                {
+                    string modeText;
+                    if (!ReadValue(args, ref i, value, flag, out modeText, out errorMessage))
+                        return false;
+
+                    int mode;
+                    if (!int.TryParse(modeText, out mode) || mode < 1 || mode > 3)
+                    {
+                        errorMessage = "-M には 1、2、3 のいずれかを指定してください。";
+                        return false;
+                    }
+
+                    options.Mode = mode;
+                }
+                else
+                {
+                    errorMessage = "未対応のコマンドライン引数です: " + raw;
+                    return false;
+                }
+            }
+
+            if (!HasAnySearchCondition(options.SearchParameters))
+            {
+                errorMessage = "検索条件を1つ以上指定してください。";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void SplitArgument(string raw, out string flag, out string value)
+        {
+            int separatorIndex = raw.IndexOf(':');
+            if (separatorIndex < 0)
+                separatorIndex = raw.IndexOf('=');
+
+            if (separatorIndex < 0)
+            {
+                flag = raw;
+                value = null;
                 return;
             }
 
-            string fileName = "Lottr" + DateTime.Now.ToString("yyMMddHHmmss") + ".csv";
-            string path = Path.Combine(ExportDirectory, fileName);
+            flag = raw.Substring(0, separatorIndex);
+            value = raw.Substring(separatorIndex + 1);
+        }
 
-            try
+        private static bool ReadValue(
+            string[] args,
+            ref int index,
+            string inlineValue,
+            string flag,
+            out string value,
+            out string errorMessage)
+        {
+            errorMessage = null;
+
+            if (!string.IsNullOrWhiteSpace(inlineValue))
             {
-                ExportHelper.ExportTraceResultToCsv(result, path);
-                Console.WriteLine("CSV exported: " + path);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine("CSV 出力に失敗しました: " + ex.Message);
+                value = inlineValue.Trim();
+                return true;
             }
 
-            // mode(1/2/3)に応じた GUI 表示などは、この簡易版では実装していない
+            if (index + 1 >= args.Length || IsFlag(args[index + 1]))
+            {
+                value = null;
+                errorMessage = flag + " の値を指定してください。";
+                return false;
+            }
+
+            index++;
+            value = args[index].Trim();
+            return true;
+        }
+
+        private static bool IsFlag(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value) && value.StartsWith("-", StringComparison.Ordinal);
+        }
+
+        private static bool HasAnySearchCondition(TraceSearchParameters p)
+        {
+            if (p == null)
+                return false;
+
+            return
+                !string.IsNullOrWhiteSpace(p.ProductionOrderNumber) ||
+                !string.IsNullOrWhiteSpace(p.ItemName) ||
+                !string.IsNullOrWhiteSpace(p.ItemCode) ||
+                !string.IsNullOrWhiteSpace(p.LotNumber);
         }
     }
 }
