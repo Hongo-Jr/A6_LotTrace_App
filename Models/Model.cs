@@ -247,12 +247,6 @@ namespace LotTraceApp.Models
         public TraceEdgeDirection EdgeDirection { get; set; }
 
         /// <summary>
-        /// 表示グループ用のルートキー。
-        /// 旧互換や表示構築用の補助情報として保持する。
-        /// </summary>
-        public string RootGroupKey { get; set; }
-
-        /// <summary>
         /// 親判定に使った親LotNo。
         ///
         /// A/B の接続判定時に、
@@ -322,7 +316,7 @@ namespace LotTraceApp.Models
         /// 想定用途:
         /// - 同一接続の重複追加防止
         /// - Path 構築時の経路識別
-        /// - 表示用の IncomingLinkKey / PathKey の元情報
+        /// - 経路探索時のリンク一意性判定
         ///
         /// 親Node・子Node に加えて、
         /// SourceTable / MaterialAInputType / SlotNo / ParentLotNumber など
@@ -413,43 +407,6 @@ namespace LotTraceApp.Models
         public string NodeKey { get; set; }
 
         /// <summary>
-        /// 旧互換の親キー。
-        /// 将来的には廃止予定。
-        /// </summary>
-        public string ParentKey { get; set; }
-
-        /// <summary>
-        /// 表示上の親ノードキー。
-        ///
-        /// 描画（線結合）で使用。
-        /// NodeIdentityKey ベースの旧互換要素を含むため、
-        /// 将来的には整理対象。
-        /// </summary>
-        public string DisplayParentNodeKey { get; set; }
-
-        /// <summary>
-        /// このセルに入ってくるリンクの識別キー。
-        ///
-        /// 経路識別・枝分かれ判定に使用。
-        /// </summary>
-        public string IncomingLinkKey { get; set; }
-
-        /// <summary>
-        /// 上流側の経路キー。
-        ///
-        /// 同一経路かどうかの判定に使用。
-        /// 主にセルの表示抑制やグルーピングで使用。
-        /// </summary>
-        public string UpstreamPathKey { get; set; }
-
-        /// <summary>
-        /// 下流側の経路キー。
-        ///
-        /// Start基準の重複行抑制などに使用。
-        /// </summary>
-        public string DownstreamPathKey { get; set; }
-
-        /// <summary>
         /// 中間レベル（Lv）。
         /// Start=0, Middle=1..N, End=-1 などで使用。
         /// </summary>
@@ -492,72 +449,20 @@ namespace LotTraceApp.Models
 
     public class TraceDisplayRow
     {
-        public string RootGroupKey { get; set; }
-        public string RootNodeKey { get; set; }
-        public string PathKey { get; set; }
         public string RouteSystem { get; set; }
         public int DisplayOrder { get; set; }
 
-        /// <summary>
-        /// フォワード表示順確定用の始点幹グループキー。
-        ///
-        /// これはサービス側が
-        /// 「同一Lot始点を連続行にまとめるため」に使う内部メタデータであり、
-        /// UIがこの値を直接解釈して並び替えや線判定を行ってはならない。
-        ///
-        /// UIでは、サービスがこの値を用いて確定した最終 Rows 順序と、
-        /// それと同一順序から組み立てられた RenderRanges を
-        /// そのまま使用する前提とする。
-        ///
-        /// 列互換・デバッグ確認のため DataTable へ残す場合はあるが、
-        /// 描画ロジックの判断材料として直接使わないこと。
-        /// </summary>
-        public string StartTrunkGroupKey { get; set; }
-
-        /// <summary>
-        /// フォワード表示順確定用の始点幹グループ順序。
-        ///
-        /// これはサービス内部で最終表示順を安定化させるための順序値であり、
-        /// UIがこの値を直接見て再並び替えする用途ではない。
-        ///
-        /// StartTrunkGroupKey と組み合わせて
-        /// サービス側の最終 Rows 構築時にのみ使用し、
-        /// UIは順序確定済みの結果を受け取って表示するだけにする。
-        /// </summary>
-        public int StartTrunkOrder { get; set; }
-
         public bool IsDisplayTarget { get; set; }
         public string SuppressReason { get; set; }
-
-        public string LotTraceKey { get; set; }
-        public string UpstreamLotOnlyKey { get; set; }
-
-        public bool IsFirstRowOfRootGroup { get; set; }
-        public bool IsLastRowOfRootGroup { get; set; }
 
         public TraceDisplayCell Start { get; set; }
         public List<TraceDisplayCell> Middles { get; private set; }
         public TraceDisplayCell End { get; set; }
 
         /// <summary>
-        /// Startグループ内順序。
-        /// </summary>
-        public int StartRowOrderInGroup { get; set; }
-
-        /// <summary>
-        /// 始点グループ先頭か。
-        /// </summary>
-        public bool IsFirstRowOfStartGroup { get; set; }
-
-        /// <summary>
         /// 始点グループ末尾か。
         /// </summary>
         public bool IsLastRowOfStartGroup { get; set; }
-
-        /// <summary>
-        /// 経路署名。
-        /// </summary>
-        public string FullPathSignature { get; set; }
 
         /// <summary>
         /// ★フォワード専用
@@ -654,10 +559,7 @@ namespace LotTraceApp.Models
     ///
     /// 注意：
     /// これは Middle 側の表示レンジ情報であり、
-    /// 経路文脈（DisplayParentNodeKey / IncomingLinkKey /
-    /// UpstreamPathKey / DownstreamPathKey）を保持する。
-    /// 幹・枝の太さ計算も今後はこの情報を組み立てる
-    /// サービス側で確定する前提。
+    /// 幹・枝の太さ計算も今後はサービス側で確定する前提。
     /// </summary>
     public class MiddleTreeRenderRange
     {
@@ -665,11 +567,6 @@ namespace LotTraceApp.Models
         public int Level { get; set; }
 
         public string NodeKey { get; set; }
-        public string DisplayParentNodeKey { get; set; }
-        public string IncomingLinkKey { get; set; }
-        public string UpstreamPathKey { get; set; }
-        public string DownstreamPathKey { get; set; }
-
         /// <summary>
         /// このノード自身が最初に現れる行
         /// </summary>
@@ -967,10 +864,6 @@ public class ChildCandidate
         public ProductionResultNode EndNode { get; set; }
         public List<ProductionResultLink> PathLinks { get; private set; }
 
-        public string RootGroupKey { get; set; }
-        public string StartTrunkGroupKey { get; set; }
-        public int StartTrunkOrder { get; set; }
-
         public bool EndIsDuplicate { get; set; }
         public int? EndDuplicateDisplayGroupIndex { get; set; }
 
@@ -978,11 +871,6 @@ public class ChildCandidate
         /// 経路の安定順序。
         /// </summary>
         public int PathOrder { get; set; }
-
-        /// <summary>
-        /// 経路全体の署名。
-        /// </summary>
-        public string FullPathSignature { get; set; }
 
         /// <summary>
         /// StartNodeから見た下流枝署名。

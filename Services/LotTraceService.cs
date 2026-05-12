@@ -39,39 +39,11 @@ namespace LotTraceApp.Services
         private ForwardDisplayLaneBuildResult _currentForwardLaneBuildResult;
         private Dictionary<string, List<BackwardParentCandidate>> _currentBackwardCandidatesByChildNodeKey;
         private Dictionary<string, List<ChildCandidate>> _currentForwardCandidatesByParentNodeKey;
-        private sealed class ForwardChildBundle
-        {
-            public int Level { get; set; }
-            public string LotKey { get; set; }
-            public string ParentMergeKey { get; set; }
-
-            public List<ChildCandidate> Members { get; private set; }
-
-            public ChildCandidate Representative { get; set; }
-
-            public ForwardChildBundle()
-            {
-                Members = new List<ChildCandidate>();
-            }
-        }
-
-        
-
         public LotTraceService(LotTraceRepository repo, ICustomerItemMasterRepository customerItemMasterRepository)
         {
             if (repo == null) throw new ArgumentNullException("repo");
             _repo = repo;
             _customerItemMasterRepository = customerItemMasterRepository;
-        }
-
-        public TraceResult ExecuteTrace(TraceSearchParameters p)
-        {
-            return ExecuteTrace(p, null, CancellationToken.None);
-        }
-
-        public TraceResult ExecuteTrace(TraceSearchParameters p, IProgress<TraceProgressState> progress)
-        {
-            return ExecuteTrace(p, progress, CancellationToken.None);
         }
 
         public TraceResult ExecuteTrace(
@@ -92,25 +64,6 @@ namespace LotTraceApp.Services
             }
         }
        
-
-        public DataTable BuildDisplayTable(TraceResult traceResult)
-        {
-            var displayResult = BuildDisplayResult(traceResult, new TraceDisplayBuildOptions
-            {
-                SuppressDuplicateStartCells = false,
-                SuppressDuplicateMiddleCells = false,
-                SuppressDuplicateEndCells = false,
-                SortBeforeSuppress = false
-            });
-
-            return BuildDisplayTableFromDisplayResult(displayResult, CancellationToken.None);
-        }
-
-        public DataTable BuildDisplayTable(TraceDisplayResult displayResult, IProgress<TraceProgressState> progress)
-        {
-            return BuildDisplayTable(displayResult, progress, CancellationToken.None);
-        }
-
         public DataTable BuildDisplayTable(
             TraceDisplayResult displayResult,
             IProgress<TraceProgressState> progress,
@@ -121,10 +74,10 @@ namespace LotTraceApp.Services
         }
 
         public TraceDisplayResult BuildDisplayResult(
-    TraceResult traceResult,
-    TraceDisplayBuildOptions options = null,
-    IProgress<TraceProgressState> progress = null,
-    CancellationToken cancellationToken = default(CancellationToken))
+            TraceResult traceResult,
+            TraceDisplayBuildOptions options = null,
+            IProgress<TraceProgressState> progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -149,17 +102,7 @@ namespace LotTraceApp.Services
                 var row = new TraceDisplayRow
                 {
                     DisplayOrder = rowIndex,
-                    RootGroupKey = pathRow.RootGroupKey,
-                    RootNodeKey = GetNodeIdentityKey(pathRow.StartNode),
-                    PathKey = BuildPathKey(pathRow),
                     RouteSystem = ResolveRouteSystem(pathRow),
-                    StartTrunkGroupKey = pathRow.StartTrunkGroupKey,
-                    StartTrunkOrder = pathRow.StartTrunkOrder,
-                    FullPathSignature = pathRow.FullPathSignature,
-
-                    LotTraceKey = pathRow == null ? null : BuildLotTraceKey(pathRow),
-                    UpstreamLotOnlyKey = pathRow == null ? null : BuildUpstreamLotOnlyKey(pathRow),
-
                     IsDisplayTarget = true,
                     SuppressReason = null
                 };
@@ -196,8 +139,6 @@ namespace LotTraceApp.Services
                     endNodeIndex);
 
                 // Startグループ情報を引き継ぐ
-                row.StartRowOrderInGroup = pathRow.PathOrder;
-                row.IsFirstRowOfStartGroup = false;
                 row.IsLastRowOfStartGroup = false;
 
                 // Lotグループ情報もそのまま引き継ぐ
@@ -282,10 +223,7 @@ namespace LotTraceApp.Services
                 return result;
             }
             
-
-
-            DumpBackwardTraceArtifacts(result, laneBuildResult, "COMPLETED");
-
+           
             // ------------------------------------------------------------
             // 4. 完成した DisplayLaneNode に対して品名解決
             // ------------------------------------------------------------
@@ -311,37 +249,299 @@ namespace LotTraceApp.Services
 
             result.TraceLineRanges.AddRange(traceLineRanges);
 
-
-
             ReportProgress(progress, "検索結果行を作成しています...", 64);
             BuildPathRowsFromDisplayLaneNodes(result, laneBuildResult);
 
             return result;
         }
 
+        #endregion
 
-        private string BuildStartTrunkGroupKey(ProductionResultNode startNode)
+        #region トレースバック（仕様書 7.2）
+        /// <summary>
+        /// 枝構造化に向けて工事中。新中間モデル適用版
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private TraceResult TraceBackward(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
         {
-            if (startNode == null)
-                return null;
+            cancellationToken.ThrowIfCancellationRequested();
 
-            // Lot優先
-            if (!string.IsNullOrWhiteSpace(startNode.LotNumber))
+            var result = new TraceResult();
+
+            var nodeMap = new Dictionary<string, ProductionResultNode>(StringComparer.OrdinalIgnoreCase);
+            var queue = new Queue<ProductionResultNode>();
+            var queuedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var linkMap = new Dictionary<string, ProductionResultLink>(StringComparer.OrdinalIgnoreCase);
+            var backwardCandidatesByChildNodeKey =
+    new Dictionary<string, List<BackwardParentCandidate>>(StringComparer.OrdinalIgnoreCase);
+
+            // 枝構造化に渡す始点一覧。
+            // 通常始点(B / A Manual)に加えて、StartD の child 側もここへ積む。
+            var laneStartNodes = new List<ProductionResultNode>();
+            var laneStartNodeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+
+            // ------------------------------------------------------------
+            // STEP1(START):
+            // バック検索の開始ノード取得
+            // 通常始点（B / A ManualInput）を取得する。
+            // これらは Current として queue に積み、以後の親探索は BFS で広げる。
+            // ------------------------------------------------------------
+            ReportProgress(progress, "トレースバックの始点を探索しています...", 15);
+            var startNodes = BuildBackwardStartNodes(p);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (startNodes != null)
             {
-                return "STARTLOT|" + startNode.LotNumber.Trim().ToUpperInvariant();
+                foreach (var raw in startNodes)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (raw == null)
+                        continue;
+
+                    EnsureNodeRegistered(result, raw);
+
+                    if (queuedKeys.Add(raw.NodeIdentityKey))
+                    {
+                        queue.Enqueue(raw);
+                    }
+                }
             }
 
-            // fallback: NodeMergeKey
-            string mergeKey = startNode.NodeIdentityKey;
-            if (!string.IsNullOrWhiteSpace(mergeKey))
+            if (queue.Count == 0)
             {
-                return "STARTNODE|" + mergeKey;
+                return result;
             }
 
-            return null;
+            // ------------------------------------------------------------
+            // STEP1.5(START-D):
+            // Drumcan始点の事前構造化
+            // child(StartD始点) -> parent を Candidate として先に反映する
+            // ------------------------------------------------------------
+            ReportProgress(progress, "始点周辺の親候補を確認しています...", 25);
+            var startDrumcanCandidates = _repo.FindBackwardStartDrumcanCandidates(p);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (startDrumcanCandidates != null)
+            {
+                foreach (var candidate in startDrumcanCandidates)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (candidate == null || candidate.ChildNode == null || candidate.Node == null)
+                        continue;
+
+                    var childNode = candidate.ChildNode;
+                    childNode.Depth = 0;
+                    childNode.ParentKey = null;
+                    childNode.StartDateLabel = ResolveStartDateLabel(childNode, null);
+
+                    EnsureNodeRegistered(result, childNode);
+
+                    // START-D child を通常始点と同様に扱う
+                    startNodes.Add(childNode);
+
+                    var parentNode = candidate.Node;
+                    parentNode.Depth = childNode.Depth + 1;
+                    parentNode.ParentKey = null;
+                    parentNode.StartDateLabel = ResolveBackwardStartDateLabel(parentNode);
+
+                    
+
+                    // ★これが本体（構造はここだけで良い）
+                    RegisterBackwardParentCandidateForDisplay(backwardCandidatesByChildNodeKey,candidate);
+
+                    // BFSは parent 側のみ
+                    if (queuedKeys.Add(parentNode.NodeIdentityKey))
+                    {
+                        queue.Enqueue(parentNode);
+                    }
+                }
+            }
+
+            if (queue.Count == 0)
+            {
+                return result;
+            }
+
+            // ------------------------------------------------------------
+            // STEP2:
+            // BFS（current = child / candidate.Node = parent）
+            // ------------------------------------------------------------
+
+            ReportProgress(progress, "親ロットを探索しています...", 35);
+
+            while (queue.Count > 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var current = queue.Dequeue();
+                if (current == null)
+                    continue;
+
+                // ★ これが必要
+                var candidates = _repo.FindBackwardParentsByLotStepFlow(current, current.Depth + 1);
+                if (candidates == null || candidates.Count == 0)
+                    continue;
+
+                foreach (var candidate in candidates)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (candidate == null || candidate.Node == null)
+                        continue;
+
+                    var parentNode = candidate.Node;
+
+                    // ★ 本体（構造登録）
+                    RegisterBackwardParentCandidateForDisplay(
+                        backwardCandidatesByChildNodeKey, candidate);
+
+                    // BFS展開
+                    if (queuedKeys.Add(parentNode.NodeIdentityKey))
+                    {
+                        queue.Enqueue(parentNode);
+                    }
+                }
+            }
+
+            // ------------------------------------------------------------
+            // STEP3:
+            // 旧互換ノード一覧の再構築
+            // ------------------------------------------------------------
+            // RebuildLegacyNodeLists(result);
+            _currentBackwardCandidatesByChildNodeKey = backwardCandidatesByChildNodeKey;
+            // ------------------------------------------------------------
+            // STEP4:
+            // バック探索結果 → 枝構造化
+            // ------------------------------------------------------------
+            ReportProgress(progress, "トレースバックの枝構造を作成しています...", 50);
+            var backwardLaneBuildResult = BuildBackwardDisplayLaneNodes(startNodes, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "品目名と開始日時を解決しています...", 60);
+            ResolveItemNamesDisplayNodes(backwardLaneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
+            ResolveStartDateLabelsForDisplayLaneNodes(backwardLaneBuildResult.DisplayNodes);
+
+            // ここで構造ベースの肉付け
+            PopulateLineDecisionInfos(backwardLaneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
+
+
+            // Occupied 確定
+            backwardLaneBuildResult.OccupiedLotGroupRanges =NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
+
+            // 追加：BuildDisplayResult から始点境界判定に使用するため一時保持
+            _currentForwardLaneBuildResult = backwardLaneBuildResult;
+
+            // ------------------------------------------------------------
+            // STEP5:
+            // backward 枝剪定・終点共通X正規化
+            // ------------------------------------------------------------
+
+            //必要ならここで枝選定メソッドを呼ぶ//
+            
+            cancellationToken.ThrowIfCancellationRequested();
+
+            //終端処理
+            backwardLaneBuildResult.EndInfos =
+                FinalizeBackwardEndNodeGroupsAndNormalizeX(
+                    backwardLaneBuildResult.DisplayNodes);
+
+            backwardLaneBuildResult.OccupiedLotGroupRanges =
+              NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
+
+            // ★追加（構造 → 線生成）
+            ReportProgress(progress, "罫線情報を作成しています...", 70);
+            var traceLineRanges =
+            BuildTraceLineRangesFromOccupiedGroups(
+                backwardLaneBuildResult.OccupiedLotGroupRanges);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            NormalizeBackwardTraceLineRangeGridKinds(traceLineRanges);
+
+            AppendSyntheticMiddleLineRangesForDirectStartEndBranches(
+                traceLineRanges,
+                backwardLaneBuildResult);
+
+            if (traceLineRanges != null && traceLineRanges.Count > 0)
+            {
+                result.TraceLineRanges.AddRange(traceLineRanges);
+            }
+
+            // ------------------------------------------------------------
+            // STEP6:
+            // 枝構造 → PathRows
+            // ※ route復元ではなく、XLevel / YLane 投影で作る
+            // ------------------------------------------------------------
+            ReportProgress(progress, "検索結果行を作成しています...", 75);
+            BuildBackwardPathRowsFromDisplayLaneNodes(result, backwardLaneBuildResult);
+
+            
+
+            return result;
         }
 
-    
+
+        /// <summary>
+        /// 新中間モデル適用。ただリポジトリとの整合はまだ怪しいかも
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private List<ProductionResultNode> BuildBackwardStartNodes(TraceSearchParameters p)
+        {
+            var result = new List<ProductionResultNode>();
+            var seenMergeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var rawStarts = _repo.FindBackwardStartNodes(p);
+            if (rawStarts == null || rawStarts.Count == 0)
+                return result;
+
+            foreach (var raw in rawStarts)
+            {
+                if (raw == null)
+                    continue;
+
+                raw.Depth = 0;
+                raw.ParentKey = null;
+                raw.StartDateLabel = ResolveStartDateLabel(raw, null);
+
+                // Backward の入口文脈は repository 側を優先する
+                if (!raw.InputSlotNo.HasValue)
+                    raw.InputSlotNo = 0;
+
+                if (string.IsNullOrWhiteSpace(raw.InputSourceType))
+                    raw.InputSourceType = null;
+
+                if (!raw.IsTraceTerminal)
+                    raw.IsTraceTerminal = string.IsNullOrWhiteSpace(raw.LotNumber);
+
+                string mergeKey = raw.NodeIdentityKey;
+
+                if (string.IsNullOrWhiteSpace(mergeKey))
+                {
+                    result.Add(raw);
+                    continue;
+                }
+
+                if (!seenMergeKeys.Add(mergeKey))
+                    continue;
+
+                result.Add(raw);
+            }
+
+            return result;
+        }
+
+        
+        #endregion
+
+        #region 表示結果変換・グリッド出力
 
         private sealed class DisplayLaneNode
         {
@@ -356,18 +556,10 @@ namespace LotTraceApp.Services
             public int YLane { get; set; }
             public int ChildIndex { get; set; }
 
-            // 既存：内部計算用として当面残す
-            public int SubtreeLaneSpan { get; set; }
-
-            // 追加：意味を明示した高さ・占有情報
-            public int RootGroupHeight { get; set; }     // 同一始点LotグループのLv0高さ
-            public int ChildBranchHeight { get; set; }   // このNode直下の子枝総高さ
             public int OccupiedFirstY { get; set; }      // このNode起点の占有開始Y
             public int OccupiedLastY { get; set; }       // このNode起点の占有終了Y
 
-            public List<DisplayLaneEdge> OutgoingEdges { get; private set; }
             public bool IsLotGroupRepresentative { get; set; }
-            public bool IsLotGroupNonRepresentative { get; set; }
 
             public string LotGroupKey { get; set; }
             public string RepresentativeNodeKey { get; set; }
@@ -375,73 +567,10 @@ namespace LotTraceApp.Services
 
             public DisplayLaneNode()
             {
-                OutgoingEdges = new List<DisplayLaneEdge>();
-
-                SubtreeLaneSpan = 1;
-
-                RootGroupHeight = 1;
-                ChildBranchHeight = 0;
                 OccupiedFirstY = -1;
                 OccupiedLastY = -1;
             }
         }
-
-
-        private sealed class DisplayLaneEdge
-        {
-            public string EdgeIdentityKey { get; set; }
-
-            public string ParentDisplayNodeKey { get; set; }
-            public string ChildDisplayNodeKey { get; set; }
-
-            public string ParentMergeKey { get; set; }
-            public string ChildMergeKey { get; set; }
-
-            public int FromXLevel { get; set; }
-            public int ToXLevel { get; set; }
-
-            public int FromYLane { get; set; }
-            public int ToYLane { get; set; }
-
-            public int ChildIndex { get; set; }
-            public string LotGroupKey { get; set; }
-
-            // 将来拡張用
-            public List<List<string>> EdgeContextMatrix { get; private set; }
-
-            public DisplayLaneEdge()
-            {
-                EdgeContextMatrix = new List<List<string>>();
-            }
-        }
-
-
-
-
-        
-
-       
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
 
         private DataTable BuildDisplayTableFromDisplayResult(
             TraceDisplayResult displayResult,
@@ -509,23 +638,9 @@ namespace LotTraceApp.Services
             table.Columns.Add("RowIndex", typeof(int));
             table.Columns.Add("DisplayOrder", typeof(int));
 
-            table.Columns.Add("RootGroupKey", typeof(string));
-            table.Columns.Add("RootNodeKey", typeof(string));
-            table.Columns.Add("PathKey", typeof(string));
             table.Columns.Add("RouteSystem", typeof(string));
 
-            table.Columns.Add("StartTrunkGroupKey", typeof(string));
-            table.Columns.Add("StartTrunkOrder", typeof(int));
-            table.Columns.Add("StartRowOrderInGroup", typeof(int));
-            table.Columns.Add("IsFirstRowOfStartGroup", typeof(bool));
             table.Columns.Add("IsLastRowOfStartGroup", typeof(bool));
-
-            table.Columns.Add("IsFirstRowOfRootGroup", typeof(bool));
-            table.Columns.Add("IsLastRowOfRootGroup", typeof(bool));
-
-            table.Columns.Add("FullPathSignature", typeof(string));
-            table.Columns.Add("LotTraceKey", typeof(string));
-            table.Columns.Add("UpstreamLotOnlyKey", typeof(string));
 
             table.Columns.Add("IsDisplayTarget", typeof(bool));
             table.Columns.Add("SuppressReason", typeof(string));
@@ -542,12 +657,6 @@ namespace LotTraceApp.Services
 
             table.Columns.Add("Start_NodeKey", typeof(string));
             table.Columns.Add("Start_MasterKey", typeof(string));
-            table.Columns.Add("Start_ParentKey", typeof(string));
-            table.Columns.Add("Start_DisplayParentNodeKey", typeof(string));
-            table.Columns.Add("Start_IncomingLinkKey", typeof(string));
-            table.Columns.Add("Start_UpstreamPathKey", typeof(string));
-            table.Columns.Add("Start_DownstreamPathKey", typeof(string));
-
             table.Columns.Add("Start_Order", typeof(string));
             table.Columns.Add("Start_Lot", typeof(string));
             table.Columns.Add("Start_ItemCode", typeof(string));
@@ -573,12 +682,6 @@ namespace LotTraceApp.Services
 
             table.Columns.Add(prefix + "NodeKey", typeof(string));
             table.Columns.Add(prefix + "MasterKey", typeof(string));
-            table.Columns.Add(prefix + "ParentKey", typeof(string));
-            table.Columns.Add(prefix + "DisplayParentNodeKey", typeof(string));
-            table.Columns.Add(prefix + "IncomingLinkKey", typeof(string));
-            table.Columns.Add(prefix + "UpstreamPathKey", typeof(string));
-            table.Columns.Add(prefix + "DownstreamPathKey", typeof(string));
-
             table.Columns.Add(prefix + "Order", typeof(string));
             table.Columns.Add(prefix + "Lot", typeof(string));
             table.Columns.Add(prefix + "ItemCode", typeof(string));
@@ -601,12 +704,6 @@ namespace LotTraceApp.Services
 
             table.Columns.Add("End_NodeKey", typeof(string));
             table.Columns.Add("End_MasterKey", typeof(string));
-            table.Columns.Add("End_ParentKey", typeof(string));
-            table.Columns.Add("End_DisplayParentNodeKey", typeof(string));
-            table.Columns.Add("End_IncomingLinkKey", typeof(string));
-            table.Columns.Add("End_UpstreamPathKey", typeof(string));
-            table.Columns.Add("End_DownstreamPathKey", typeof(string));
-
             table.Columns.Add("End_Order", typeof(string));
             table.Columns.Add("End_Lot", typeof(string));
             table.Columns.Add("End_ItemCode", typeof(string));
@@ -632,23 +729,9 @@ namespace LotTraceApp.Services
             row["RowIndex"] = rowIndex;
             row["DisplayOrder"] = displayRow.DisplayOrder;
 
-            SetValue(row, "RootGroupKey", displayRow.RootGroupKey);
-            SetValue(row, "RootNodeKey", displayRow.RootNodeKey);
-            SetValue(row, "PathKey", displayRow.PathKey);
             SetValue(row, "RouteSystem", displayRow.RouteSystem);
 
-            SetValue(row, "StartTrunkGroupKey", displayRow.StartTrunkGroupKey);
-            row["StartTrunkOrder"] = displayRow.StartTrunkOrder;
-            row["StartRowOrderInGroup"] = displayRow.StartRowOrderInGroup;
-            row["IsFirstRowOfStartGroup"] = displayRow.IsFirstRowOfStartGroup;
             row["IsLastRowOfStartGroup"] = displayRow.IsLastRowOfStartGroup;
-
-            row["IsFirstRowOfRootGroup"] = displayRow.IsFirstRowOfRootGroup;
-            row["IsLastRowOfRootGroup"] = displayRow.IsLastRowOfRootGroup;
-
-            SetValue(row, "FullPathSignature", displayRow.FullPathSignature);
-            SetValue(row, "LotTraceKey", displayRow.LotTraceKey);
-            SetValue(row, "UpstreamLotOnlyKey", displayRow.UpstreamLotOnlyKey);
 
             row["IsDisplayTarget"] = displayRow.IsDisplayTarget;
             SetValue(row, "SuppressReason", displayRow.SuppressReason);
@@ -692,12 +775,6 @@ namespace LotTraceApp.Services
 
             SetValue(row, prefix + "NodeKey", cell.NodeKey);
             SetValue(row, prefix + "MasterKey", cell.MasterKey);
-            SetValue(row, prefix + "ParentKey", cell.ParentKey);
-            SetValue(row, prefix + "DisplayParentNodeKey", cell.DisplayParentNodeKey);
-            SetValue(row, prefix + "IncomingLinkKey", cell.IncomingLinkKey);
-            SetValue(row, prefix + "UpstreamPathKey", cell.UpstreamPathKey);
-            SetValue(row, prefix + "DownstreamPathKey", cell.DownstreamPathKey);
-
             SetValue(row, prefix + "Order", cell.ProductionOrderNumber);
             SetValue(row, prefix + "Lot", cell.LotNumber);
             SetValue(row, prefix + "ItemCode", cell.ItemCode);
@@ -738,21 +815,7 @@ namespace LotTraceApp.Services
             row[columnName] = value ?? DBNull.Value;
         }
 
-        
 
-
-
-
-
-        
-        
-        
-
-       
-        
-        
-
-       
         private TraceDisplayCell GetMiddleCell(TraceDisplayRow row, int level)
         {
             if (row == null)
@@ -770,93 +833,6 @@ namespace LotTraceApp.Services
 
             return row.Middles[index];
         }
-
-        
-
-       
-       
-       
-       
-
-        private void AppendNodeAndLot(List<string> parts, ProductionResultNode node, bool isEnd = false)
-        {
-            if (parts == null || node == null)
-                return;
-
-            // ------------------------------------------------------------
-            // 1) Node表現
-            // ------------------------------------------------------------
-            string nodePart;
-            if (IsBSystemNode(node))
-            {
-                // B系統：Node ID = MasterKey
-                nodePart = "N|B|" + Safe(node.ControlMasterKey);
-            }
-            else
-            {
-                // A系統：Node ID = MasterKey + SlotNo
-                int slotNo = GetASlotNumber(node);
-                string slotPart = slotNo > 0 ? slotNo.ToString() : "?";
-
-                nodePart = "N|A|" + Safe(node.ControlMasterKey) + "|S" + slotPart;
-            }
-
-            parts.Add(nodePart);
-
-            // ------------------------------------------------------------
-            // 2) Lot接続表現
-            // ------------------------------------------------------------
-            string lot = NormalizeLot(node.LotNumber);
-            if (!string.IsNullOrEmpty(lot))
-            {
-                parts.Add("L|" + lot);
-                return;
-            }
-
-            // ------------------------------------------------------------
-            // 3) Lotなし表現
-            // ------------------------------------------------------------
-            if (node.IsTraceTerminal)
-            {
-                parts.Add(isEnd ? "END|NO_LOT|T" : "NO_LOT|T");
-                return;
-            }
-
-            if (isEnd)
-            {
-                parts.Add("END|NO_LOT");
-            }
-        }
-
-        private string NormalizeLot(string lot)
-        {
-            if (string.IsNullOrWhiteSpace(lot))
-                return null;
-
-            return lot.Trim();
-        }
-
-        private string Safe(string value)
-        {
-            return string.IsNullOrWhiteSpace(value) ? "?" : value.Trim();
-        }
-
-        private bool IsBSystemNode(ProductionResultNode node)
-        {
-            if (node == null)
-                return false;
-
-            return string.Equals(node.RouteSystem, "B", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private int GetASlotNumber(ProductionResultNode node)
-        {
-            if (node == null)
-                return 0;
-
-            return node.InputSlotNo ?? 0;
-        }
-
 
 
         private TraceDisplayCell CreateDisplayCell(
@@ -880,15 +856,7 @@ namespace LotTraceApp.Services
                 MasterKey = node.ControlMasterKey,
                 NodeKey = node.NodeIdentityKey,
 
-                // 旧互換
-                ParentKey = GetParentKeyFromPathRow(pathRow, nodeIndexInPath),
                 ParentMasterKey = node.ParentMasterKey,
-
-                // 線描画・経路識別
-                DisplayParentNodeKey = GetDisplayParentNodeKeyFromPathRow(pathRow, nodeIndexInPath),
-                IncomingLinkKey = GetIncomingLinkKeyFromPathRow(pathRow, nodeIndexInPath),
-                UpstreamPathKey = GetUpstreamPathKeyFromPathRow(pathRow, nodeIndexInPath),
-                DownstreamPathKey = GetDownstreamPathKeyFromPathRow(pathRow, nodeIndexInPath),
 
                 // 座標情報
                 ColumnKind = columnKind,
@@ -924,8 +892,6 @@ namespace LotTraceApp.Services
                 SuppressReason = null
             };
         }
-
-        
 
         
         private TraceLotGroupInfo FindLotGroupInfo(TracePathRow pathRow, TraceDisplayColumnKind columnKind, int level)
@@ -1034,10 +1000,7 @@ namespace LotTraceApp.Services
 
             if (outgoingLinks.Count == 0)
             {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
+                var pathRow = new TracePathRow();
 
                 FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
 
@@ -1097,43 +1060,14 @@ namespace LotTraceApp.Services
                              && object.ReferenceEquals(l.ParentNode, node))
                     .ToList();
 
-            WritePathRowsDebugLine(
-                "VISIT_NODE",
-                node,
-                null,
-                null,
-                currentPathNodes.Count,
-                node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                outgoingLinks.Count,
-                BuildDebugPathNodesText(currentPathNodes),
-                BuildDebugPathLinksText(currentPathLinks),
-                currentPathNodes.Count,
-                currentPathLinks.Count,
-                "Enter recursive node");
+            
 
             if (outgoingLinks.Count == 0)
             {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
+                var pathRow = new TracePathRow();
 
                 FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
                 result.PathRows.Add(pathRow);
-
-                WritePathRowsDebugLine(
-                    "LEAF_PATH_ADDED",
-                    node,
-                    pathRow.StartNode,
-                    pathRow.EndNode,
-                    currentPathNodes.Count,
-                    node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                    0,
-                    BuildDebugPathNodesText(currentPathNodes),
-                    BuildDebugPathLinksText(currentPathLinks),
-                    pathRow.MiddleNodes == null ? 0 : pathRow.MiddleNodes.Count,
-                    pathRow.PathLinks == null ? 0 : pathRow.PathLinks.Count,
-                    "outgoingLinks.Count == 0");
 
                 currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
                 return;
@@ -1147,58 +1081,16 @@ namespace LotTraceApp.Services
 
                 if (string.IsNullOrWhiteSpace(linkKey))
                 {
-                    WritePathRowsDebugLine(
-                        "SKIP_LINK_EMPTY_KEY",
-                        node,
-                        link == null ? null : link.ParentNode,
-                        link == null ? null : link.ChildNode,
-                        currentPathNodes.Count,
-                        node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                        outgoingLinks.Count,
-                        BuildDebugPathNodesText(currentPathNodes),
-                        BuildDebugPathLinksText(currentPathLinks),
-                        currentPathNodes.Count,
-                        currentPathLinks.Count,
-                        "GetPathLinkKey(link) is empty");
                     continue;
                 }
 
                 if (visitedLinks.Contains(linkKey))
                 {
-                    WritePathRowsDebugLine(
-                        "SKIP_LINK_VISITED",
-                        node,
-                        link.ParentNode,
-                        link.ChildNode,
-                        currentPathNodes.Count,
-                        node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                        outgoingLinks.Count,
-                        BuildDebugPathNodesText(currentPathNodes),
-                        BuildDebugPathLinksText(currentPathLinks),
-                        currentPathNodes.Count,
-                        currentPathLinks.Count,
-                        "visitedLinks already contains linkKey: " + linkKey+ " DIR=" + link.EdgeDirection);
-                    continue;
+                   continue;
                 }
 
                 visitedLinks.Add(linkKey);
-                currentPathLinks.Add(link);
-
-                WritePathRowsDebugLine(
-                    "TRAVERSE_LINK",
-                    node,
-                    link.ParentNode,
-                    link.ChildNode,
-                    currentPathNodes.Count,
-                    node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                    outgoingLinks.Count,
-                    BuildDebugPathNodesText(currentPathNodes),
-                    BuildDebugPathLinksText(currentPathLinks)
-                        + " | DIR=" + (link.EdgeDirection.ToString()),
-                    currentPathNodes.Count,
-                    currentPathLinks.Count,
-                    "Traverse child");
-
+                currentPathLinks.Add(link);          
                 traversedAnyChild = true;
 
                 BuildPathRowsRecursive(
@@ -1212,164 +1104,17 @@ namespace LotTraceApp.Services
                 currentPathLinks.RemoveAt(currentPathLinks.Count - 1);
                 visitedLinks.Remove(linkKey);
 
-                WritePathRowsDebugLine(
-                    "RETURN_FROM_CHILD",
-                    node,
-                    link.ParentNode,
-                    link.ChildNode,
-                    currentPathNodes.Count,
-                    node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                    outgoingLinks.Count,
-                    BuildDebugPathNodesText(currentPathNodes),
-                    BuildDebugPathLinksText(currentPathLinks),
-                    currentPathNodes.Count,
-                    currentPathLinks.Count,
-                    "Return from child");
             }
 
             if (!traversedAnyChild)
             {
-                var pathRow = new TracePathRow
-                {
-                    RootGroupKey = rootGroupKey
-                };
+                var pathRow = new TracePathRow();
 
                 FillPathRowNodesAndLinks(pathRow, currentPathNodes, currentPathLinks);
                 result.PathRows.Add(pathRow);
-
-                WritePathRowsDebugLine(
-                    "FALLBACK_PATH_ADDED",
-                    node,
-                    pathRow.StartNode,
-                    pathRow.EndNode,
-                    currentPathNodes.Count,
-                    node.ChildLinks == null ? 0 : node.ChildLinks.Count,
-                    outgoingLinks.Count,
-                    BuildDebugPathNodesText(currentPathNodes),
-                    BuildDebugPathLinksText(currentPathLinks),
-                    pathRow.MiddleNodes == null ? 0 : pathRow.MiddleNodes.Count,
-                    pathRow.PathLinks == null ? 0 : pathRow.PathLinks.Count,
-                    "!traversedAnyChild");
             }
 
             currentPathNodes.RemoveAt(currentPathNodes.Count - 1);
-        }
-
-        
-
-
-
-        private void WritePathRowsDebugLine(
-            string action,
-            ProductionResultNode node,
-            ProductionResultNode startNode,
-            ProductionResultNode endNode,
-            int rootCount,
-            int childLinksCount,
-            int outgoingLinksCount,
-            string pathNodesText,
-            string pathLinksText,
-            int pathNodeCount,
-            int pathLinkCount,
-            string note)
-        {
-            try
-            {
-                string filePath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "LotTrace_Debug_PathRows.csv");
-
-                using (var sw = new StreamWriter(filePath, true, Encoding.UTF8))
-                {
-                    sw.WriteLine(string.Join(",",
-                        EscapeCsv(action),
-                        EscapeCsv(GetDebugNodeKey(node)),
-                        EscapeCsv(node.NodeIdentityKey),
-                        EscapeCsv(node == null ? null : node.ControlMasterKey),
-                        EscapeCsv(node == null ? null : node.LotNumber),
-                        EscapeCsv(GetDebugNodeKey(startNode)),
-                        EscapeCsv(GetDebugNodeKey(endNode)),
-                        EscapeCsv(rootCount.ToString()),
-                        EscapeCsv(childLinksCount.ToString()),
-                        EscapeCsv(outgoingLinksCount.ToString()),
-                        EscapeCsv(pathNodesText),
-                        EscapeCsv(pathLinksText),
-                        EscapeCsv(pathNodeCount.ToString()),
-                        EscapeCsv(pathLinkCount.ToString()),
-                        EscapeCsv(GetDebugNodeKey(startNode)),
-                        EscapeCsv(GetDebugNodeKey(endNode)),
-                        EscapeCsv(Math.Max(0, pathNodeCount - 2).ToString()),
-                        EscapeCsv(note)));
-                }
-            }
-            catch
-            {
-                // デバッグ出力失敗は握りつぶす
-            }
-        }
-
-      
-
-        private string BuildDebugPathNodesText(List<ProductionResultNode> nodes)
-        {
-            if (nodes == null || nodes.Count == 0)
-                return null;
-
-            var parts = new List<string>();
-
-            foreach (var node in nodes)
-            {
-                parts.Add(GetDebugNodeKey(node));
-            }
-
-            return string.Join(" -> ", parts);
-        }
-
-        private string BuildDebugPathLinksText(List<ProductionResultLink> links)
-        {
-            if (links == null || links.Count == 0)
-                return null;
-
-            var parts = new List<string>();
-
-            foreach (var link in links)
-            {
-                if (link == null)
-                {
-                    parts.Add("(null)");
-                    continue;
-                }
-
-                string parentKey = GetDebugNodeKey(link.ParentNode);
-                string childKey = GetDebugNodeKey(link.ChildNode);
-                string source = link.SourceTable.ToString();
-                string slotNo = link.SlotNo.ToString();
-
-                parts.Add(
-                    (parentKey ?? "?")
-                    + "=>"
-                    + (childKey ?? "?")
-                    + "|"
-                    + source
-                    + "|S"
-                    + slotNo);
-            }
-
-            return string.Join(" / ", parts);
-        }
-
-        private string GetNodeIdentityKey(ProductionResultNode node)
-        {
-            if (node == null)
-                return string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(node.ControlMasterKey))
-                return node.ControlMasterKey;
-
-            if (!string.IsNullOrWhiteSpace(node.LotNumber))
-                return "LOT|" + node.LotNumber;
-
-            return string.Empty;
         }
 
         /// <summary>
@@ -1447,315 +1192,11 @@ namespace LotTraceApp.Services
             }
         }
 
-        private string GetDebugNodeKey(ProductionResultNode node)
-        {
-            if (node == null)
-                return null;
-
-            if (!string.IsNullOrWhiteSpace(node.ControlMasterKey))
-                return node.ControlMasterKey;
-
-            if (!string.IsNullOrWhiteSpace(node.LotNumber))
-                return "LOT|" + node.LotNumber;
-
-            return null;
-        }
-
-        
 
         #endregion
 
-        #region トレースバック（仕様書 7.2）
-        /// <summary>
-        /// 枝構造化に向けて工事中。新中間モデル適用版
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        private TraceResult TraceBackward(
-            TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+        #region 経路行補助
 
-            var result = new TraceResult();
-
-            var nodeMap = new Dictionary<string, ProductionResultNode>(StringComparer.OrdinalIgnoreCase);
-            var queue = new Queue<ProductionResultNode>();
-            var queuedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var linkMap = new Dictionary<string, ProductionResultLink>(StringComparer.OrdinalIgnoreCase);
-            var backwardCandidatesByChildNodeKey =
-    new Dictionary<string, List<BackwardParentCandidate>>(StringComparer.OrdinalIgnoreCase);
-
-            // 枝構造化に渡す始点一覧。
-            // 通常始点(B / A Manual)に加えて、StartD の child 側もここへ積む。
-            var laneStartNodes = new List<ProductionResultNode>();
-            var laneStartNodeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-
-            // ------------------------------------------------------------
-            // STEP1(START):
-            // バック検索の開始ノード取得
-            // 通常始点（B / A ManualInput）を取得する。
-            // これらは Current として queue に積み、以後の親探索は BFS で広げる。
-            // ------------------------------------------------------------
-            ReportProgress(progress, "トレースバックの始点を探索しています...", 15);
-            var startNodes = BuildBackwardStartNodes(p);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (startNodes != null)
-            {
-                foreach (var raw in startNodes)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (raw == null)
-                        continue;
-
-                    EnsureNodeRegistered(result, raw);
-
-                    if (queuedKeys.Add(raw.NodeIdentityKey))
-                    {
-                        queue.Enqueue(raw);
-                    }
-                }
-            }
-
-            if (queue.Count == 0)
-            {
-                DumpBackwardTraceArtifacts(result, null, "QUEUE_EMPTY");
-                return result;
-            }
-
-            // ------------------------------------------------------------
-            // STEP1.5(START-D):
-            // Drumcan始点の事前構造化
-            // child(StartD始点) -> parent を Candidate として先に反映する
-            // ------------------------------------------------------------
-            ReportProgress(progress, "始点周辺の親候補を確認しています...", 25);
-            var startDrumcanCandidates = _repo.FindBackwardStartDrumcanCandidates(p);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (startDrumcanCandidates != null)
-            {
-                foreach (var candidate in startDrumcanCandidates)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (candidate == null || candidate.ChildNode == null || candidate.Node == null)
-                        continue;
-
-                    var childNode = candidate.ChildNode;
-                    childNode.Depth = 0;
-                    childNode.ParentKey = null;
-                    childNode.StartDateLabel = ResolveStartDateLabel(childNode, null);
-
-                    EnsureNodeRegistered(result, childNode);
-
-                    // START-D child を通常始点と同様に扱う
-                    startNodes.Add(childNode);
-
-                    var parentNode = candidate.Node;
-                    parentNode.Depth = childNode.Depth + 1;
-                    parentNode.ParentKey = null;
-                    parentNode.StartDateLabel = ResolveBackwardStartDateLabel(parentNode);
-
-                    
-
-                    // ★これが本体（構造はここだけで良い）
-                    RegisterBackwardParentCandidateForDisplay(backwardCandidatesByChildNodeKey,candidate);
-
-                    // BFSは parent 側のみ
-                    if (queuedKeys.Add(parentNode.NodeIdentityKey))
-                    {
-                        queue.Enqueue(parentNode);
-                    }
-                }
-            }
-
-            if (queue.Count == 0)
-            {
-                DumpBackwardTraceArtifacts(result, null, "QUEUE_EMPTY");
-                return result;
-            }
-
-            // ------------------------------------------------------------
-            // STEP2:
-            // BFS（current = child / candidate.Node = parent）
-            // ------------------------------------------------------------
-
-            ReportProgress(progress, "親ロットを探索しています...", 35);
-
-            while (queue.Count > 0)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var current = queue.Dequeue();
-                if (current == null)
-                    continue;
-
-                // ★ これが必要
-                var candidates = _repo.FindBackwardParentsByLotStepFlow(current, current.Depth + 1);
-                DumpBackwardParentCandidatesExpanded(current, candidates);
-                if (candidates == null || candidates.Count == 0)
-                    continue;
-
-                foreach (var candidate in candidates)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (candidate == null || candidate.Node == null)
-                        continue;
-
-                    var parentNode = candidate.Node;
-
-                    // ★ 本体（構造登録）
-                    RegisterBackwardParentCandidateForDisplay(
-                        backwardCandidatesByChildNodeKey, candidate);
-
-                    // BFS展開
-                    if (queuedKeys.Add(parentNode.NodeIdentityKey))
-                    {
-                        queue.Enqueue(parentNode);
-                    }
-                }
-            }
-
-            // ------------------------------------------------------------
-            // STEP3:
-            // 旧互換ノード一覧の再構築
-            // ------------------------------------------------------------
-            // RebuildLegacyNodeLists(result);
-            _currentBackwardCandidatesByChildNodeKey = backwardCandidatesByChildNodeKey;
-            // ------------------------------------------------------------
-            // STEP4:
-            // バック探索結果 → 枝構造化
-            // ------------------------------------------------------------
-            ReportProgress(progress, "トレースバックの枝構造を作成しています...", 50);
-            var backwardLaneBuildResult = BuildBackwardDisplayLaneNodes(startNodes, cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-            DumpBackwardTraceArtifacts(result, backwardLaneBuildResult, "COMPLETED");
-            ReportProgress(progress, "品目名と開始日時を解決しています...", 60);
-            ResolveItemNamesDisplayNodes(backwardLaneBuildResult.DisplayNodes);
-            cancellationToken.ThrowIfCancellationRequested();
-            ResolveStartDateLabelsForDisplayLaneNodes(backwardLaneBuildResult.DisplayNodes);
-
-            // ここで構造ベースの肉付け
-            PopulateLineDecisionInfos(backwardLaneBuildResult.DisplayNodes);
-            cancellationToken.ThrowIfCancellationRequested();
-
-
-            // Occupied 確定
-            backwardLaneBuildResult.OccupiedLotGroupRanges =NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
-
-            // 追加：BuildDisplayResult から始点境界判定に使用するため一時保持
-            _currentForwardLaneBuildResult = backwardLaneBuildResult;
-
-            // ------------------------------------------------------------
-            // STEP5:
-            // backward 枝剪定・終点共通X正規化
-            // ------------------------------------------------------------
-
-            //枝剪定はダンプまで取る所で残しておく。まだその先は実装しない
-            ApplyBackwardBranchPruning(backwardLaneBuildResult);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            //終端処理
-            backwardLaneBuildResult.EndInfos =
-                FinalizeBackwardEndNodeGroupsAndNormalizeX(
-                    backwardLaneBuildResult.DisplayNodes);
-
-            backwardLaneBuildResult.OccupiedLotGroupRanges =
-              NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
-
-            // ★追加（構造 → 線生成）
-            ReportProgress(progress, "罫線情報を作成しています...", 70);
-            var traceLineRanges =
-            BuildTraceLineRangesFromOccupiedGroups(
-                backwardLaneBuildResult.OccupiedLotGroupRanges);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            NormalizeBackwardTraceLineRangeGridKinds(traceLineRanges);
-
-            AppendSyntheticMiddleLineRangesForDirectStartEndBranches(
-                traceLineRanges,
-                backwardLaneBuildResult);
-
-            if (traceLineRanges != null && traceLineRanges.Count > 0)
-            {
-                result.TraceLineRanges.AddRange(traceLineRanges);
-            }
-
-            // ------------------------------------------------------------
-            // STEP6:
-            // 枝構造 → PathRows
-            // ※ route復元ではなく、XLevel / YLane 投影で作る
-            // ------------------------------------------------------------
-            ReportProgress(progress, "検索結果行を作成しています...", 75);
-            BuildBackwardPathRowsFromDisplayLaneNodes(result, backwardLaneBuildResult);
-
-            
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// 新中間モデル適用。ただリポジトリとの整合はまだ怪しいかも
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        private List<ProductionResultNode> BuildBackwardStartNodes(TraceSearchParameters p)
-        {
-            var result = new List<ProductionResultNode>();
-            var seenMergeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            var rawStarts = _repo.FindBackwardStartNodes(p);
-            if (rawStarts == null || rawStarts.Count == 0)
-                return result;
-
-            foreach (var raw in rawStarts)
-            {
-                if (raw == null)
-                    continue;
-
-                raw.Depth = 0;
-                raw.ParentKey = null;
-                raw.StartDateLabel = ResolveStartDateLabel(raw, null);
-
-                // Backward の入口文脈は repository 側を優先する
-                if (!raw.InputSlotNo.HasValue)
-                    raw.InputSlotNo = 0;
-
-                if (string.IsNullOrWhiteSpace(raw.InputSourceType))
-                    raw.InputSourceType = null;
-
-                if (!raw.IsTraceTerminal)
-                    raw.IsTraceTerminal = string.IsNullOrWhiteSpace(raw.LotNumber);
-
-                string mergeKey = raw.NodeIdentityKey;
-
-                if (string.IsNullOrWhiteSpace(mergeKey))
-                {
-                    result.Add(raw);
-                    continue;
-                }
-
-                if (!seenMergeKeys.Add(mergeKey))
-                    continue;
-
-                result.Add(raw);
-            }
-
-            return result;
-        }
-
-        
-        #endregion
-
-        #region 経路展開
-
-        
         private void FillPathRowNodesAndLinks(
     TracePathRow pathRow,
     List<ProductionResultNode> currentPathNodes,
@@ -1828,177 +1269,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region　メタ・経路キー
-
-        private ProductionResultNode GetNodeFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath < 0)
-                return null;
-
-            if (nodeIndexInPath == 0)
-                return pathRow.StartNode;
-
-            int middleCount = pathRow.MiddleNodes == null ? 0 : pathRow.MiddleNodes.Count;
-
-            if (nodeIndexInPath >= 1 && nodeIndexInPath <= middleCount)
-            {
-                return pathRow.MiddleNodes[nodeIndexInPath - 1];
-            }
-
-            if (nodeIndexInPath == middleCount + 1)
-                return pathRow.EndNode;
-
-            return null;
-        }
-
-        private string GetDisplayParentNodeKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null || link.ParentNode == null)
-                return null;
-
-            // ★描画接続用：NodeIdentityKeyではなくMergeKeyを使用
-            // ※Node同一性の正規判定に合わせる
-            string parentMergeKey = link.ParentNode.NodeIdentityKey;
-            return string.IsNullOrWhiteSpace(parentMergeKey) ? null : parentMergeKey;
-        }
-
-        private string GetIncomingLinkKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null)
-                return null;
-
-            return GetPathLinkKey(link);
-        }
-
-        private string GetParentKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            if (nodeIndexInPath <= 0)
-                return null;
-
-            if (pathRow.PathLinks == null)
-                return null;
-
-            int linkIndex = nodeIndexInPath - 1;
-            if (linkIndex < 0 || linkIndex >= pathRow.PathLinks.Count)
-                return null;
-
-            var link = pathRow.PathLinks[linkIndex];
-            if (link == null || link.ParentNode == null)
-                return null;
-
-            // ★旧互換ParentKeyだが、値はMergeKeyベースへ正規化する
-            // ※NodeIdentityKeyは使用しない
-            string parentMergeKey = link.ParentNode.NodeIdentityKey;
-            return string.IsNullOrWhiteSpace(parentMergeKey) ? null : parentMergeKey;
-        }
-
-        private string GetUpstreamPathKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            var parts = new List<string>();
-
-            var startNode = GetNodeFromPathRow(pathRow, 0);
-            if (startNode == null)
-                return null;
-
-            parts.Add("N:" + startNode.NodeIdentityKey);
-
-            if (nodeIndexInPath <= 0)
-            {
-                return string.Join("->", parts);
-            }
-
-            if (pathRow.PathLinks == null || pathRow.PathLinks.Count == 0)
-                return string.Join("->", parts);
-
-            int maxLinkIndex = Math.Min(nodeIndexInPath - 1, pathRow.PathLinks.Count - 1);
-
-            for (int i = 0; i <= maxLinkIndex; i++)
-            {
-                var link = pathRow.PathLinks[i];
-                if (link == null)
-                    continue;
-
-                parts.Add("L:" + GetPathLinkKey(link));
-
-                var childNode = link.ChildNode;
-                if (childNode != null)
-                {
-                    parts.Add("N:" + childNode.NodeIdentityKey);
-                }
-            }
-
-            return string.Join("->", parts);
-        }
-
-        private string GetDownstreamPathKeyFromPathRow(TracePathRow pathRow, int nodeIndexInPath)
-        {
-            if (pathRow == null)
-                return null;
-
-            var currentNode = GetNodeFromPathRow(pathRow, nodeIndexInPath);
-            if (currentNode == null)
-                return null;
-
-            var parts = new List<string>();
-            parts.Add("N:" + currentNode.NodeIdentityKey);
-
-            if (pathRow.PathLinks == null || pathRow.PathLinks.Count == 0)
-                return string.Join("->", parts);
-
-            for (int i = nodeIndexInPath; i < pathRow.PathLinks.Count; i++)
-            {
-                var link = pathRow.PathLinks[i];
-                if (link == null)
-                    continue;
-
-                parts.Add("L:" + GetPathLinkKey(link));
-
-                var childNode = link.ChildNode;
-                if (childNode != null)
-                {
-                    parts.Add("N:" + childNode.NodeIdentityKey);
-                }
-            }
-
-            return string.Join("->", parts);
-        }
+        #region 経路メタ情報
 
         private string GetPathLinkKey(ProductionResultLink link)
         {
@@ -2022,124 +1293,6 @@ namespace LotTraceApp.Services
                 + link.SlotNo.ToString()
                 + "|"
                 + (string.IsNullOrWhiteSpace(link.ParentLotNumber) ? string.Empty : link.ParentLotNumber.Trim().ToUpperInvariant());
-        }
-
-        private string BuildPathKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return string.Empty;
-
-            var parts = new List<string>();
-
-            if (pathRow.StartNode != null)
-                parts.Add("N:" + pathRow.StartNode.NodeIdentityKey);
-
-            if (pathRow.PathLinks != null)
-            {
-                foreach (var link in pathRow.PathLinks)
-                {
-                    parts.Add("L:" + GetPathLinkKey(link));
-
-                    if (link != null && link.ChildNode != null)
-                    {
-                        parts.Add("N:" + link.ChildNode.NodeIdentityKey);
-                    }
-                }
-            }
-            else
-            {
-                if (pathRow.MiddleNodes != null)
-                {
-                    foreach (var node in pathRow.MiddleNodes)
-                    {
-                        parts.Add("N:" + node.NodeIdentityKey);
-                    }
-                }
-
-                if (pathRow.EndNode != null)
-                    parts.Add("N:" + pathRow.EndNode.NodeIdentityKey);
-            }
-
-            return string.Join("->", parts);
-        }
-
-        private string BuildLotTraceKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return null;
-
-            var parts = new List<string>();
-
-            // Start
-            AppendNodeAndLot(parts, pathRow.StartNode, isEnd: false);
-
-            // Middle
-            if (pathRow.MiddleNodes != null)
-            {
-                foreach (var node in pathRow.MiddleNodes)
-                {
-                    AppendNodeAndLot(parts, node, isEnd: false);
-                }
-            }
-
-            // End
-            AppendNodeAndLot(parts, pathRow.EndNode, isEnd: true);
-
-            return parts.Count == 0
-                ? null
-                : string.Join("->", parts);
-        }
-
-        private string BuildUpstreamLotOnlyKey(TracePathRow pathRow)
-        {
-            if (pathRow == null)
-                return null;
-
-            // 行単位キーなので、その行の到達先（EndNode）を自Nodeとみなす
-            var selfNode = pathRow.EndNode ?? pathRow.StartNode;
-            if (selfNode == null)
-                return null;
-
-            var parts = new List<string>();
-
-            // 1) 自Node識別だけは持たせる
-            parts.Add(selfNode.NodeIdentityKey);
-
-            // 2) そこに至るまでの接続Lotだけを積む
-            if (pathRow.PathLinks != null)
-            {
-                foreach (var link in pathRow.PathLinks)
-                {
-                    string lot = GetLinkLotNumber(link);
-                    if (!string.IsNullOrEmpty(lot))
-                    {
-                        parts.Add("L|" + lot);
-                    }
-                    else
-                    {
-                        parts.Add("L|NO_LOT");
-                    }
-                }
-            }
-
-            return parts.Count == 0
-                ? null
-                : string.Join("<=", parts);
-        }
-
-        
-
-        private string GetLinkLotNumber(ProductionResultLink link)
-        {
-            if (link == null)
-                return null;
-
-            // 今回の「接続要素としてのLot」はまず ParentLotNumber を正採用
-            string lot = NormalizeLot(link.ParentLotNumber);
-            if (!string.IsNullOrEmpty(lot))
-                return lot;
-
-            return null;
         }
 
         private string ResolveRouteSystem(TracePathRow pathRow)
@@ -2166,8 +1319,7 @@ namespace LotTraceApp.Services
         }
 
         #endregion
-
-      
+              
         #region 交点検出（仕様書 7.3）
 
         /// <summary>
@@ -2309,9 +1461,8 @@ namespace LotTraceApp.Services
         }
 
         #endregion
-
-        
-        #region 品目名処理群
+                
+        #region 品目名解決
 
 
         private void ResolveItemNamesDisplayNodes(List<DisplayLaneNode> displayNodes)
@@ -2373,68 +1524,7 @@ namespace LotTraceApp.Services
         }
         #endregion
 
-
-        
-        
-
-        private void ExportAllNodesDebugCsv(IEnumerable<ProductionResultNode> nodes, string fileName)
-        {
-            try
-            {
-                string filePath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    fileName);
-
-                using (var sw = new StreamWriter(filePath, false, Encoding.UTF8))
-                {
-                    sw.WriteLine(string.Join(",",
-                        "MergeKey",
-                        "NodeOnlyKey",
-                        "RouteSystem",
-                        "MasterKey",
-                        "LotNumber",
-                        "ItemCode",
-                        "ItemName",
-                        "InputSourceType",
-                        "InputSlotNo",
-                        "StartDateLabel",
-                        "Depth",
-                        "ParentCount",
-                        "ChildCount"));
-
-                    if (nodes == null)
-                        return;
-
-                    foreach (var node in nodes)
-                    {
-                        if (node == null)
-                            continue;
-
-                        sw.WriteLine(string.Join(",",
-                            EscapeCsv(node.NodeIdentityKey),
-                            EscapeCsv(node.NodeIdentityKey),
-                            EscapeCsv(node.RouteSystem),
-                            EscapeCsv(node.ControlMasterKey),
-                            EscapeCsv(node.LotNumber),
-                            EscapeCsv(node.ItemCode),
-                            EscapeCsv(node.ItemName),
-                            EscapeCsv(node.InputSourceType),
-                            EscapeCsv(node.InputSlotNo.HasValue ? node.InputSlotNo.Value.ToString() : null),
-                            EscapeCsv(node.StartDateLabel),
-                            EscapeCsv(node.Depth.ToString()),
-                            EscapeCsv(node.ParentNodes == null ? "0" : node.ParentNodes.Count.ToString()),
-                            EscapeCsv(node.ChildNodes == null ? "0" : node.ChildNodes.Count.ToString())));
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
-
-
-        #region 枝構造関数群
+        #region 表示レーンから経路行への変換
 
 
         //枝構造をPathRowに流し込む
@@ -2496,13 +1586,6 @@ namespace LotTraceApp.Services
                     row.MiddleNodes[middleIndex] = displayNode.SourceNode;
                 }
 
-                //row.RootGroupKey = row.StartNode == null
-                //    ? null
-                //    : BuildStartTrunkGroupKey(row.StartNode);
-
-                row.StartTrunkGroupKey = row.RootGroupKey;
-                row.StartTrunkOrder = row.PathOrder;
-
                 result.PathRows.Add(row);
             }
         }
@@ -2536,105 +1619,13 @@ namespace LotTraceApp.Services
             }
         }
 
-        private string ResolvePathRowRootGroupKey(
-            ProductionResultNode startBasisNode,
-            List<DisplayLaneNode> laneNodes)
-        {
-            if (startBasisNode != null)
-            {
-                string key = startBasisNode.NodeIdentityKey;
-                if (!string.IsNullOrWhiteSpace(key))
-                    return key;
-            }
-
-            if (laneNodes == null || laneNodes.Count == 0)
-                return null;
-
-            var firstNode = laneNodes.FirstOrDefault(x => x != null && x.SourceNode != null);
-            if (firstNode == null || firstNode.SourceNode == null)
-                return null;
-
-            return firstNode.SourceNode.NodeIdentityKey;
-        }
-
-        private string BuildPathRowFullPathSignature(TracePathRow row)
-        {
-            if (row == null)
-                return null;
-
-            var parts = new List<string>();
-
-            if (row.StartNode != null)
-            {
-                parts.Add("S:" + (row.StartNode.NodeIdentityKey ?? string.Empty));
-            }
-
-            if (row.MiddleNodes != null && row.MiddleNodes.Count > 0)
-            {
-                for (int i = 0; i < row.MiddleNodes.Count; i++)
-                {
-                    var node = row.MiddleNodes[i];
-                    if (node == null)
-                    {
-                        parts.Add("M" + i.ToString() + ":");
-                    }
-                    else
-                    {
-                        parts.Add("M" + i.ToString() + ":" + (node.NodeIdentityKey ?? string.Empty));
-                    }
-                }
-            }
-
-            if (row.EndNode != null)
-            {
-                parts.Add("E:" + (row.EndNode.NodeIdentityKey ?? string.Empty));
-            }
-
-            return string.Join("|", parts);
-        }
-
-        
-
-        
-       
-        
-
-        private sealed class BranchSortMetric
-        {
-            public int LongestEdgeCountToTerminal { get; set; }
-            public int LongestNodeCountToTerminal { get; set; }
-            public int MaxTerminalXLevel { get; set; }
-            public int SubtreeLeafCount { get; set; }
-        }
-
-        private sealed class BranchLaneRange
-        {
-            public int FirstY { get; set; }
-            public int LastY { get; set; }
-            public int LaneSpan { get; set; }
-        }
-
-
-        
         private sealed class EndDisplayNodeInfo
         {
             public string DisplayNodeKey { get; set; }
-            public string MergeKey { get; set; }
 
-            public string EndGroupKey { get; set; }
-            public int EndGroupIndex { get; set; }
-            public bool IsFirstOfGroup { get; set; }
             public bool IsDuplicate { get; set; }
 
-            // ★追加
             public int? DuplicateDisplayIndex { get; set; }
-
-            public int OriginalXLevel { get; set; }
-            public int EndXLevel { get; set; }
-            public int YLane { get; set; }
-
-            public string LotNumber { get; set; }
-            public string ControlMasterKey { get; set; }
         }
 
         private sealed class ForwardDisplayLaneBuildResult
@@ -2655,6 +1646,7 @@ namespace LotTraceApp.Services
 
             }
         }
+
         private string BuildDisplayLaneNodeKey(ProductionResultNode node, int xLevel, int yLane)
         {
             
@@ -2664,8 +1656,6 @@ namespace LotTraceApp.Services
                 yLane.ToString(),
                 node.NodeIdentityKey);
         }
-
-       
 
         private string NormalizeDisplayLaneLot(string lotNumber)
         {
@@ -2677,7 +1667,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新罫線メソッド群
+        #region 罫線・占有範囲
 
 
         private void PopulateOccupiedRange(List<DisplayLaneNode> nodes)
@@ -2852,7 +1842,6 @@ namespace LotTraceApp.Services
                 if (row == null)
                     continue;
 
-                row.IsFirstRowOfStartGroup = false;
                 row.IsLastRowOfStartGroup = false;
             }
 
@@ -2875,7 +1864,6 @@ namespace LotTraceApp.Services
                     var firstRow = rows[firstY];
                     if (firstRow != null)
                     {
-                        firstRow.IsFirstRowOfStartGroup = true;
                     }
                 }
 
@@ -3535,9 +2523,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-
-
-        #region 新トレースフォワード関連群
+        #region フォワード表示レーン構築
 
 
         private List<ChildCandidate> GetNextLevelCandidates(
@@ -3743,7 +2729,6 @@ namespace LotTraceApp.Services
                 .ThenBy(g => g.Key ?? string.Empty)
                 .ToList();
 
-            int groupIndex = 1;
             int nextDuplicateDisplayIndex = 1;
 
             foreach (var group in grouped)
@@ -3764,21 +2749,11 @@ namespace LotTraceApp.Services
                     output.Add(new EndDisplayNodeInfo
                     {
                         DisplayNodeKey = node.DisplayNodeKey,
-                        MergeKey = node.SourceNode.NodeIdentityKey,
-                        EndGroupKey = group.Key ?? string.Empty,
-                        EndGroupIndex = groupIndex,
-                        IsFirstOfGroup = (i == 0),
                         IsDuplicate = (i > 0),
-                        OriginalXLevel = endXLevel,
-                        EndXLevel = endXLevel,
-                        YLane = node.YLane,
-                        LotNumber = node.SourceNode.LotNumber,
-                        ControlMasterKey = node.SourceNode.ControlMasterKey,
                         DuplicateDisplayIndex = (i > 0) ? duplicateDisplayIndex : null
                     });
                 }
 
-                groupIndex++;
             }
 
             return output;
@@ -4125,7 +3100,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新トレースバック関連群
+        #region バックワード表示レーン構築
 
 
         private ForwardDisplayLaneBuildResult BuildBackwardDisplayLaneNodes(
@@ -4196,9 +3171,6 @@ namespace LotTraceApp.Services
                 XLevel = xLevel,
                 YLane = trunkY,
                 ChildIndex = 0,
-                SubtreeLaneSpan = 1,
-                RootGroupHeight = 1,
-                ChildBranchHeight = 0,
                 OccupiedFirstY = trunkY,
                 OccupiedLastY = trunkY
             };
@@ -4291,10 +3263,8 @@ namespace LotTraceApp.Services
                 ? 0
                 : currentDisplayNode.ChildIndex;
 
-            currentDisplayNode.ChildBranchHeight = createdChildCount;
             currentDisplayNode.OccupiedFirstY = minY;
             currentDisplayNode.OccupiedLastY = maxY;
-            currentDisplayNode.SubtreeLaneSpan = Math.Max(1, maxY - minY + 1);
 
             return currentDisplayNode;
         }
@@ -4467,13 +3437,6 @@ namespace LotTraceApp.Services
                 // STEP2:
                 // 行の代表情報を最低限埋める
                 // ------------------------------------------------------------
-                var firstNode = laneNodes.FirstOrDefault(x => x != null && x.SourceNode != null);
-                var startBasisNode = row.StartNode ?? (firstNode == null ? null : firstNode.SourceNode);
-
-                row.RootGroupKey = ResolvePathRowRootGroupKey(startBasisNode, laneNodes);
-                row.StartTrunkGroupKey = BuildStartTrunkGroupKey(row.StartNode);
-                row.StartTrunkOrder = row.PathOrder;
-
                 // ------------------------------------------------------------
                 // STEP3:
                 // EndInfos を使って End を確定する
@@ -4519,12 +3482,6 @@ namespace LotTraceApp.Services
                 // ------------------------------------------------------------
                 TrimTrailingNullMiddleNodes(row);
 
-                // ------------------------------------------------------------
-                // STEP5:
-                // 署名確定
-                // ------------------------------------------------------------
-                row.FullPathSignature = BuildPathRowFullPathSignature(row);
-
                 result.PathRows.Add(row);
             }
 
@@ -4569,7 +3526,6 @@ namespace LotTraceApp.Services
                 .ThenBy(g => g.Key ?? string.Empty, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            int groupIndex = 1;
             int nextDuplicateDisplayIndex = 1;
 
             foreach (var group in grouped)
@@ -4592,7 +3548,6 @@ namespace LotTraceApp.Services
                     if (node == null)
                         continue;
 
-                    int oldXLevel = node.XLevel;
                     string oldDisplayNodeKey = node.DisplayNodeKey;
 
                     node.XLevel = endXLevel;
@@ -4609,21 +3564,11 @@ namespace LotTraceApp.Services
                     output.Add(new EndDisplayNodeInfo
                     {
                         DisplayNodeKey = node.DisplayNodeKey,
-                        MergeKey = node.MergeKey,
-                        EndGroupKey = group.Key ?? string.Empty,
-                        EndGroupIndex = groupIndex,
-                        IsFirstOfGroup = (i == 0),
                         IsDuplicate = (i > 0),
-                        OriginalXLevel = oldXLevel,
-                        EndXLevel = endXLevel,
-                        YLane = node.YLane,
-                        LotNumber = node.SourceNode == null ? null : node.SourceNode.LotNumber,
-                        ControlMasterKey = node.SourceNode == null ? null : node.SourceNode.ControlMasterKey,
                         DuplicateDisplayIndex = (i > 0) ? duplicateDisplayIndex : null
                     });
                 }
 
-                groupIndex++;
             }
 
             return output;
@@ -4697,7 +3642,7 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region 新トレースバック枝剪定関連群
+        #region バックワード枝剪定
 
         private sealed class BackwardPruneGroup
         {
@@ -4844,6 +3789,11 @@ namespace LotTraceApp.Services
             return result;
         }
 
+
+        /// <summary>
+        /// 枝選定用の準備メソッド。必要が無ければ使わない
+        /// </summary>
+        /// <param name="backwardLaneBuildResult"></param>
         private void ApplyBackwardBranchPruning(
     ForwardDisplayLaneBuildResult backwardLaneBuildResult)
         {
@@ -4883,10 +3833,6 @@ namespace LotTraceApp.Services
                     }
                 }
             }
-
-            DumpBackwardPrunedDisplayNodeKeys(
-                prunedDisplayNodeKeys,
-                "LotTrace_Debug_BackwardPrunedDisplayNodeKeys.csv");
 
             // 今回はまだ物理削除しなくてもよい
         }
@@ -5039,106 +3985,23 @@ namespace LotTraceApp.Services
 
         #endregion
 
-        #region デバッグ群
+        #region デバッグCSV出力
 
         
 
-        private void ExportDataTableToCsvSafe(
-    DataTable table,
-    string fileNameWithoutExtension,
-    bool overwrite = false)
-        {
-            if (table == null)
-                return;
+       
 
-            try
-            {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string debugDir = Path.Combine(baseDir, "Debug");
-
-                if (!Directory.Exists(debugDir))
-                    Directory.CreateDirectory(debugDir);
-
-                string filePath;
-
-                if (overwrite)
-                {
-                    filePath = Path.Combine(debugDir, fileNameWithoutExtension + ".csv");
-                }
-                else
-                {
-                    string time = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-                    filePath = Path.Combine(debugDir, fileNameWithoutExtension + "_" + time + ".csv");
-                }
-
-                // ★ ロック回避：FileShare.ReadWrite
-                using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
-                using (var sw = new StreamWriter(fs, Encoding.UTF8))
-                {
-                    // ヘッダー
-                    for (int i = 0; i < table.Columns.Count; i++)
-                    {
-                        if (i > 0) sw.Write(",");
-                        sw.Write(EscapeCsv(table.Columns[i].ColumnName));
-                    }
-                    sw.WriteLine();
-
-                    // データ
-                    foreach (DataRow row in table.Rows)
-                    {
-                        for (int i = 0; i < table.Columns.Count; i++)
-                        {
-                            if (i > 0) sw.Write(",");
-
-                            var value = row[i];
-                            string text = value == null || value == DBNull.Value
-                                ? string.Empty
-                                : value.ToString();
-
-                            sw.Write(EscapeCsv(text));
-                        }
-                        sw.WriteLine();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // ★ 落とさない
-                System.Diagnostics.Debug.WriteLine("CSV出力失敗: " + ex.Message);
-            }
-        }
-
-        
-        
-
-        
-        
-
-        
-
-        private void DumpBackwardTraceArtifacts(
-    TraceResult result,
-    ForwardDisplayLaneBuildResult backwardLaneBuildResult,
-    string phase)
+        private void DumpTraceDisplayLaneNodes(
+            TraceDirection direction,
+            ForwardDisplayLaneBuildResult laneBuildResult,
+            string phase)
         {
             try
             {
-                DumpBackwardTraceSummary(result, backwardLaneBuildResult, phase);
-
-                if (result != null)
-                {
-                    ExportAllNodesDebugCsv(
-                        result.AllNodes,
-                        "LotTrace_Debug_Backward_AllNodes.csv");
-                }
-
                 DumpDisplayLaneNodesToFile(
-                    backwardLaneBuildResult == null ? null : backwardLaneBuildResult.DisplayNodes,
-                    "LotTrace_Debug_BackwardDisplayLaneNodes.csv");
-
-                DumpDisplayLaneEdgesToFile(
-                    backwardLaneBuildResult == null ? null : backwardLaneBuildResult.DisplayNodes,
-                    "LotTrace_Debug_BackwardDisplayLaneEdges.csv");
+                    direction,
+                    laneBuildResult == null ? null : laneBuildResult.DisplayNodes,
+                    phase);
             }
             catch
             {
@@ -5146,51 +4009,11 @@ namespace LotTraceApp.Services
             }
         }
 
-        private void DumpBackwardTraceSummary(
-    TraceResult result,
-    ForwardDisplayLaneBuildResult backwardLaneBuildResult,
-    string phase)
-        {
-            try
-            {
-                string folder = EnsureDebugFolderExists();
-                string path = Path.Combine(folder, "LotTrace_Debug_BackwardTraceSummary.csv");
-
-                var sb = new StringBuilder();
-                sb.AppendLine("Phase,AllNodes,AllLinks,StartNodes,MiddleNodes,EndNodes,RootNodes,DisplayNodes");
-
-                int allNodes = result == null || result.AllNodes == null ? 0 : result.AllNodes.Count;
-                int allLinks = result == null || result.AllLinks == null ? 0 : result.AllLinks.Count;
-                int startNodes = result == null || result.StartNodes == null ? 0 : result.StartNodes.Count;
-                int middleNodes = result == null || result.MiddleNodes == null ? 0 : result.MiddleNodes.Count;
-                int endNodes = result == null || result.EndNodes == null ? 0 : result.EndNodes.Count;
-                int rootNodes = result == null || result.RootNodes == null ? 0 : result.RootNodes.Count;
-                int displayNodes = backwardLaneBuildResult == null || backwardLaneBuildResult.DisplayNodes == null
-                    ? 0
-                    : backwardLaneBuildResult.DisplayNodes.Count;
-
-                sb.AppendLine(string.Join(",",
-                    EscapeCsv(phase),
-                    allNodes.ToString(),
-                    allLinks.ToString(),
-                    startNodes.ToString(),
-                    middleNodes.ToString(),
-                    endNodes.ToString(),
-                    rootNodes.ToString(),
-                    displayNodes.ToString()));
-
-                File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
-            }
-            catch
-            {
-                // デバッグ出力失敗は本処理を止めない
-            }
-        }
-
-        private string EnsureDebugFolderExists()
+        
+        private string EnsureTraceDebugFolderExists()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string debugDir = Path.Combine(baseDir, "Debug/Back");
+            string debugDir = Path.Combine(baseDir, "Debug", "Trace");
 
             if (!Directory.Exists(debugDir))
             {
@@ -5201,21 +4024,25 @@ namespace LotTraceApp.Services
         }
 
         private void DumpDisplayLaneNodesToFile(
-    List<DisplayLaneNode> nodes,
-    string fileName)
+            TraceDirection direction,
+            List<DisplayLaneNode> nodes,
+            string phase)
         {
             if (nodes == null || nodes.Count == 0)
                 return;
 
             try
             {
-                string folder = EnsureDebugFolderExists();
-                string path = Path.Combine(folder, fileName);
+                string folder = EnsureTraceDebugFolderExists();
+                string safeDirection = direction.ToString();
+                string path = Path.Combine(
+                    folder,
+                    "LotTrace_Debug_" + safeDirection + "_DisplayLaneNodes.csv");
 
                 var sb = new StringBuilder();
 
                 sb.AppendLine(
-                    "DisplayNodeKey,ParentDisplayNodeKey,MergeKey,XLevel,YLane,ChildIndex,SubtreeLaneSpan,RootGroupHeight,ChildBranchHeight,OccupiedFirstY,OccupiedLastY,LotGroupKey,RepresentativeNodeKey,MasterKey,LotNumber,RouteSystem,InputSlotNo,InputSourceType,Depth,NodeType,OutgoingEdgeCount,OutgoingRelationKeys,OutgoingChildDisplayNodeKeys");
+                    "Direction,Phase,DisplayNodeKey,ParentDisplayNodeKey,MergeKey,XLevel,YLane,ChildIndex,LotGroupKey,RepresentativeNodeKey,OccupiedFirstY,OccupiedLastY,ProductionOrderNumber,ItemCode,ItemName,LotNumber,ControlMasterKey,RouteSystem,InputSlotNo,InputSourceType,Depth,NodeType");
 
                 foreach (var node in nodes
                     .Where(x => x != null)
@@ -5225,49 +4052,30 @@ namespace LotTraceApp.Services
                 {
                     var src = node.SourceNode;
 
-                    var outgoingEdges = node.OutgoingEdges == null
-                        ? new List<DisplayLaneEdge>()
-                        : node.OutgoingEdges
-                            .Where(x => x != null)
-                            .OrderBy(x => x.ChildIndex)
-                            .ThenBy(x => x.ChildDisplayNodeKey, StringComparer.OrdinalIgnoreCase)
-                            .ToList();
-
-                    string outgoingRelationKeys = outgoingEdges.Count == 0
-                        ? null
-                        : string.Join(" || ",
-                            outgoingEdges.Select(x => x.EdgeIdentityKey ?? string.Empty));
-
-                    string outgoingChildDisplayNodeKeys = outgoingEdges.Count == 0
-                        ? null
-                        : string.Join(" || ",
-                            outgoingEdges.Select(x => x.ChildDisplayNodeKey ?? string.Empty));
-
+                    sb.Append(EscapeCsv(safeDirection)).Append(",");
+                    sb.Append(EscapeCsv(phase)).Append(",");
                     sb.Append(EscapeCsv(node.DisplayNodeKey)).Append(",");
                     sb.Append(EscapeCsv(node.ParentDisplayNodeKey)).Append(",");
                     sb.Append(EscapeCsv(node.MergeKey)).Append(",");
                     sb.Append(node.XLevel.ToString()).Append(",");
                     sb.Append(node.YLane.ToString()).Append(",");
                     sb.Append(node.ChildIndex.ToString()).Append(",");
-                    sb.Append(node.SubtreeLaneSpan.ToString()).Append(",");
-                    sb.Append(node.RootGroupHeight.ToString()).Append(",");
-                    sb.Append(node.ChildBranchHeight.ToString()).Append(",");
-                    sb.Append(node.OccupiedFirstY.ToString()).Append(",");
-                    sb.Append(node.OccupiedLastY.ToString()).Append(",");
                     sb.Append(EscapeCsv(node.LotGroupKey)).Append(",");
                     sb.Append(EscapeCsv(node.RepresentativeNodeKey)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.ControlMasterKey)).Append(",");
+                    sb.Append(node.OccupiedFirstY.ToString()).Append(",");
+                    sb.Append(node.OccupiedLastY.ToString()).Append(",");
+                    sb.Append(EscapeCsv(src == null ? null : src.ProductionOrderNumber)).Append(",");
+                    sb.Append(EscapeCsv(src == null ? null : src.ItemCode)).Append(",");
+                    sb.Append(EscapeCsv(src == null ? null : src.ItemName)).Append(",");
                     sb.Append(EscapeCsv(src == null ? null : src.LotNumber)).Append(",");
+                    sb.Append(EscapeCsv(src == null ? null : src.ControlMasterKey)).Append(",");
                     sb.Append(EscapeCsv(src == null ? null : src.RouteSystem)).Append(",");
                     sb.Append(EscapeCsv(src == null || !src.InputSlotNo.HasValue
                         ? null
                         : src.InputSlotNo.Value.ToString())).Append(",");
                     sb.Append(EscapeCsv(src == null ? null : src.InputSourceType)).Append(",");
                     sb.Append(src == null ? "" : src.Depth.ToString()).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.NodeType)).Append(",");
-                    sb.Append(outgoingEdges.Count.ToString()).Append(",");
-                    sb.Append(EscapeCsv(outgoingRelationKeys)).Append(",");
-                    sb.Append(EscapeCsv(outgoingChildDisplayNodeKeys));
+                    sb.Append(EscapeCsv(src == null ? null : src.NodeType));
                     sb.AppendLine();
                 }
 
@@ -5279,63 +4087,7 @@ namespace LotTraceApp.Services
             }
         }
 
-        private void DumpDisplayLaneEdgesToFile(
-    List<DisplayLaneNode> nodes,
-    string fileName)
-        {
-            if (nodes == null || nodes.Count == 0)
-                return;
-
-            try
-            {
-                string folder = EnsureDebugFolderExists();
-                string path = Path.Combine(folder, fileName);
-
-                var sb = new StringBuilder();
-
-                sb.AppendLine(
-                    "OwnerDisplayNodeKey,OwnerMergeKey,OwnerLotNumber,EdgeIdentityKey,ParentDisplayNodeKey,ChildDisplayNodeKey,ParentMergeKey,ChildMergeKey,FromXLevel,ToXLevel,FromYLane,ToYLane,ChildIndex,LotGroupKey");
-
-                foreach (var node in nodes
-                    .Where(x => x != null)
-                    .OrderBy(x => x.XLevel)
-                    .ThenBy(x => x.YLane))
-                {
-                    if (node.OutgoingEdges == null || node.OutgoingEdges.Count == 0)
-                        continue;
-
-                    foreach (var edge in node.OutgoingEdges
-                        .Where(x => x != null)
-                        .OrderBy(x => x.FromXLevel)
-                        .ThenBy(x => x.FromYLane)
-                        .ThenBy(x => x.ChildIndex))
-                    {
-                        sb.Append(EscapeCsv(node.DisplayNodeKey)).Append(",");
-                        sb.Append(EscapeCsv(node.MergeKey)).Append(",");
-                        sb.Append(EscapeCsv(node.SourceNode == null ? null : node.SourceNode.LotNumber)).Append(",");
-                        sb.Append(EscapeCsv(edge.EdgeIdentityKey)).Append(",");
-                        sb.Append(EscapeCsv(edge.ParentDisplayNodeKey)).Append(",");
-                        sb.Append(EscapeCsv(edge.ChildDisplayNodeKey)).Append(",");
-                        sb.Append(EscapeCsv(edge.ParentMergeKey)).Append(",");
-                        sb.Append(EscapeCsv(edge.ChildMergeKey)).Append(",");
-                        sb.Append(edge.FromXLevel.ToString()).Append(",");
-                        sb.Append(edge.ToXLevel.ToString()).Append(",");
-                        sb.Append(edge.FromYLane.ToString()).Append(",");
-                        sb.Append(edge.ToYLane.ToString()).Append(",");
-                        sb.Append(edge.ChildIndex.ToString()).Append(",");
-                        sb.Append(EscapeCsv(edge.LotGroupKey));
-                        sb.AppendLine();
-                    }
-                }
-
-                File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
-            }
-            catch
-            {
-                // ダンプ失敗は本処理を止めない
-            }
-        }
-
+        
         private string EscapeCsv(string value)
         {
             if (value == null)
@@ -5345,273 +4097,6 @@ namespace LotTraceApp.Services
             return "\"" + s + "\"";
         }
 
-
-        private void DumpBackwardParentCandidatesExpanded(
-    ProductionResultNode current,
-    IList<BackwardParentCandidate> parentCandidates)
-        {
-            try
-            {
-                string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
-                Directory.CreateDirectory(dir);
-
-                string path = Path.Combine(dir, "LotTrace_Debug_BackwardParentCandidates_Expanded.csv");
-                bool exists = File.Exists(path);
-
-                using (var sw = new StreamWriter(path, true, Encoding.UTF8))
-                {
-                    if (!exists)
-                    {
-                        sw.WriteLine(string.Join(",",
-                            "Timestamp",
-                            "CurrentDepth",
-                            "CandidateIndex",
-
-                            "Current_ProductionOrderNumber",
-                            "Current_LotNumber",
-                            "Current_ItemCode",
-                            "Current_ItemName",
-                            "Current_StartDate",
-                            "Current_StartDateLabel",
-                            "Current_EndDate",
-                            "Current_ManufacturingProcessName",
-                            "Current_ManufacturingTankName",
-                            "Current_Weight",
-                            "Current_ControlMasterKey",
-                            "Current_ParentKey",
-                            "Current_ParentMasterKey",
-                            "Current_RouteSystem",
-                            "Current_InputSourceType",
-                            "Current_InputSlotNo",
-                            "Current_NodeType",
-                            "Current_IsTraceTerminal",
-
-                            "Candidate_SourceTable",
-                            "Candidate_MaterialAInputType",
-                            "Candidate_SlotNo",
-                            "Candidate_ParentLotNumber",
-                            "Candidate_ChildLotNumber",
-                            "Candidate_RelationKey",
-                            "Candidate_DebugSource",
-
-                            "Child_ProductionOrderNumber",
-                            "Child_LotNumber",
-                            "Child_ItemCode",
-                            "Child_ItemName",
-                            "Child_StartDate",
-                            "Child_StartDateLabel",
-                            "Child_EndDate",
-                            "Child_ManufacturingProcessName",
-                            "Child_ManufacturingTankName",
-                            "Child_Weight",
-                            "Child_ControlMasterKey",
-                            "Child_ParentKey",
-                            "Child_ParentMasterKey",
-                            "Child_RouteSystem",
-                            "Child_InputSourceType",
-                            "Child_InputSlotNo",
-                            "Child_NodeType",
-                            "Child_IsTraceTerminal",
-
-                            "Parent_ProductionOrderNumber",
-                            "Parent_LotNumber",
-                            "Parent_ItemCode",
-                            "Parent_ItemName",
-                            "Parent_StartDate",
-                            "Parent_StartDateLabel",
-                            "Parent_EndDate",
-                            "Parent_ManufacturingProcessName",
-                            "Parent_ManufacturingTankName",
-                            "Parent_Weight",
-                            "Parent_ControlMasterKey",
-                            "Parent_ParentKey",
-                            "Parent_ParentMasterKey",
-                            "Parent_RouteSystem",
-                            "Parent_InputSourceType",
-                            "Parent_InputSlotNo",
-                            "Parent_NodeType",
-                            "Parent_IsTraceTerminal"
-                        ));
-                    }
-
-                    if (parentCandidates == null || parentCandidates.Count == 0)
-                    {
-                        sw.WriteLine(string.Join(",",
-                            EscapeCsv(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")),
-                            EscapeCsv(current == null ? null : current.Depth.ToString()),
-                            EscapeCsv("-1"),
-
-                            EscapeCsv(current == null ? null : current.ProductionOrderNumber),
-                            EscapeCsv(current == null ? null : current.LotNumber),
-                            EscapeCsv(current == null ? null : current.ItemCode),
-                            EscapeCsv(current == null ? null : current.ItemName),
-                            EscapeCsv(FormatDateTimeForDump(current == null ? null : current.StartDate)),
-                            EscapeCsv(current == null ? null : current.StartDateLabel),
-                            EscapeCsv(FormatDateTimeForDump(current == null ? null : current.EndDate)),
-                            EscapeCsv(current == null ? null : current.ManufacturingProcessName),
-                            EscapeCsv(current == null ? null : current.ManufacturingTankName),
-                            EscapeCsv(FormatNullableFloatForDump(current == null ? null : current.Weight)),
-                            EscapeCsv(current == null ? null : current.ControlMasterKey),
-                            EscapeCsv(current == null ? null : current.ParentKey),
-                            EscapeCsv(current == null ? null : current.ParentMasterKey),
-                            EscapeCsv(current == null ? null : current.RouteSystem),
-                            EscapeCsv(current == null ? null : current.InputSourceType),
-                            EscapeCsv(current == null || !current.InputSlotNo.HasValue ? null : current.InputSlotNo.Value.ToString()),
-                            EscapeCsv(current == null ? null : current.NodeType),
-                            EscapeCsv(current != null && current.IsTraceTerminal ? "1" : "0"),
-
-                            EscapeCsv("NO_CANDIDATES"),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null),
-                            EscapeCsv(null)
-                        ));
-                        return;
-                    }
-
-                    for (int i = 0; i < parentCandidates.Count; i++)
-                    {
-                        var candidate = parentCandidates[i];
-                        var childNode = candidate == null ? null : candidate.ChildNode;
-                        var parentNode = candidate == null ? null : candidate.Node;
-
-                        sw.WriteLine(string.Join(",",
-                            EscapeCsv(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")),
-                            EscapeCsv(current == null ? null : current.Depth.ToString()),
-                            EscapeCsv(i.ToString()),
-
-                            EscapeCsv(current == null ? null : current.ProductionOrderNumber),
-                            EscapeCsv(current == null ? null : current.LotNumber),
-                            EscapeCsv(current == null ? null : current.ItemCode),
-                            EscapeCsv(current == null ? null : current.ItemName),
-                            EscapeCsv(FormatDateTimeForDump(current == null ? null : current.StartDate)),
-                            EscapeCsv(current == null ? null : current.StartDateLabel),
-                            EscapeCsv(FormatDateTimeForDump(current == null ? null : current.EndDate)),
-                            EscapeCsv(current == null ? null : current.ManufacturingProcessName),
-                            EscapeCsv(current == null ? null : current.ManufacturingTankName),
-                            EscapeCsv(FormatNullableFloatForDump(current == null ? null : current.Weight)),
-                            EscapeCsv(current == null ? null : current.ControlMasterKey),
-                            EscapeCsv(current == null ? null : current.ParentKey),
-                            EscapeCsv(current == null ? null : current.ParentMasterKey),
-                            EscapeCsv(current == null ? null : current.RouteSystem),
-                            EscapeCsv(current == null ? null : current.InputSourceType),
-                            EscapeCsv(current == null || !current.InputSlotNo.HasValue ? null : current.InputSlotNo.Value.ToString()),
-                            EscapeCsv(current == null ? null : current.NodeType),
-                            EscapeCsv(current != null && current.IsTraceTerminal ? "1" : "0"),
-
-                            //EscapeCsv(candidate == null ? null : candidate.SourceTable.ToString()),
-                            //EscapeCsv(candidate == null ? null : candidate.MaterialAInputType.ToString()),
-                            //EscapeCsv(candidate == null ? null : candidate.SlotNo.ToString()),
-                            EscapeCsv(candidate == null ? null : candidate.ParentLotNumber),
-                            //EscapeCsv(candidate == null ? null : candidate.ChildLotNumber),
-                            EscapeCsv(candidate == null ? null : candidate.RelationKey),
-                            EscapeCsv(candidate == null ? null : candidate.DebugSource),
-
-                            EscapeCsv(childNode == null ? null : childNode.ProductionOrderNumber),
-                            EscapeCsv(childNode == null ? null : childNode.LotNumber),
-                            EscapeCsv(childNode == null ? null : childNode.ItemCode),
-                            EscapeCsv(childNode == null ? null : childNode.ItemName),
-                            EscapeCsv(FormatDateTimeForDump(childNode == null ? null : childNode.StartDate)),
-                            EscapeCsv(childNode == null ? null : childNode.StartDateLabel),
-                            EscapeCsv(FormatDateTimeForDump(childNode == null ? null : childNode.EndDate)),
-                            EscapeCsv(childNode == null ? null : childNode.ManufacturingProcessName),
-                            EscapeCsv(childNode == null ? null : childNode.ManufacturingTankName),
-                            EscapeCsv(FormatNullableFloatForDump(childNode == null ? null : childNode.Weight)),
-                            EscapeCsv(childNode == null ? null : childNode.ControlMasterKey),
-                            EscapeCsv(childNode == null ? null : childNode.ParentKey),
-                            EscapeCsv(childNode == null ? null : childNode.ParentMasterKey),
-                            EscapeCsv(childNode == null ? null : childNode.RouteSystem),
-                            EscapeCsv(childNode == null ? null : childNode.InputSourceType),
-                            EscapeCsv(childNode == null || !childNode.InputSlotNo.HasValue ? null : childNode.InputSlotNo.Value.ToString()),
-                            EscapeCsv(childNode == null ? null : childNode.NodeType),
-                            EscapeCsv(childNode != null && childNode.IsTraceTerminal ? "1" : "0"),
-
-                            EscapeCsv(parentNode == null ? null : parentNode.ProductionOrderNumber),
-                            EscapeCsv(parentNode == null ? null : parentNode.LotNumber),
-                            EscapeCsv(parentNode == null ? null : parentNode.ItemCode),
-                            EscapeCsv(parentNode == null ? null : parentNode.ItemName),
-                            EscapeCsv(FormatDateTimeForDump(parentNode == null ? null : parentNode.StartDate)),
-                            EscapeCsv(parentNode == null ? null : parentNode.StartDateLabel),
-                            EscapeCsv(FormatDateTimeForDump(parentNode == null ? null : parentNode.EndDate)),
-                            EscapeCsv(parentNode == null ? null : parentNode.ManufacturingProcessName),
-                            EscapeCsv(parentNode == null ? null : parentNode.ManufacturingTankName),
-                            EscapeCsv(FormatNullableFloatForDump(parentNode == null ? null : parentNode.Weight)),
-                            EscapeCsv(parentNode == null ? null : parentNode.ControlMasterKey),
-                            EscapeCsv(parentNode == null ? null : parentNode.ParentKey),
-                            EscapeCsv(parentNode == null ? null : parentNode.ParentMasterKey),
-                            EscapeCsv(parentNode == null ? null : parentNode.RouteSystem),
-                            EscapeCsv(parentNode == null ? null : parentNode.InputSourceType),
-                            EscapeCsv(parentNode == null || !parentNode.InputSlotNo.HasValue ? null : parentNode.InputSlotNo.Value.ToString()),
-                            EscapeCsv(parentNode == null ? null : parentNode.NodeType),
-                            EscapeCsv(parentNode != null && parentNode.IsTraceTerminal ? "1" : "0")
-                        ));
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
-        
-
-        private string FormatDateTimeForDump(DateTime? value)
-        {
-            return value.HasValue
-                ? value.Value.ToString("yyyy-MM-dd HH:mm:ss.fff")
-                : null;
-        }
-
-        private string FormatNullableFloatForDump(float? value)
-        {
-            return value.HasValue
-                ? value.Value.ToString()
-                : null;
-        }
-
-        
-
-        
 
         #endregion
     }

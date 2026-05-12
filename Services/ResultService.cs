@@ -17,7 +17,6 @@ namespace LotTraceApp.Services
     public class ResultService
     {
         private readonly ResultRepositories _repo;
-        private readonly ICustomerItemMasterRepository _customerItemMasterRepository;
         private readonly DisplayNameProvider _dis;
 
         // CSV（表示名変換）
@@ -36,10 +35,9 @@ namespace LotTraceApp.Services
         // ★ ドロップダウン用 擬似ID
         public const string FilterId = "__FILTER__";
 
-        public ResultService(ResultRepositories repo, ICustomerItemMasterRepository customerItemMasterRepository)
+        public ResultService(ResultRepositories repo)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
-            _customerItemMasterRepository = customerItemMasterRepository;
 
             // CSVはここで1回読み込み
             _dis = new DisplayNameProvider(csvPath);
@@ -47,11 +45,6 @@ namespace LotTraceApp.Services
             _filterDis = new DisplayNameProvider(filterCsvPath);
             _filterHistoryStore = new FilterHistoryStore(BuildFilterHistoryPath());
 
-        }
-
-        public DataTable History(string productionOrderNumber, string itemCode, string lotNumber, string processId)
-        {
-            return _repo.FindSingleControlHistory2(productionOrderNumber, itemCode, lotNumber, processId);
         }
 
         public bool TryGetDisplayName(string originalName, out string displayName)
@@ -405,44 +398,6 @@ namespace LotTraceApp.Services
         private static string BuildContextKey(string productionOrderNumber, string itemCode, string lotNumber)
         {
             return (productionOrderNumber ?? "") + "|" + (itemCode ?? "") + "|" + (lotNumber ?? "");
-        }
-
-        public DataTable FilterHistory(string productionOrderNumber, string itemCode, string lotNumber)
-        {
-            var dt = new DataTable();
-            dt.Columns.Add("ProcessId");
-            dt.Columns.Add("ProcessName");
-            dt.Columns.Add("UseCount", typeof(int));
-            dt.Columns.Add("LastUsed", typeof(string));
-
-            string ctx = BuildContextKey(productionOrderNumber, itemCode, lotNumber);
-
-            var available = GetAvailableProcesses(productionOrderNumber, itemCode, lotNumber);
-            var nameMap = available.ToDictionary(x => x.Id, x => x.Name, StringComparer.OrdinalIgnoreCase);
-
-            var all = _filterHistoryStore.LoadAll();
-
-            var rows = all
-                .Where(x => x != null
-                            && x.ContextKey.Equals(ctx, StringComparison.OrdinalIgnoreCase)
-                            && !string.IsNullOrWhiteSpace(x.ProcessId)
-                            && nameMap.ContainsKey(x.ProcessId))
-                .OrderByDescending(x => x.LastUsedUtc)
-                .ThenByDescending(x => x.UseCount)
-                .Take(15)
-                .ToList();
-
-            foreach (var r in rows)
-            {
-                var dr = dt.NewRow();
-                dr["ProcessId"] = r.ProcessId;
-                dr["ProcessName"] = nameMap[r.ProcessId];
-                dr["UseCount"] = r.UseCount;
-                dr["LastUsed"] = r.LastUsedUtc.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss");
-                dt.Rows.Add(dr);
-            }
-
-            return dt;
         }
 
         public void RememberFilterHistory(string productionOrderNumber, string itemCode, string lotNumber, string processId)
