@@ -1,4 +1,4 @@
-.\bin\Debug\LotTraceApp.exe -B -S MA01_1222 -M 1
-.\bin\Debug\LotTraceApp.exe -B -S CA01_1222 -M 2
+.\bin\Debug\LotTraceApp.exe -B -S MA01_aa -M 1
+.\bin\Debug\LotTraceApp.exe -B -S CA01_aa -M 2
 .\bin\Debug\LotTraceApp.exe -B -S SB01_1222 -M 3
 .\bin\Debug\LotTraceApp.exe -F -S SB01_1222 -M 3
