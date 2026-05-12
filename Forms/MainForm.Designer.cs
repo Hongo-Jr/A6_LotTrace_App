@@ -516,7 +516,6 @@ namespace LotTraceApp
             this.btnClear.Size = new System.Drawing.Size(150, 50);
             this.btnClear.TabIndex = 18;
             this.btnClear.Text = "クリア";
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
             // btnCsvOutput
             // 
@@ -542,20 +541,19 @@ namespace LotTraceApp
             // 
             this.panelStartHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
             this.panelStartHeader.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartHeader.Location = new System.Drawing.Point(10, 194);
+            this.panelStartHeader.Location = new System.Drawing.Point(26, 194);
             this.panelStartHeader.Name = "panelStartHeader";
-            this.panelStartHeader.Size = new System.Drawing.Size(520, 28);
+            this.panelStartHeader.Size = new System.Drawing.Size(504, 28);
             this.panelStartHeader.TabIndex = 24;
             // 
             // dataGridStart
             // 
-            this.dataGridStart.Location = new System.Drawing.Point(10, 222);
+            this.dataGridStart.Location = new System.Drawing.Point(26, 222);
             this.dataGridStart.Name = "dataGridStart";
             this.dataGridStart.ReadOnly = true;
             this.dataGridStart.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridStart.Size = new System.Drawing.Size(520, 626);
+            this.dataGridStart.Size = new System.Drawing.Size(504, 626);
             this.dataGridStart.TabIndex = 25;
-            this.dataGridStart.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridStart_CellMouseClick);
             // 
             // panelMiddleHeader
             // 
@@ -574,7 +572,6 @@ namespace LotTraceApp
             this.dataGridMiddle.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridMiddle.Size = new System.Drawing.Size(800, 626);
             this.dataGridMiddle.TabIndex = 27;
-            this.dataGridMiddle.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridMiddle_CellMouseClick);
             // 
             // panelEndHeader
             // 
@@ -593,7 +590,6 @@ namespace LotTraceApp
             this.dataGridEnd.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridEnd.Size = new System.Drawing.Size(520, 626);
             this.dataGridEnd.TabIndex = 29;
-            this.dataGridEnd.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridEnd_CellMouseClick);
             // 
             // swichTab
             // 

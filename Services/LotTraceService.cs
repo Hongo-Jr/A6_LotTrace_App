@@ -9,10 +9,23 @@ using LotTraceApp.Repositories;
 
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading;
 
 
 namespace LotTraceApp.Services
 {
+    public sealed class TraceProgressState
+    {
+        public TraceProgressState(string message, int? percent = null)
+        {
+            Message = message;
+            Percent = percent;
+        }
+
+        public string Message { get; private set; }
+        public int? Percent { get; private set; }
+    }
+
     public class LotTraceService
     {
         private readonly LotTraceRepository _repo;
@@ -53,15 +66,29 @@ namespace LotTraceApp.Services
 
         public TraceResult ExecuteTrace(TraceSearchParameters p)
         {
+            return ExecuteTrace(p, null, CancellationToken.None);
+        }
+
+        public TraceResult ExecuteTrace(TraceSearchParameters p, IProgress<TraceProgressState> progress)
+        {
+            return ExecuteTrace(p, progress, CancellationToken.None);
+        }
+
+        public TraceResult ExecuteTrace(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
+        {
             if (p == null) throw new ArgumentNullException("p");
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (p.Direction == TraceDirection.Forward)
             {
-                return TraceForward(p);
+                return TraceForward(p, progress, cancellationToken);
             }
             else
             {
-                return TraceBackward(p);
+                return TraceBackward(p, progress, cancellationToken);
             }
         }
        
@@ -76,21 +103,43 @@ namespace LotTraceApp.Services
                 SortBeforeSuppress = false
             });
 
-            return BuildDisplayTableFromDisplayResult(displayResult);
+            return BuildDisplayTableFromDisplayResult(displayResult, CancellationToken.None);
+        }
+
+        public DataTable BuildDisplayTable(TraceDisplayResult displayResult, IProgress<TraceProgressState> progress)
+        {
+            return BuildDisplayTable(displayResult, progress, CancellationToken.None);
+        }
+
+        public DataTable BuildDisplayTable(
+            TraceDisplayResult displayResult,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
+        {
+            ReportProgress(progress, "グリッド列を準備しています...", 80);
+            return BuildDisplayTableFromDisplayResult(displayResult, cancellationToken);
         }
 
         public TraceDisplayResult BuildDisplayResult(
     TraceResult traceResult,
-    TraceDisplayBuildOptions options = null)
+    TraceDisplayBuildOptions options = null,
+    IProgress<TraceProgressState> progress = null,
+    CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var displayResult = new TraceDisplayResult();
             displayResult.Options = options ?? new TraceDisplayBuildOptions();
 
             if (traceResult == null || traceResult.PathRows == null || traceResult.PathRows.Count == 0)
                 return displayResult;
 
+            ReportProgress(progress, "表示行を変換しています...", 68);
+
             for (int rowIndex = 0; rowIndex < traceResult.PathRows.Count; rowIndex++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var pathRow = traceResult.PathRows[rowIndex];
                 if (pathRow == null)
                     continue;
@@ -181,6 +230,7 @@ namespace LotTraceApp.Services
                 ? Math.Max(1, maxMiddleDepthFromRows)
                 : maxMiddleDepthFromRows;
 
+            ReportProgress(progress, "グリッド罫線情報を整えています...", 74);
            
                 MarkStartGroupBoundariesFromOccupiedRanges(
                     displayResult.Rows,
@@ -195,10 +245,23 @@ namespace LotTraceApp.Services
             return displayResult;
         }
 
+        private static void ReportProgress(IProgress<TraceProgressState> progress, string message, int? percent = null)
+        {
+            if (progress == null || string.IsNullOrWhiteSpace(message))
+                return;
+
+            progress.Report(new TraceProgressState(message, percent));
+        }
+
         #region トレースフォワード（仕様書 7.1）
 
-        private TraceResult TraceForward(TraceSearchParameters p)
+        private TraceResult TraceForward(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var result = new TraceResult();
 
             // 今回は Lv1 の枝構造確認用。
@@ -207,8 +270,9 @@ namespace LotTraceApp.Services
             _currentForwardCandidatesByParentNodeKey =
                 new Dictionary<string, List<ChildCandidate>>(StringComparer.OrdinalIgnoreCase);
 
-            
+            ReportProgress(progress, "トレースフォワードの始点を探索しています...", 15);
             var laneBuildResult = BuildForwardDisplayLaneNodes(p);
+            cancellationToken.ThrowIfCancellationRequested();
             _currentForwardLaneBuildResult = laneBuildResult;
 
             if (laneBuildResult == null ||
@@ -225,7 +289,9 @@ namespace LotTraceApp.Services
             // ------------------------------------------------------------
             // 4. 完成した DisplayLaneNode に対して品名解決
             // ------------------------------------------------------------
+            ReportProgress(progress, "品目名と開始日時を解決しています...", 48);
             ResolveItemNamesDisplayNodes(laneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
             ResolveStartDateLabelsForDisplayLaneNodes(laneBuildResult.DisplayNodes);
 
             // ------------------------------------------------------------
@@ -235,7 +301,9 @@ namespace LotTraceApp.Services
 
             result.TraceLineRanges.Clear();
 
+            ReportProgress(progress, "罫線を描画しています...", 58);
             var traceLineRanges = BuildForwardLineRanges(laneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
 
             AppendForwardOccupiedMiddleLineRanges(traceLineRanges,laneBuildResult);
 
@@ -245,6 +313,7 @@ namespace LotTraceApp.Services
 
 
 
+            ReportProgress(progress, "検索結果行を作成しています...", 64);
             BuildPathRowsFromDisplayLaneNodes(result, laneBuildResult);
 
             return result;
@@ -374,8 +443,12 @@ namespace LotTraceApp.Services
 
         
 
-        private DataTable BuildDisplayTableFromDisplayResult(TraceDisplayResult displayResult)
+        private DataTable BuildDisplayTableFromDisplayResult(
+            TraceDisplayResult displayResult,
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var table = new DataTable();
 
             if (displayResult == null)
@@ -390,6 +463,7 @@ namespace LotTraceApp.Services
 
             for (int level = 1; level <= maxMiddleDepth; level++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 AddDisplayTableMiddleColumns(table, level);
             }
 
@@ -400,6 +474,8 @@ namespace LotTraceApp.Services
 
             for (int rowIndex = 0; rowIndex < displayResult.Rows.Count; rowIndex++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var displayRow = displayResult.Rows[rowIndex];
                 if (displayRow == null)
                     continue;
@@ -411,6 +487,8 @@ namespace LotTraceApp.Services
 
                 for (int level = 1; level <= maxMiddleDepth; level++)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     var middleCell = GetMiddleCell(displayRow, level);
                     FillDisplayTableMiddleColumns(dr, level, middleCell);
                 }
@@ -1393,8 +1471,13 @@ namespace LotTraceApp.Services
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private TraceResult TraceBackward(TraceSearchParameters p)
+        private TraceResult TraceBackward(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress,
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var result = new TraceResult();
 
             var nodeMap = new Dictionary<string, ProductionResultNode>(StringComparer.OrdinalIgnoreCase);
@@ -1416,12 +1499,16 @@ namespace LotTraceApp.Services
             // 通常始点（B / A ManualInput）を取得する。
             // これらは Current として queue に積み、以後の親探索は BFS で広げる。
             // ------------------------------------------------------------
+            ReportProgress(progress, "トレースバックの始点を探索しています...", 15);
             var startNodes = BuildBackwardStartNodes(p);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (startNodes != null)
             {
                 foreach (var raw in startNodes)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (raw == null)
                         continue;
 
@@ -1445,12 +1532,16 @@ namespace LotTraceApp.Services
             // Drumcan始点の事前構造化
             // child(StartD始点) -> parent を Candidate として先に反映する
             // ------------------------------------------------------------
+            ReportProgress(progress, "始点周辺の親候補を確認しています...", 25);
             var startDrumcanCandidates = _repo.FindBackwardStartDrumcanCandidates(p);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (startDrumcanCandidates != null)
             {
                 foreach (var candidate in startDrumcanCandidates)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (candidate == null || candidate.ChildNode == null || candidate.Node == null)
                         continue;
 
@@ -1493,9 +1584,12 @@ namespace LotTraceApp.Services
             // BFS（current = child / candidate.Node = parent）
             // ------------------------------------------------------------
 
+            ReportProgress(progress, "親ロットを探索しています...", 35);
 
             while (queue.Count > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var current = queue.Dequeue();
                 if (current == null)
                     continue;
@@ -1508,6 +1602,8 @@ namespace LotTraceApp.Services
 
                 foreach (var candidate in candidates)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     if (candidate == null || candidate.Node == null)
                         continue;
 
@@ -1535,13 +1631,18 @@ namespace LotTraceApp.Services
             // STEP4:
             // バック探索結果 → 枝構造化
             // ------------------------------------------------------------
-            var backwardLaneBuildResult = BuildBackwardDisplayLaneNodes(startNodes);
+            ReportProgress(progress, "トレースバックの枝構造を作成しています...", 50);
+            var backwardLaneBuildResult = BuildBackwardDisplayLaneNodes(startNodes, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             DumpBackwardTraceArtifacts(result, backwardLaneBuildResult, "COMPLETED");
+            ReportProgress(progress, "品目名と開始日時を解決しています...", 60);
             ResolveItemNamesDisplayNodes(backwardLaneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
             ResolveStartDateLabelsForDisplayLaneNodes(backwardLaneBuildResult.DisplayNodes);
 
             // ここで構造ベースの肉付け
             PopulateLineDecisionInfos(backwardLaneBuildResult.DisplayNodes);
+            cancellationToken.ThrowIfCancellationRequested();
 
 
             // Occupied 確定
@@ -1557,6 +1658,7 @@ namespace LotTraceApp.Services
 
             //枝剪定はダンプまで取る所で残しておく。まだその先は実装しない
             ApplyBackwardBranchPruning(backwardLaneBuildResult);
+            cancellationToken.ThrowIfCancellationRequested();
 
             //終端処理
             backwardLaneBuildResult.EndInfos =
@@ -1567,9 +1669,11 @@ namespace LotTraceApp.Services
               NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
 
             // ★追加（構造 → 線生成）
+            ReportProgress(progress, "罫線情報を作成しています...", 70);
             var traceLineRanges =
             BuildTraceLineRangesFromOccupiedGroups(
                 backwardLaneBuildResult.OccupiedLotGroupRanges);
+            cancellationToken.ThrowIfCancellationRequested();
 
             NormalizeBackwardTraceLineRangeGridKinds(traceLineRanges);
 
@@ -1587,6 +1691,7 @@ namespace LotTraceApp.Services
             // 枝構造 → PathRows
             // ※ route復元ではなく、XLevel / YLane 投影で作る
             // ------------------------------------------------------------
+            ReportProgress(progress, "検索結果行を作成しています...", 75);
             BuildBackwardPathRowsFromDisplayLaneNodes(result, backwardLaneBuildResult);
 
             
@@ -2063,9 +2168,6 @@ namespace LotTraceApp.Services
         #endregion
 
       
-
-        
-
         #region 交点検出（仕様書 7.3）
 
         /// <summary>
@@ -2086,12 +2188,13 @@ namespace LotTraceApp.Services
                 int tabNo = kv.Key;
                 var trace = kv.Value;
 
-                if (trace == null || trace.AllNodes == null || trace.AllNodes.Count == 0)
+                var sourceNodes = EnumerateCrossPointSourceNodes(trace).ToList();
+                if (sourceNodes.Count == 0)
                     continue;
 
                 var seenNodeKeysInTab = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                foreach (var node in trace.AllNodes)
+                foreach (var node in sourceNodes)
                 {
                     if (node == null)
                         continue;
@@ -2150,6 +2253,36 @@ namespace LotTraceApp.Services
                 .ThenBy(x => x.ItemName, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(x => x.NodeKey, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+        }
+
+        private IEnumerable<ProductionResultNode> EnumerateCrossPointSourceNodes(TraceResult trace)
+        {
+            if (trace == null)
+                yield break;
+
+            if (trace.PathRows == null || trace.PathRows.Count == 0)
+                yield break;
+
+            foreach (var row in trace.PathRows)
+            {
+                if (row == null)
+                    continue;
+
+                if (row.StartNode != null)
+                    yield return row.StartNode;
+
+                if (row.MiddleNodes != null)
+                {
+                    foreach (var node in row.MiddleNodes)
+                    {
+                        if (node != null)
+                            yield return node;
+                    }
+                }
+
+                if (row.EndNode != null)
+                    yield return row.EndNode;
+            }
         }
 
         private sealed class CrossPointBuildEntry
@@ -3995,8 +4128,12 @@ namespace LotTraceApp.Services
         #region 新トレースバック関連群
 
 
-        private ForwardDisplayLaneBuildResult BuildBackwardDisplayLaneNodes(List<ProductionResultNode> startNodes)
+        private ForwardDisplayLaneBuildResult BuildBackwardDisplayLaneNodes(
+            List<ProductionResultNode> startNodes,
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var buildResult = new ForwardDisplayLaneBuildResult();
 
             if (startNodes == null || startNodes.Count == 0)
@@ -4007,6 +4144,8 @@ namespace LotTraceApp.Services
 
             foreach (var root in startNodes)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (root == null)
                     continue;
 
@@ -4018,7 +4157,8 @@ namespace LotTraceApp.Services
                     xLevel: 0,
                     trunkY: trunkY,
                     ref nextY,
-                    output: displayNodes);
+                    output: displayNodes,
+                    cancellationToken: cancellationToken);
 
                 if (rootDisplayNode == null)
                     continue;
@@ -4036,8 +4176,11 @@ namespace LotTraceApp.Services
     int xLevel,
     int trunkY,
     ref int nextYRef,
-    List<DisplayLaneNode> output)
+    List<DisplayLaneNode> output,
+    CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (currentNode == null)
                 return null;
 
@@ -4085,6 +4228,7 @@ namespace LotTraceApp.Services
 
             foreach (var candidate in candidates)
             {
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (!string.Equals(
                     candidate.ChildNode.NodeIdentityKey,
@@ -4125,7 +4269,8 @@ namespace LotTraceApp.Services
                     xLevel: xLevel + 1,
                     trunkY: childTrunkY,
                     ref nextYRef,
-                    output: output);
+                    output: output,
+                    cancellationToken: cancellationToken);
 
                 if (childDisplayNode == null)
                     continue;
