@@ -97,7 +97,7 @@ namespace LotTraceApp.Services
                 if (pathRow == null)
                     continue;
 
-                
+
 
                 var row = new TraceDisplayRow
                 {
@@ -172,18 +172,19 @@ namespace LotTraceApp.Services
                 : maxMiddleDepthFromRows;
 
             ReportProgress(progress, "グリッド罫線情報を整えています...", 74);
-           
-                MarkStartGroupBoundariesFromOccupiedRanges(
-                    displayResult.Rows,
-                    _currentForwardLaneBuildResult == null
-                        ? null
-                        : _currentForwardLaneBuildResult.OccupiedLotGroupRanges);
-           
+
+            MarkStartGroupBoundariesFromOccupiedRanges(
+                displayResult.Rows,
+                _currentForwardLaneBuildResult == null
+                    ? null
+                    : _currentForwardLaneBuildResult.OccupiedLotGroupRanges);
+
             PopulateLineRanges(displayResult, traceResult.TraceLineRanges);
 
-    
+
 
             return displayResult;
+
         }
 
         private static void ReportProgress(IProgress<TraceProgressState> progress, string message, int? percent = null)
