@@ -30,12 +30,12 @@ namespace LotTraceApp
         {
             return new TraceSearchParameters
             {
-                ProductionOrderNumber = txtOrderNumber.Text.Trim(),
-                ItemName = txtItemName.Text.Trim(),
-                ItemCode = txtItemCode.Text.Trim(),
-                LotNumber = txtLotNumber.Text.Trim(),
-                From = chkUseFrom.Checked ? dtpFrom.Value.Date : (DateTime?)null,
-                To = chkUseTo.Checked ? dtpTo.Value.Date.AddDays(1).AddSeconds(-1) : (DateTime?)null,
+                ProductionOrderNumber = txtBottoleOrderNo.Text.Trim(),
+                ItemName = txtBottoleItemName.Text.Trim(),
+                ItemCode = txtBottoleItemCode.Text.Trim(),
+                LotNumber = txtBottoleLotNo.Text.Trim(),
+                //From = chkUseFrom.Checked ? dtpFrom.Value.Date : (DateTime?)null,
+                //To = timeCheck.Checked ? timeCheck.Value.Date.AddDays(1).AddSeconds(-1) : (DateTime?)null,
                 Direction = rdoForwardBottle.Checked ? TraceDirection.Forward : TraceDirection.Backward
             };
         }
@@ -51,12 +51,12 @@ namespace LotTraceApp
 
         private void btnClearBottle_Click(object sender, EventArgs e)
         {
-            txtOrderNumber.Clear();
-            txtItemName.Clear();
-            txtItemCode.Clear();
-            txtLotNumber.Clear();
-            chkUseFrom.Checked = false;
-            chkUseTo.Checked = false;
+            txtBottoleOrderNo.Clear();
+            txtBottoleItemName.Clear();
+            txtBottoleItemCode.Clear();
+            txtBottoleLotNo.Clear();
+            //chkUseFrom.Checked = false;
+            timeCheck.Checked = false;
 
             dgvStartBottle.DataSource = null;
             dgvEndBottle.DataSource = null;
@@ -136,11 +136,6 @@ namespace LotTraceApp
         /// <summary>
         /// [37] 液設備ボタン クリック時：液設備画面へ戻る
         /// </summary>
-        private void btnBackToLiquid_Click(object sender, EventArgs e)
-        {
-            // MainForm から ShowDialog(this) などで開かれている前提なら、
-            // このフォームを閉じるだけで液設備画面にフォーカスが戻ります。
-            this.Close();
-        }
+       
     }
 }
