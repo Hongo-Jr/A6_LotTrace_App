@@ -912,9 +912,7 @@ namespace LotTraceApp.Utils
         {
             if (xlCell == null || dgvCell == null || plan == null ||
                 crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
-            {
                 return;
-            }
 
             DataGridViewRow row = dgvCell.OwningRow;
             if (row == null)
@@ -924,16 +922,17 @@ namespace LotTraceApp.Utils
                 ? dgvCell.OwningColumn.Name ?? string.Empty
                 : string.Empty;
 
-            string nodeKeyColumnName = ResolveNodeKeyColumnNameForForeColorGrouping(columnName);
-            if (string.IsNullOrWhiteSpace(nodeKeyColumnName))
+            // ★ここが変更点：Start_/LvX_/End_ を特定して MK|/NK| を組み立てる
+            string prefix = ResolveCrossPointGroupPrefix(columnName);
+            if (string.IsNullOrWhiteSpace(prefix))
                 return;
 
-            string nodeKey = GetRowValue(row, nodeKeyColumnName);
-            if (string.IsNullOrWhiteSpace(nodeKey) || !crossPointNodeKeys.Contains(nodeKey))
+            string uiKey = BuildCrossPointUiKeyFromRow(row, prefix);
+            if (string.IsNullOrWhiteSpace(uiKey) || !crossPointNodeKeys.Contains(uiKey))
                 return;
 
             xlCell.Style.Fill.PatternType = XLFillPatternValues.Solid;
-            xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(GetCrossPointNodeBackColor(nodeKey));
+            xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(GetCrossPointNodeBackColor(uiKey));
         }
 
         private static void ApplyIntersectionCrossPointBackColor(
@@ -1685,6 +1684,51 @@ namespace LotTraceApp.Utils
             public List<DataGridViewRow> MiddleRows { get; set; }
             public List<DataGridViewRow> RightRows { get; set; }
             public int MaxVisibleRowCount { get; set; }
+        }
+        private static string ResolveCrossPointGroupPrefix(string columnName)
+        {
+            if (string.IsNullOrWhiteSpace(columnName))
+                return null;
+
+            if (columnName.StartsWith("Start_", StringComparison.OrdinalIgnoreCase)) return "Start_";
+            if (columnName.StartsWith("End_", StringComparison.OrdinalIgnoreCase)) return "End_";
+
+            if (columnName.StartsWith("Lv", StringComparison.OrdinalIgnoreCase))
+            {
+                int idx = columnName.IndexOf('_');
+                if (idx > 2)
+                {
+                    string levelText = columnName.Substring(2, idx - 2);
+                    if (int.TryParse(levelText, out int level))
+                        return "Lv" + level + "_";
+                }
+            }
+            return null;
+        }
+
+        private static string BuildCrossPointUiKeyFromRow(DataGridViewRow row, string prefix)
+        {
+            if (row == null || string.IsNullOrWhiteSpace(prefix))
+                return null;
+
+            string masterKey = GetRowValue(row, prefix + "MasterKey");
+            string nodeKey = GetRowValue(row, prefix + "NodeKey");
+
+            // DataTableに入ってる前提（無い場合は null のままでもOK）
+            string startDateLabel = GetRowValue(row, prefix + "StartDateLabel");
+            string inputSourceType = GetRowValue(row, prefix + "InputSourceType");
+
+            bool isManual =
+                string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(inputSourceType, "ManualInput", StringComparison.OrdinalIgnoreCase);
+
+            if (isManual)
+                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+
+            if (!string.IsNullOrWhiteSpace(masterKey))
+                return "MK|" + masterKey.Trim();
+
+            return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
         }
     }
 }

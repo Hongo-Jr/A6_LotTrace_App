@@ -2649,7 +2649,11 @@ namespace LotTraceApp
             p.LotNumber = tab.TxtLot.Text.Trim();
 
             if (tab.ChkUseFrom.Checked)
+            {
                 p.From = tab.DtpFrom.Value.Date;
+                // Toは「当日23:59:59.9999999」まで含める（Dateだけだと00:00:00になって漏れやすい）
+                p.To = tab.DtpTo.Value.Date.AddDays(1).AddTicks(-1);
+            }
 
             p.Direction = tab.RdoForward.Checked ? TraceDirection.Forward : TraceDirection.Backward;
             return p;
@@ -3432,7 +3436,7 @@ namespace LotTraceApp
 
             try
             {
-                _lastCrossPoints = _liquidService.DetectCrossPoints(targets);
+                _lastCrossPoints = DetectCrossPointsByMasterKey(targets);
                 _lastCrossPointTargetTabs = targets.Keys.OrderBy(x => x).ToList();
             }
             catch (Exception ex)
@@ -3446,15 +3450,15 @@ namespace LotTraceApp
                 _lastCrossPoints,
                 _lastCrossPointTargetTabs);
             ApplyCrossPointGridColumnWidths();
-            StoreCrossPointNodeKeysByTab(_lastCrossPoints, _lastCrossPointTargetTabs);
+            StoreCrossPointMasterKeysByTab(_lastCrossPoints, _lastCrossPointTargetTabs);
             RebuildGridPaintCaches();
             InvalidateTraceGridsForTabs(_lastCrossPointTargetTabs);
             swichTab.SelectedTab = IntersectionTab;
         }
 
-        private void StoreCrossPointNodeKeysByTab(
-            IEnumerable<CrossPointRecord> records,
-            IEnumerable<int> targetTabs)
+        private void StoreCrossPointMasterKeysByTab(
+     IEnumerable<CrossPointRecord> records,
+     IEnumerable<int> targetTabs)
         {
             _crossPointNodeKeysByTab.Clear();
 
@@ -3465,7 +3469,7 @@ namespace LotTraceApp
                     if (!_crossPointNodeKeysByTab.ContainsKey(tabNo))
                     {
                         _crossPointNodeKeysByTab[tabNo] =
-                            new HashSet<string>(StringComparer.Ordinal);
+                            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     }
                 }
             }
@@ -3475,6 +3479,7 @@ namespace LotTraceApp
 
             foreach (var record in records)
             {
+                // ★NodeKey欄には MasterKey が入っている前提
                 if (record == null || record.CrossPointFlag != 1 ||
                     string.IsNullOrWhiteSpace(record.NodeKey))
                 {
@@ -3486,7 +3491,7 @@ namespace LotTraceApp
                     if (record.GetTabPresence(tabNo) != 1)
                         continue;
 
-                    _crossPointNodeKeysByTab[tabNo].Add(record.NodeKey);
+                    _crossPointNodeKeysByTab[tabNo].Add(record.NodeKey.Trim());
                 }
             }
         }
@@ -3514,6 +3519,140 @@ namespace LotTraceApp
             if (tab.GridStart != null) tab.GridStart.Invalidate();
             if (tab.GridMiddle != null) tab.GridMiddle.Invalidate();
             if (tab.GridEnd != null) tab.GridEnd.Invalidate();
+        }
+        private List<CrossPointRecord> DetectCrossPointsByMasterKey(Dictionary<int, TraceResult> tabResults)
+        {
+            // key = (MK|xxxx or NK|xxxx)
+            var tabsByKey = new Dictionary<string, HashSet<int>>(StringComparer.OrdinalIgnoreCase);
+            var repNodeByKey = new Dictionary<string, ProductionResultNode>(StringComparer.OrdinalIgnoreCase);
+
+            if (tabResults == null || tabResults.Count == 0)
+                return new List<CrossPointRecord>();
+
+            foreach (var kv in tabResults)
+            {
+                int tabNo = kv.Key;
+                var trace = kv.Value;
+                if (trace?.PathRows == null) continue;
+
+                foreach (var row in trace.PathRows)
+                {
+                    if (row == null) continue;
+
+                    foreach (var node in EnumerateRowNodes(row))
+                    {
+                        if (node == null) continue;
+
+                        string key = BuildCrossPointUiKey(node); // ★ここが肝
+                        if (string.IsNullOrWhiteSpace(key)) continue;
+
+                        if (!tabsByKey.TryGetValue(key, out var set))
+                        {
+                            set = new HashSet<int>();
+                            tabsByKey[key] = set;
+                            repNodeByKey[key] = node;
+                        }
+                        set.Add(tabNo);
+                    }
+                }
+            }
+
+            var allTabs = tabResults.Keys.OrderBy(x => x).ToList();
+            var records = new List<CrossPointRecord>();
+
+            foreach (var kv in tabsByKey)
+            {
+                string key = kv.Key;
+                var tabs = kv.Value;
+                var node = repNodeByKey[key];
+
+                var r = new CrossPointRecord
+                {
+                    // NodeKey列は非表示なので「キー格納」に流用（MK| or NK| を入れる）
+                    NodeKey = key,
+                    CrossPointFlag = tabs.Count >= 2 ? 1 : 0,
+                    ProductionOrderNumber = node?.ProductionOrderNumber,
+                    LotNumber = node?.LotNumber,
+                    ItemName = node?.ItemName,
+                    StartDateText = (node != null && node.StartDate.HasValue)
+                        ? node.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
+                        : node?.StartDateLabel,
+                    Weight = node?.Weight
+                };
+
+                foreach (int t in allTabs)
+                    r.TabPresence[t] = tabs.Contains(t) ? 1 : 0;
+
+                records.Add(r);
+            }
+
+            return records
+                .OrderByDescending(x => x.CrossPointFlag)
+                .ThenBy(x => x.ProductionOrderNumber, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.LotNumber, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.ItemName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.NodeKey, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private string BuildCrossPointUiKey(ProductionResultNode node)
+        {
+            if (node == null) return null;
+
+            // 手投入は MasterKey で束ねると粗すぎるので NodeKey 側で分離
+            bool isManual = string.Equals(node.StartDateLabel, "手投入", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(node.InputSourceType, "ManualInput", StringComparison.OrdinalIgnoreCase);
+
+            string masterKey = (node.ControlMasterKey ?? "").Trim();
+            string nodeKey = (node.NodeIdentityKey ?? "").Trim();
+
+            if (isManual)
+                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey;
+
+            if (!string.IsNullOrWhiteSpace(masterKey))
+                return "MK|" + masterKey;
+
+            // MasterKey無い場合のフォールバック
+            return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey;
+        }
+
+        private IEnumerable<ProductionResultNode> EnumerateRowNodes(TracePathRow row)
+        {
+            if (row.StartNode != null) yield return row.StartNode;
+
+            if (row.MiddleNodes != null)
+            {
+                foreach (var n in row.MiddleNodes)
+                    if (n != null) yield return n;
+            }
+
+            if (row.EndNode != null) yield return row.EndNode;
+        }
+        private string ResolveCrossPointGroupPrefix(DataGridView grid, int columnIndex)
+        {
+            if (grid == null) return null;
+            if (columnIndex < 0 || columnIndex >= grid.Columns.Count) return null;
+
+            var column = grid.Columns[columnIndex];
+            if (column == null) return null;
+
+            string name = column.Name ?? string.Empty;
+
+            if (name.StartsWith("Start_", StringComparison.OrdinalIgnoreCase)) return "Start_";
+            if (name.StartsWith("End_", StringComparison.OrdinalIgnoreCase)) return "End_";
+
+            if (name.StartsWith("Lv", StringComparison.OrdinalIgnoreCase))
+            {
+                int idx = name.IndexOf('_');
+                if (idx > 2)
+                {
+                    string levelText = name.Substring(2, idx - 2);
+                    if (int.TryParse(levelText, out int level))
+                        return "Lv" + level + "_";
+                }
+            }
+
+            return null;
         }
 
         #endregion
@@ -4734,13 +4873,15 @@ namespace LotTraceApp
 
         private void BuildGridBackColorCaches()
         {
-            var tab = GetCurrentTabContext();
-            if (tab == null)
-                return;
+            for (int tabNo = 1; tabNo <= 10; tabNo++)
+            {
+                var tab = GetTabContext(tabNo);
+                if (tab == null) continue;
 
-            BuildGridBackColorCache(tab, tab.GridStart);
-            BuildGridBackColorCache(tab, tab.GridMiddle);
-            BuildGridBackColorCache(tab, tab.GridEnd);
+                BuildGridBackColorCache(tab, tab.GridStart);
+                BuildGridBackColorCache(tab, tab.GridMiddle);
+                BuildGridBackColorCache(tab, tab.GridEnd);
+            }
         }
 
         private void BuildGridBackColorCache(TraceTabContext tab, DataGridView grid)
@@ -4750,8 +4891,10 @@ namespace LotTraceApp
 
             HashSet<string> crossPointNodeKeys;
             if (!_crossPointNodeKeysByTab.TryGetValue(tab.TabNo, out crossPointNodeKeys) ||
-                crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
+    crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
             {
+                // ★このタブは交点ハイライト対象が無いので、過去の塗りを消す
+                _gridPaintCache.BackColorCaches.Remove(grid);
                 return;
             }
 
@@ -4765,8 +4908,7 @@ namespace LotTraceApp
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                string nodeKeyColumnName =
-                    ResolveNodeKeyColumnNameForForeColorGrouping(grid, columnIndex);
+                string nodeKeyColumnName = ResolveCrossPointGroupPrefix(grid, columnIndex);
                 string groupKey = nodeKeyColumnName ?? string.Empty;
 
                 int groupIndex;
@@ -4793,19 +4935,19 @@ namespace LotTraceApp
 
                 for (int groupIndex = 0; groupIndex < nodeKeyColumnNames.Count; groupIndex++)
                 {
-                    string nodeKeyColumnName = nodeKeyColumnNames[groupIndex];
-                    if (string.IsNullOrEmpty(nodeKeyColumnName))
+                    string prefix = nodeKeyColumnNames[groupIndex];
+                    if (string.IsNullOrEmpty(prefix))
                         continue;
 
-                    string nodeKey = GetTableString(boundItem.Row, nodeKeyColumnName);
-                    if (string.IsNullOrWhiteSpace(nodeKey) || !crossPointNodeKeys.Contains(nodeKey))
+                    string key = BuildCrossPointUiKeyFromRow(boundItem.Row, prefix);
+                    if (string.IsNullOrWhiteSpace(key) || !crossPointNodeKeys.Contains(key))
                         continue;
 
                     Tuple<Color, Color> colors;
-                    if (!colorByNodeKey.TryGetValue(nodeKey, out colors))
+                    if (!colorByNodeKey.TryGetValue(key, out colors))
                     {
-                        colors = GetCrossPointNodeColors(nodeKey);
-                        colorByNodeKey[nodeKey] = colors;
+                        colors = GetCrossPointNodeColors(key);
+                        colorByNodeKey[key] = colors;
                     }
 
                     rowGroupBackColors[rowIndex, groupIndex] = colors.Item1;
@@ -5134,10 +5276,28 @@ namespace LotTraceApp
                 default: return Color.FromArgb(255, v, p, q);
             }
         }
+        private string BuildCrossPointUiKeyFromRow(DataRow row, string prefix)
+        {
+            if (row == null) return null;
+
+            string masterKey = GetTableString(row, prefix + "MasterKey");
+            string nodeKey = GetTableString(row, prefix + "NodeKey");
+            string startDateLabel = GetTableString(row, prefix + "StartDateLabel"); // ★DataTableにはある
+
+            bool isManual = string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase);
+
+            if (isManual)
+                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+
+            if (!string.IsNullOrWhiteSpace(masterKey))
+                return "MK|" + masterKey.Trim();
+
+            return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+        }
 
         #endregion
 
-       
+
 
         private static string GetRowString(DataRow r, string colName)
         {
