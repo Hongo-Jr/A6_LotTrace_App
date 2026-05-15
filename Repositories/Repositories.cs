@@ -140,7 +140,13 @@ WHERE 1 = 1
           CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
           1
       ) IN ('2','3')
+  AND SUBSTRING(
+        scp.MasterKey,
+        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
+        1
+    ) IN ('4','7')
 ";
+
 
                     // 既存Appendをそのまま使用
                     AppendStartNodeSearchConditions(p, cmd, ref sql, "scp");
@@ -1480,17 +1486,11 @@ ORDER BY
             node.ManufacturingTankName = null;
             node.Weight = drumWeight;
 
-            node.ControlMasterKey = BuildDeterministicSpecialNodeMasterKey(
-                        "F_STARTD_DRUM_PARENT",
-                        drumLotNumber,
+            node.ControlMasterKey = BuildDrumcanSpecialNodeMasterKey(
                         drumItemCode,
                         drumLotNumber,
                         drumWeight,
-                        "Drumcan",
-                        slotNo,
-                        childNode == null ? null : childNode.ControlMasterKey,
-                        childNode == null ? null : childNode.LotNumber,
-                        childNode == null ? null : childNode.ItemCode);
+                        slotNo);
 
             node.Depth = 0;
             node.NodeType = "Start";
@@ -1736,6 +1736,16 @@ WHERE mb.SourceTankLotNumber01 = @ParentLot
 
             // A/B のどちら由来の親Lot候補か
             public TraceSourceTable SourceTable { get; set; }
+        }
+
+        private sealed class BackwardStep1DrumcanRow
+        {
+            public string ChildMasterKey { get; set; }
+            public string ParentLotNumber { get; set; }
+            public string ItemCode { get; set; }
+            public float? Weight { get; set; }
+            public string SourceType { get; set; }
+            public int SlotNo { get; set; }
         }
 
 
@@ -2058,6 +2068,7 @@ WHERE mb.LotNumber = @ChildLotNumber
     ProductionResultNode current,int depth)
         {
             var parentCandidates = new List<BackwardParentCandidate>();
+            var aRows = new List<BackwardStep1DrumcanRow>();
 
             if (current == null || string.IsNullOrWhiteSpace(current.LotNumber))
                 return parentCandidates;
@@ -2130,18 +2141,26 @@ WHERE mb.LotNumber = @ChildLotNumber
                             continue;
                         }
 
-                        AppendBackwardStep1DrumcanCandidatesForA(
-                            parentCandidates,
-                            current,
-                            childMasterKey,
-                            drumcanParentLotNumber,
-                            drumcanItemCode,
-                            drumcanWeight,
-                            sourceType,
-                            slotNo,
-                            depth);
+                        aRows.Add(new BackwardStep1DrumcanRow
+                        {
+                            ChildMasterKey = childMasterKey,
+                            ParentLotNumber = drumcanParentLotNumber,
+                            ItemCode = drumcanItemCode,
+                            Weight = drumcanWeight,
+                            SourceType = sourceType,
+                            SlotNo = slotNo
+                        });
                     }
                 }
+            }
+
+            if (aRows.Count > 0)
+            {
+                AppendBackwardStep1DrumcanCandidatesForA(
+                    parentCandidates,
+                    current,
+                    aRows,
+                    depth);
             }
 
             return parentCandidates;
@@ -2150,15 +2169,17 @@ WHERE mb.LotNumber = @ChildLotNumber
         private void AppendBackwardStep1DrumcanCandidatesForA(
     List<BackwardParentCandidate> parentCandidates,
     ProductionResultNode current,
-    string childMasterKey,
-    string drumcanParentLotNumber,
-    string drumcanItemCode,
-    float? drumcanWeight,
-    string sourceType,
-    int slotNo,
+    List<BackwardStep1DrumcanRow> drumcanRows,
     int depth)
         {
             if (parentCandidates == null || current == null)
+                return;
+
+            if (drumcanRows == null || drumcanRows.Count == 0)
+                return;
+
+            var firstRow = drumcanRows.FirstOrDefault(x => x != null);
+            if (firstRow == null)
                 return;
 
             var parentC = new ProductionResultNode();
@@ -2174,48 +2195,20 @@ WHERE mb.LotNumber = @ChildLotNumber
             parentC.Weight = null;
             parentC.ControlMasterKey = BuildDeterministicSpecialNodeMasterKey(
                 "A_STEP1_DRUMCAN_PARENT_C",
-                childMasterKey ?? current.ControlMasterKey ?? current.LotNumber,
+                firstRow.ChildMasterKey ?? current.ControlMasterKey ?? current.LotNumber,
                 parentC.ItemCode,
                 parentC.LotNumber,
                 parentC.Weight,
-                sourceType,
-                slotNo);
+                "Drumcan",
+                null);
             parentC.Depth = 0;
             parentC.NodeType = "Middle";
             parentC.ParentKey = null;
             parentC.ParentMasterKey = null;
             parentC.RouteSystem = "A";
-            parentC.InputSlotNo = slotNo;
-            parentC.InputSourceType = sourceType;
+            parentC.InputSlotNo = null;
+            parentC.InputSourceType = "Drumcan";
             parentC.IsTraceTerminal = string.IsNullOrWhiteSpace(parentC.LotNumber);
-
-            var drumcanParent = new ProductionResultNode();
-            drumcanParent.ProductionOrderNumber = null;
-            drumcanParent.LotNumber = drumcanParentLotNumber;
-            drumcanParent.ItemName = null;
-            drumcanParent.ItemCode = drumcanItemCode;
-            drumcanParent.StartDate = null;
-            drumcanParent.StartDateLabel = null;
-            drumcanParent.EndDate = null;
-            drumcanParent.ManufacturingProcessName = null;
-            drumcanParent.ManufacturingTankName = null;
-            drumcanParent.Weight = drumcanWeight;
-            drumcanParent.ControlMasterKey = BuildDeterministicSpecialNodeMasterKey(
-                "A_STEP1_DRUMCAN_PARENT",
-                parentC.ControlMasterKey ?? parentC.LotNumber,
-                drumcanParent.ItemCode,
-                drumcanParent.LotNumber,
-                drumcanParent.Weight,
-                sourceType,
-                slotNo);
-            drumcanParent.Depth = 0;
-            drumcanParent.NodeType = "Middle";
-            drumcanParent.ParentKey = null;
-            drumcanParent.ParentMasterKey = null;
-            drumcanParent.RouteSystem = "A";
-            drumcanParent.InputSlotNo = slotNo;
-            drumcanParent.InputSourceType = sourceType;
-            drumcanParent.IsTraceTerminal = string.IsNullOrWhiteSpace(drumcanParent.LotNumber);
 
             var candidate = FinalizeBackwardParentCandidate(new BackwardParentCandidate
             {
@@ -2230,17 +2223,48 @@ WHERE mb.LotNumber = @ChildLotNumber
                 parentCandidates.Add(candidate);
             }
 
-            candidate = FinalizeBackwardParentCandidate(new BackwardParentCandidate
+            foreach (var row in drumcanRows)
             {
-                Node = drumcanParent,
-                ChildNode = parentC,
-                ParentLotNumber = drumcanParent.LotNumber,
-                RelationKey = null,
-                DebugSource = "STEP1-D-P"
-            });
-            if (candidate != null)
-            {
-                parentCandidates.Add(candidate);
+                if (row == null || string.IsNullOrWhiteSpace(row.ParentLotNumber))
+                    continue;
+
+                var drumcanParent = new ProductionResultNode();
+                drumcanParent.ProductionOrderNumber = null;
+                drumcanParent.LotNumber = row.ParentLotNumber;
+                drumcanParent.ItemName = null;
+                drumcanParent.ItemCode = row.ItemCode;
+                drumcanParent.StartDate = null;
+                drumcanParent.StartDateLabel = null;
+                drumcanParent.EndDate = null;
+                drumcanParent.ManufacturingProcessName = null;
+                drumcanParent.ManufacturingTankName = null;
+                drumcanParent.Weight = row.Weight;
+                drumcanParent.ControlMasterKey = BuildDrumcanSpecialNodeMasterKey(
+                    drumcanParent.ItemCode,
+                    drumcanParent.LotNumber,
+                    drumcanParent.Weight,
+                    row.SlotNo);
+                drumcanParent.Depth = 0;
+                drumcanParent.NodeType = "Middle";
+                drumcanParent.ParentKey = null;
+                drumcanParent.ParentMasterKey = null;
+                drumcanParent.RouteSystem = "A";
+                drumcanParent.InputSlotNo = row.SlotNo;
+                drumcanParent.InputSourceType = row.SourceType;
+                drumcanParent.IsTraceTerminal = string.IsNullOrWhiteSpace(drumcanParent.LotNumber);
+
+                candidate = FinalizeBackwardParentCandidate(new BackwardParentCandidate
+                {
+                    Node = drumcanParent,
+                    ChildNode = parentC,
+                    ParentLotNumber = drumcanParent.LotNumber,
+                    RelationKey = null,
+                    DebugSource = "STEP1-D-P"
+                });
+                if (candidate != null)
+                {
+                    parentCandidates.Add(candidate);
+                }
             }
         }
 
@@ -2274,13 +2298,10 @@ WHERE mb.LotNumber = @ChildLotNumber
             drumcanParent.ManufacturingProcessName = null;
             drumcanParent.ManufacturingTankName = null;
             drumcanParent.Weight = drumcanWeight;
-            drumcanParent.ControlMasterKey = BuildDeterministicSpecialNodeMasterKey(
-                "B_STEP1_DRUMCAN_PARENT",
-                childMasterKey ?? current.ControlMasterKey ?? current.LotNumber,
+            drumcanParent.ControlMasterKey = BuildDrumcanSpecialNodeMasterKey(
                 drumcanParent.ItemCode,
                 drumcanParent.LotNumber,
                 drumcanParent.Weight,
-                sourceType,
                 slotNo);
             drumcanParent.Depth = 0;
             drumcanParent.NodeType = "Middle";
@@ -2944,7 +2965,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                         childNode.ParentMasterKey = null;
                         childNode.RouteSystem = "A";
                         childNode.InputSourceType = sourceType;
-                        childNode.InputSlotNo = slotNo;
+                        childNode.InputSlotNo = null;
                         childNode.IsTraceTerminal = string.IsNullOrWhiteSpace(childNode.LotNumber);
 
                         var parentNode = new ProductionResultNode();
@@ -2958,13 +2979,10 @@ WHERE scp.LotNumber = @ParentLotNumber
                         parentNode.ManufacturingProcessName = null;
                         parentNode.ManufacturingTankName = null;
                         parentNode.Weight = parentWeight;
-                        parentNode.ControlMasterKey = BuildDeterministicSpecialNodeMasterKey(
-                            "A_START_D_PARENT",
-                            childNode.ControlMasterKey ?? childNode.LotNumber,
+                        parentNode.ControlMasterKey = BuildDrumcanSpecialNodeMasterKey(
                             parentNode.ItemCode,
                             parentNode.LotNumber,
                             parentNode.Weight,
-                            sourceType,
                             slotNo);
                         parentNode.Depth = 0;
                         parentNode.NodeType = "Middle";
@@ -3249,6 +3267,25 @@ WHERE scp.LotNumber = @ParentLotNumber
             string raw = string.Join("|", parts);
 
             return "SPC_" + ComputeSha1Hex(raw);
+        }
+
+        private string BuildDrumcanSpecialNodeMasterKey(
+    string itemCode,
+    string lotNumber,
+    float? weight,
+    int? inputSlotNo)
+        {
+            string normalizedWeight = weight.HasValue
+                ? weight.Value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                : "";
+
+            return string.Join("|",
+                "SPNODE",
+                "DRUMCAN",
+                NormalizeKeyPart(itemCode),
+                NormalizeKeyPart(lotNumber),
+                normalizedWeight,
+                inputSlotNo.HasValue ? inputSlotNo.Value.ToString() : "");
         }
 
         private string NormalizeKeyPart(string value)

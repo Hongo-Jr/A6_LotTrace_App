@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 
 namespace LotTraceApp.Services
@@ -3214,6 +3213,7 @@ namespace LotTraceApp.Services
 
                 result.AddRange(candidates.Where(x => x != null));
             }
+
             return result;
         }
 
@@ -3232,139 +3232,89 @@ namespace LotTraceApp.Services
             //var PearentNodes = new List<DisplayLaneNode>();
             int branchBaseY = 0;
             var PlacedeNodes = new List<DisplayLaneNode>();
+            //始点処理
 
-
-            //始点処理。始点Node群抽出
-            var rootNodes = new List<DisplayLaneNode>();
-            for(int index =0;  index < displayNodeGroups.Count; index++)
+            while (true)
             {
-                var roots = displayNodeGroups[index];
-                if (roots == null || roots.Level != 0)
-                {
-                    continue;
-                }
+                int rootindex = displayNodeGroups.FindIndex(g => g.Level == 0);
+                if (rootindex < 0)
+                    break;
 
-                rootNodes.AddRange(roots.ChildNodes);
+                var target = displayNodeGroups[rootindex];
+                displayNodeGroups.RemoveAt(rootindex);
 
-            }
-            var workRootNodes = rootNodes.ToList();
-            int currentBaseY = 0;
-            int currentY = 0;
-            int nextLevelY = 0;
-            int Xlevel = 0;
-            bool isFirst = true;
+                    int baseY = branchBaseY;
+                    int currentY = baseY;
+                    int currentY_b = baseY;
+                    int nextLevelY = baseY;
 
-            while (workRootNodes.Count > 0)
-            {
-                //先頭配置
-                var CurrentNode = workRootNodes[0];
-                if(isFirst == true)
-                {
-                    PlacedeNodes.Add(BackwardPlaceNode(CurrentNode, Xlevel, currentBaseY));
-                    currentBaseY++;
-                    currentY++;
-                    isFirst = false;
-                }
-               
-                //再帰
-                var nextTargets = GetBackwardNextDisplayNodes(displayNodeGroups, Xlevel+1, CurrentNode);
-                
-                if(nextTargets == null||nextTargets.Count == 0)
-                {
-                    PlacedeNodes.Add(BackwardPlaceNode(CurrentNode, Xlevel, currentBaseY));
-                    currentBaseY++;
-                    currentY++;
-                }
-                else
-                {
-                    //再帰
-                }
-
-                workRootNodes.RemoveAt(0);
-            }
+                    var ChildNode = target.ChildNodes[0];
+                    //ChildNodes = target.ChildNodes;
+                    //PearentNodes = target.ParentNodes;
 
 
+                    //始点配置、次グループ探索
+                    while (target.ChildNodes.Count > 0)
+                    {
+                    //var child = ChildNodes[l];
+                    //ChildNodes.Remove(targets[0].ChildNodes[0]);
+                    target.ParentNodes.Count();
+                        currentY = Math.Max(currentY, nextLevelY);
+
+                        if (target.ParentNodes.Count <= 0)
+                        {
+                            PlacedeNodes.Add(BackwardPlaceNode(target.ChildNodes[0], 0, currentY_b));
+                            currentY++;
+                            currentY_b++;
+
+                        }
+                        else
+                        {
+                            PlacedeNodes.Add(BackwardPlaceNode(target.ChildNodes[0], 0, currentY));
+                            currentY++;
+                            currentY_b++;
+                        }
 
 
-            //for (int rootindex = 0; rootindex < displayNodeGroups.Count; rootindex++)
-            //{
-            //    var target = displayNodeGroups[rootindex];
-            //    if (target == null || target.Level != 0)
-            //        continue;
+                        while (target.ParentNodes.Count > 0)
+                        {
+                            int XLevel = 0;
+                            int beforeNextLevelY = nextLevelY;
 
-            //    int baseY = branchBaseY;
-            //    int currentY = baseY;
-            //    int currentY_b = baseY;
-            //    int nextLevelY = baseY;
+                        //var pearent = PearentNodes[i];
+                        //PearentNodes.Remove(pearent);
+                        var nextTargets = TakeNextTargets(displayNodeGroups, XLevel+1, target.ParentNodes[0]) ;
+                            if (nextTargets.Count <= 0 && target.ParentNodes[0].SourceNode.IsTraceTerminal ==true)
+                            {
+                                PlacedeNodes.Add(BackwardPlaceNode(target.ParentNodes[0], XLevel + 1, nextLevelY));
+                                nextLevelY++;
+                            }
+                            else
+                            {
+                                //再帰
+                                nextLevelY = PlaceBackwardNextTargetsRecursive(
+                                    displayNodeGroups,
+                                    nextTargets,
+                                    XLevel + 1,
+                                    nextLevelY,
+                                    PlacedeNodes);
 
+                            }
+
+                            int nextLevelused = nextLevelY - beforeNextLevelY;
+                            currentY += nextLevelused;
+                            target.ParentNodes.RemoveAt(0);
+                        }
+                        target.ChildNodes.RemoveAt(0);
+                    }
+
+                    branchBaseY = Math.Max(currentY, nextLevelY);
                     
-            //    var ChildNodes = target.ChildNodes;
-            //    var PearentNodes = target.ParentNodes;
-
-
-
-
 
                 
-            //        //始点配置、次グループ探索
-            //        while(ChildNodes.Count > 0) 
-            //        {
-                        
-            //            target.ParentNodes.Count();
-            //            currentY = Math.Max(currentY, nextLevelY);
-                        
+            }
 
-            //            if (PearentNodes.Count <= 0)
-            //            {
-            //            PlacedeNodes.Add(BackwardPlaceNode(ChildNodes[0], 0, currentY_b));
-            //                currentY++;
-            //                currentY_b++;
-
-            //            }
-            //            else
-            //            {
-            //                PlacedeNodes.Add(BackwardPlaceNode(ChildNodes[0], 0, currentY));
-            //                currentY++;
-            //                currentY_b++;
-            //            }
-
-
-            //            while(PearentNodes.Count >0)
-            //            {
-            //                int XLevel = 0;
-            //                int beforeNextLevelY = nextLevelY;
-                            
-
-            //                //var pearent = PearentNodes[i];
-            //                //PearentNodes.Remove(pearent);
-            //                var nextTargets = TakeNextTargets(displayNodeGroups, XLevel+1, PearentNodes[0]) ;
-            //                    if (nextTargets.Count <= 0 && PearentNodes[0].SourceNode.IsTraceTerminal ==true)
-            //                    {
-            //                        PlacedeNodes.Add(BackwardPlaceNode(PearentNodes[0], XLevel + 1, nextLevelY));
-            //                        nextLevelY++;
-            //                    }
-            //                    else
-            //                    {
-            //                        //再帰
-            //                        nextLevelY = PlaceBackwardNextTargetsRecursive(
-            //                            displayNodeGroups,
-            //                            nextTargets,
-            //                            XLevel + 1,
-            //                            nextLevelY,
-            //                            PlacedeNodes);
-
-            //                     }
-
-            //                int nextLevelused = nextLevelY - beforeNextLevelY;
-            //                currentY += nextLevelused;
-            //                PearentNodes.RemoveAt(0);
-            //            }
-            //        ChildNodes.RemoveAt(0);
-            //    }
-                
-            //        branchBaseY = Math.Max(currentY, nextLevelY);
-            //}
-
+            
             buildResult.DisplayNodes.AddRange(PlacedeNodes);
             return buildResult;
 
@@ -3382,70 +3332,58 @@ namespace LotTraceApp.Services
             int currentY =baseY;
             int currentY_b = baseY;
             int nextLevelY = baseY;
-            
+            //var nexttargets = new List<BackwardDisplayNodeGroup>();
 
 
-            for(int i = 0; i < targets.Count; i++) 
+            while(targets.Count > 0) 
             {
-                var target = targets[i];
-                
-                var ChildNodes = target.ChildNodes;
-                var PearentNodes = target.ParentNodes;
-                
-                if (target == null)
-                    continue;
+                //var target = targets[i];
+                //targets.Remove(target);
+                //var ChildNodes = target.ChildNodes;
+                //var PearentNodes = target.ParentNodes;
 
                 bool isFirstChild = true;
-                
 
-                while(ChildNodes.Count > 0)
+                while (targets[0].ChildNodes.Count >0) 
                 {
-                    
+                    //var child = ChildNodes[l];
+                    //ChildNodes.Remove(child);
+
                     if (isFirstChild == true)
                     {
-                        placedeNodes.Add(BackwardPlaceNode(ChildNodes[0], x, currentY_b));
+                        placedeNodes.Add(BackwardPlaceNode(targets[0].ChildNodes[0], x, currentY_b));
                         currentY++;
                         currentY_b++;
                         isFirstChild = false;
                     }
                     else
                     {
-                        if (PearentNodes.Count < 0)
+                        if (targets[0].ParentNodes.Count <= 0)
                         {
-                            placedeNodes.Add(BackwardPlaceNode(ChildNodes[0], x, currentY_b));
+                            placedeNodes.Add(BackwardPlaceNode(targets[0].ChildNodes[0], x, currentY_b));
                             currentY++;
                             currentY_b++;
                         }
                         else
                         {
-                            placedeNodes.Add(BackwardPlaceNode(ChildNodes[0], x, currentY));
+                            placedeNodes.Add(BackwardPlaceNode(targets[0].ChildNodes[0], x, currentY));
                             currentY++;
                             currentY_b++;
                         }
                     }
-
+                    
                     currentY++;
 
-                    while(PearentNodes.Count >0)
+                    while (targets[0].ParentNodes.Count > 0) 
                     {
                         int beforeNextLevelY = nextLevelY;
-                        
-                        
-                        var nexTtargets = TakeNextTargets(displayNodeGroups, x + 1, PearentNodes[0]);
+                        //var pearent = PearentNodes[j];
+                        //PearentNodes.Remove(pearent);
+                        var nexTtargets = TakeNextTargets(displayNodeGroups, x + 1, targets[0].ParentNodes[0]);
 
-                        var NextNodeList = new List<DisplayLaneNode>();
-                        foreach (var nextTarget in nexTtargets)
+                        if (nexTtargets.Count <= 0 && targets[0].ParentNodes[0].SourceNode.IsTraceTerminal == true)
                         {
-                            NextNodeList.AddRange(nextTarget.ParentNodes);
-                            if(nextTarget.ParentNodes.Count > 0)
-                            {
-                                NextNodeList.Add(ChildNodes[0]);
-                            }
-                        }
-
-                        if (nexTtargets.Count <= 0 && PearentNodes[0].SourceNode.IsTraceTerminal == true)
-                        {
-                            placedeNodes.Add(BackwardPlaceNode(PearentNodes[0], x + 1, nextLevelY));
+                            placedeNodes.Add(BackwardPlaceNode(targets[0].ParentNodes[0], x + 1, nextLevelY));
                             nextLevelY++;
 
                         }
@@ -3461,12 +3399,11 @@ namespace LotTraceApp.Services
 
                         int nextLevelUsed = nextLevelY - beforeNextLevelY;
                         currentY += nextLevelUsed;
-
-                        PearentNodes.RemoveAt(0);
+                        targets[0].ParentNodes.RemoveAt(0);
                     }
-                    
-                    ChildNodes.RemoveAt(0);
+                    targets[0].ChildNodes.RemoveAt(0);
                 }
+                targets.RemoveAt(0);
             }
 
             branchBaseY = Math.Max(currentY, nextLevelY);
@@ -3474,34 +3411,6 @@ namespace LotTraceApp.Services
 
             return branchBaseY;
         }
-
-        private List<DisplayLaneNode> GetBackwardNextDisplayNodes(List<BackwardDisplayNodeGroup> displayNodeGroups,int nextLevel,DisplayLaneNode current)
-        {
-            var result = new List<DisplayLaneNode>();
-
-            foreach (var group in displayNodeGroups)
-            {
-                if (group == null || group.Level != nextLevel)
-                    continue;
-
-                bool matched = group.ChildNodes != null &&
-                    group.ChildNodes.Any(c =>
-                        c?.SourceNode != null &&
-                        string.Equals(
-                            c.SourceNode.NodeIdentityKey,
-                            current.SourceNode.NodeIdentityKey,
-                            StringComparison.OrdinalIgnoreCase));
-
-                if (!matched)
-                    continue;
-
-                if (group.ParentNodes != null)
-                    result.AddRange(group.ParentNodes);
-            }
-
-            return result;
-        }
-
 
         private List<BackwardDisplayNodeGroup> TakeNextTargets(
     List<BackwardDisplayNodeGroup> displayNodeGroups,
@@ -3536,7 +3445,7 @@ namespace LotTraceApp.Services
                     continue;
 
                 result.Add(g);
-                //displayNodeGroups.RemoveAt(i);
+                displayNodeGroups.RemoveAt(i);
             }
 
             return result;
