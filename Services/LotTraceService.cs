@@ -176,11 +176,11 @@ namespace LotTraceApp.Services
 
             ReportProgress(progress, "グリッド罫線情報を整えています...", 74);
 
-            //MarkStartGroupBoundariesFromOccupiedRanges(
-            //    displayResult.Rows,
-            //    _currentForwardLaneBuildResult == null
-            //        ? null
-            //        : _currentForwardLaneBuildResult.OccupiedLotGroupRanges);
+            MarkStartGroupBoundariesFromOccupiedRanges(
+                displayResult.Rows,
+                _currentForwardLaneBuildResult == null
+                    ? null
+                    : _currentForwardLaneBuildResult.OccupiedLotGroupRanges);
 
             PopulateLineRanges(displayResult, traceResult.TraceLineRanges);
 
@@ -447,7 +447,8 @@ namespace LotTraceApp.Services
 
 
             // Occupied 確定
-            backwardLaneBuildResult.OccupiedLotGroupRanges =NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
+            backwardLaneBuildResult.OccupiedLotGroupRanges =
+                NormalizeOccupiedRangeByBackwardDisplayTree(backwardLaneBuildResult.DisplayNodes);
 
             // 追加：BuildDisplayResult から始点境界判定に使用するため一時保持
             _currentForwardLaneBuildResult = backwardLaneBuildResult;
@@ -466,8 +467,9 @@ namespace LotTraceApp.Services
                 FinalizeBackwardEndNodeGroupsAndNormalizeX(
                     backwardLaneBuildResult.DisplayNodes);
 
+            PopulateOccupiedRange(backwardLaneBuildResult.DisplayNodes);
             backwardLaneBuildResult.OccupiedLotGroupRanges =
-              NormalizeOccupiedRangeByCandidate(backwardLaneBuildResult.DisplayNodes);
+                NormalizeOccupiedRangeByBackwardDisplayTree(backwardLaneBuildResult.DisplayNodes);
 
             // ★追加（構造 → 線生成）
             ReportProgress(progress, "罫線情報を作成しています...", 70);
@@ -1784,59 +1786,48 @@ namespace LotTraceApp.Services
             if (occupiedGroups == null || occupiedGroups.Count == 0)
                 return result;
 
-            //var validGroups = occupiedGroups
-            //    .Where(x =>
-            //        x != null &&
-            //        x.Level >= 0 &&
-            //        x.OccupiedLastY >= 0)
-            //    .ToList();
+            var validGroups = occupiedGroups
+                .Where(x =>
+                    x != null &&
+                    x.Level >= 0 &&
+                    x.OccupiedFirstY >= 0 &&
+                    x.OccupiedLastY >= 0)
+                .ToList();
 
-            //if (validGroups.Count == 0)
-            //    return result;
+            if (validGroups.Count == 0)
+                return result;
 
-            //// 完成木構造上に実在する XLevel 群だけを使う
-            //var usedLevels = validGroups
-            //    .Select(x => x.Level)
-            //    .Distinct()
-            //    .OrderBy(x => x)
-            //    .ToList();
+            var usedLevels = validGroups
+                .Select(x => x.Level)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
 
-            //if (usedLevels.Count == 0)
-            //    return result;
+            if (usedLevels.Count == 0)
+                return result;
 
-            //// 最右の実在列を End とみなす
-            //int endX = usedLevels[usedLevels.Count - 1];
+            int maxLevel = usedLevels[usedLevels.Count - 1];
+            int middleMaxX = Math.Max(1, maxLevel);
 
-            //// Middle の最終列は「endX 未満で実在する最大X」
-            //int middleMaxX = usedLevels.Max();
+            foreach (var group in validGroups
+                .OrderBy(x => x.Level)
+                .ThenBy(x => x.OccupiedLastY)
+                .ThenBy(x => x.ParentDisplayNodeKey, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.LotGroupKey, StringComparer.OrdinalIgnoreCase))
+            {
+                result.Add(new TraceLineRange
+                {
+                    GridKind = group.Level == 0 ? "Start" : "Middle",
+                    LineKind = group.Level == 0 ? "Start" : group.Level == 1 ? "Trunk" : "Branch",
+                    Level = group.Level,
+                    StartRowIndex = group.OccupiedLastY,
+                    EndRowIndex = group.OccupiedLastY,
+                    FromXLevel = group.Level,
+                    ToXLevel = group.Level == 0 ? middleMaxX : Math.Max(group.Level, middleMaxX)
+                });
+            }
 
-
-
-            //foreach (var group in validGroups
-            //    .OrderBy(x => x.Level)
-            //    .ThenBy(x => x.OccupiedLastY)
-            //    .ThenBy(x => x.ParentDisplayNodeKey, StringComparer.OrdinalIgnoreCase)
-            //    .ThenBy(x => x.LotGroupKey, StringComparer.OrdinalIgnoreCase))
-            //{
-            //    bool isEndGroup = group.Level == endX;
-
-            //    // Middle 線なのに伸ばす先の Middle 列が存在しない場合は作らない
-            //    if (!isEndGroup && middleMaxX < group.Level)
-            //        continue;
-
-            //    result.Add(new TraceLineRange
-            //    {
-            //        GridKind = group.Level == 0 ? "Start" : isEndGroup ? "End" : "Middle",
-            //        LineKind = group.Level == 0 ? "Start" : group.Level == 1 ? "Trunk" : "Branch",
-            //        Level = group.Level,
-            //        StartRowIndex = group.OccupiedLastY,
-            //        EndRowIndex = group.OccupiedLastY,
-            //        FromXLevel = group.Level,
-            //        ToXLevel = isEndGroup ? group.Level : middleMaxX
-            //    });
-            //}
-
-            //DeduplicateTraceLineRanges(result);
+            DeduplicateTraceLineRanges(result);
             return result;
         }
 
@@ -1872,7 +1863,7 @@ namespace LotTraceApp.Services
                 int firstY = group.OccupiedFirstY;
                 int lastY = group.OccupiedLastY;
 
-                if (firstY >= 0 && firstY <= rows.Count)
+                if (firstY >= 0 && firstY < rows.Count)
                 {
                     var firstRow = rows[firstY];
                     if (firstRow != null)
@@ -1880,7 +1871,7 @@ namespace LotTraceApp.Services
                     }
                 }
 
-                if (lastY >= 0 && lastY <= rows.Count)
+                if (lastY >= 0 && lastY < rows.Count)
                 {
                     var lastRow = rows[lastY];
                     if (lastRow != null)
@@ -2261,6 +2252,61 @@ namespace LotTraceApp.Services
             }
 
            
+            return result;
+        }
+
+        private List<OccupiedLotGroupRange> NormalizeOccupiedRangeByBackwardDisplayTree(List<DisplayLaneNode> nodes)
+        {
+            var result = new List<OccupiedLotGroupRange>();
+
+            if (nodes == null || nodes.Count == 0)
+                return result;
+
+            var validNodes = nodes
+                .Where(n =>
+                    n != null &&
+                    !string.IsNullOrWhiteSpace(n.DisplayNodeKey) &&
+                    n.OccupiedFirstY >= 0 &&
+                    n.OccupiedLastY >= 0)
+                .ToList();
+
+            if (validNodes.Count == 0)
+                return result;
+
+            var childrenMap = BuildBackwardChildrenMap(validNodes);
+
+            foreach (var node in validNodes
+                .OrderBy(n => n.XLevel)
+                .ThenBy(n => n.OccupiedLastY)
+                .ThenBy(n => n.YLane)
+                .ThenBy(n => n.DisplayNodeKey, StringComparer.OrdinalIgnoreCase))
+            {
+                if (node.XLevel <= 0)
+                {
+                    if (!string.IsNullOrWhiteSpace(node.ParentDisplayNodeKey))
+                        continue;
+                }
+                else
+                {
+                    List<DisplayLaneNode> children;
+                    if (!childrenMap.TryGetValue(node.DisplayNodeKey, out children) ||
+                        children == null ||
+                        children.Count == 0)
+                    {
+                        continue;
+                    }
+                }
+
+                result.Add(new OccupiedLotGroupRange
+                {
+                    Level = node.XLevel,
+                    ParentDisplayNodeKey = node.ParentDisplayNodeKey ?? string.Empty,
+                    LotGroupKey = node.LotGroupKey ?? node.DisplayNodeKey ?? string.Empty,
+                    OccupiedFirstY = node.OccupiedFirstY,
+                    OccupiedLastY = node.OccupiedLastY
+                });
+            }
+
             return result;
         }
 
@@ -3243,7 +3289,13 @@ namespace LotTraceApp.Services
                 }
 
                 var rootNodes = roots.ChildNodes.ToList();
-                branchBaseY = PlaceBackwardNextTargetsRecursive(displayNodeGroups, rootNodes,0, branchBaseY, PlacedeNodes);
+                branchBaseY = PlaceBackwardNextTargetsRecursive(
+                    displayNodeGroups,
+                    rootNodes,
+                    0,
+                    branchBaseY,
+                    PlacedeNodes,
+                    null);
 
           
             }
@@ -3254,7 +3306,13 @@ namespace LotTraceApp.Services
         }
 
        
-        private int PlaceBackwardNextTargetsRecursive(List<BackwardDisplayNodeGroup> displayNodeGroups,List<DisplayLaneNode> currentNodes,int x, int y,List<DisplayLaneNode> placedeNodes)
+        private int PlaceBackwardNextTargetsRecursive(
+            List<BackwardDisplayNodeGroup> displayNodeGroups,
+            List<DisplayLaneNode> currentNodes,
+            int x,
+            int y,
+            List<DisplayLaneNode> placedeNodes,
+            string parentDisplayNodeKey)
         {
             
           
@@ -3278,7 +3336,8 @@ namespace LotTraceApp.Services
                     currentY = Math.Max(currentY, nextLevelY);
                 }
 
-                placedeNodes.Add(BackwardPlaceNode(Current, x, currentY));
+                var placedCurrent = BackwardPlaceNode(Current, x, currentY, parentDisplayNodeKey);
+                placedeNodes.Add(placedCurrent);
                 currentY++;
 
                 foreach (var nextGroup in nextGroups)
@@ -3292,7 +3351,13 @@ namespace LotTraceApp.Services
 
                     var nextCurrents = nextGroup.ParentNodes?.ToList() ?? new List<DisplayLaneNode>();
 
-                    nextLevelY = PlaceBackwardNextTargetsRecursive(displayNodeGroups, nextCurrents, x+1, nextLevelY, placedeNodes);
+                    nextLevelY = PlaceBackwardNextTargetsRecursive(
+                        displayNodeGroups,
+                        nextCurrents,
+                        x + 1,
+                        nextLevelY,
+                        placedeNodes,
+                        placedCurrent == null ? null : placedCurrent.DisplayNodeKey);
                     
                 }
                 
@@ -3368,7 +3433,11 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private DisplayLaneNode BackwardPlaceNode(DisplayLaneNode current, int x, int y)
+        private DisplayLaneNode BackwardPlaceNode(
+            DisplayLaneNode current,
+            int x,
+            int y,
+            string parentDisplayNodeKey)
         {
             if (current == null)
                 return null;
@@ -3376,9 +3445,13 @@ namespace LotTraceApp.Services
             var placedCurrent = new DisplayLaneNode
             {
                 SourceNode = current.SourceNode,
+                MergeKey = current.MergeKey,
+                ParentDisplayNodeKey = parentDisplayNodeKey,
 
                 XLevel = x,
                 YLane = y,
+                OccupiedFirstY = y,
+                OccupiedLastY = y,
 
                 DisplayNodeKey = string.Join(
                     "|",
