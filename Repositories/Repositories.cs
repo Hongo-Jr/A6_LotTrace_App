@@ -44,6 +44,9 @@ namespace LotTraceApp.Repositories
             var list = new List<ProductionResultNode>();
             var uniqueMasterKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+            if (ShouldSkipMaterialTableAStartSearch(p))
+                return list;
+
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
             {
@@ -59,23 +62,9 @@ FROM dbo.MaterialTableA ma
 WHERE 1 = 1
 ";
 
-                if (!string.IsNullOrWhiteSpace(p.ProductionOrderNumber))
-                {
-                    sql += " AND ma.ForeignKey LIKE @Order";
-                    cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-                }
-
-                if (!string.IsNullOrWhiteSpace(p.LotNumber))
-                {
-                    sql += " AND ma.LotNumber LIKE @Lot";
-                    cmd.Parameters.AddWithValue("@Lot", "%" + p.LotNumber + "%");
-                }
-
-                if (!string.IsNullOrWhiteSpace(p.ItemCode))
-                {
-                    sql += " AND ma.ItemCode LIKE @ItemCode";
-                    cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-                }
+                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, "ma", "ForeignKey", "@Order");
+                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, ref sql, "ma", "LotNumber", "@Lot");
+                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, ref sql, "ma", "ItemCode", "@ItemCode");
 
                 cmd.CommandText = sql;
 
@@ -287,55 +276,187 @@ AND SUBSTRING(
     ref string sql,
     string alias)
         {
-            if (!string.IsNullOrWhiteSpace(p.ProductionOrderNumber))
-            {
-                sql += " AND " + alias + ".ForeignKey LIKE @Order";
-                cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-            }
+            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, alias, "ForeignKey", "@Order");
+            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, ref sql, alias, "LotNumber", "@Lot");
+            AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, ref sql, alias, "ItemCode", "@ItemCode");
 
-            if (!string.IsNullOrWhiteSpace(p.LotNumber))
-            {
-                sql += " AND " + alias + ".LotNumber LIKE @Lot";
-                cmd.Parameters.AddWithValue("@Lot", "%" + p.LotNumber + "%");
-            }
-
-            if (!string.IsNullOrWhiteSpace(p.ItemCode))
-            {
-                sql += " AND " + alias + ".ItemCode LIKE @ItemCode";
-                cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-            }
-
-            if (p.From.HasValue)
+            if (p != null && p.From.HasValue)
             {
                 sql += " AND " + alias + ".StartDate >= @From";
                 cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
             }
 
-            if (p.To.HasValue)
+            if (p != null && p.To.HasValue)
             {
                 sql += " AND " + alias + ".StartDate <= @To";
                 cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
         }
+
+        private void AppendSearchParameterCondition(
+            string rawValue,
+            SqlCommand cmd,
+            ref string sql,
+            string alias,
+            string columnName,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                return;
+
+            bool useLike = ContainsUserWildcard(rawValue);
+            sql += " AND " + alias + "." + columnName + (useLike ? " LIKE " : " = ") + parameterName;
+            if (useLike)
+                sql += " ESCAPE '\\'";
+
+            if (!cmd.Parameters.Contains(parameterName))
+            {
+                string value = useLike
+                    ? BuildSqlLikePatternFromUserWildcard(rawValue)
+                    : rawValue.Trim();
+
+                cmd.Parameters.AddWithValue(parameterName, value);
+            }
+        }
+
+        private void AppendSearchParameterCondition(
+            string rawValue,
+            SqlCommand cmd,
+            StringBuilder sql,
+            string alias,
+            string columnName,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                return;
+
+            bool useLike = ContainsUserWildcard(rawValue);
+            sql.AppendLine("  AND " + alias + "." + columnName + (useLike ? " LIKE " : " = ") + parameterName + (useLike ? " ESCAPE '\\'" : string.Empty));
+
+            if (!cmd.Parameters.Contains(parameterName))
+            {
+                string value = useLike
+                    ? BuildSqlLikePatternFromUserWildcard(rawValue)
+                    : rawValue.Trim();
+
+                cmd.Parameters.AddWithValue(parameterName, value);
+            }
+        }
+
+        private void AddSearchParameterValue(
+            string rawValue,
+            SqlCommand cmd,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+                return;
+
+            if (cmd.Parameters.Contains(parameterName))
+                return;
+
+            string value = ContainsUserWildcard(rawValue)
+                ? BuildSqlLikePatternFromUserWildcard(rawValue)
+                : rawValue.Trim();
+
+            cmd.Parameters.AddWithValue(parameterName, value);
+        }
+
+        private bool ContainsUserWildcard(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value) && value.IndexOf('*') >= 0;
+        }
+
+        private string BuildSqlLikePatternFromUserWildcard(string value)
+        {
+            if (value == null)
+                return null;
+
+            var pattern = new StringBuilder();
+            string trimmed = value.Trim();
+
+            foreach (char ch in trimmed)
+            {
+                switch (ch)
+                {
+                    case '*':
+                        pattern.Append('%');
+                        break;
+                    case '%':
+                    case '_':
+                    case '\\':
+                        pattern.Append('\\').Append(ch);
+                        break;
+                    case '[':
+                        pattern.Append("[[]");
+                        break;
+                    default:
+                        pattern.Append(ch);
+                        break;
+                }
+            }
+
+            return pattern.ToString();
+        }
+
+        private bool ShouldSkipMaterialTableAStartSearch(TraceSearchParameters p)
+        {
+            return HasMaterialTableAUnresolvableStartCondition(p) &&
+                !HasMaterialTableAResolvableStartCondition(p);
+        }
+
+        private bool HasMaterialTableAResolvableStartCondition(TraceSearchParameters p)
+        {
+            if (p == null)
+                return false;
+
+            return !string.IsNullOrWhiteSpace(p.ProductionOrderNumber) ||
+                !string.IsNullOrWhiteSpace(p.LotNumber) ||
+                !string.IsNullOrWhiteSpace(p.ItemCode);
+        }
+
+        private bool HasMaterialTableAUnresolvableStartCondition(TraceSearchParameters p)
+        {
+            if (p == null)
+                return false;
+
+            return !string.IsNullOrWhiteSpace(p.ItemName) ||
+                p.From.HasValue ||
+                p.To.HasValue;
+        }
+
+        private void AppendSingleControlProcessStartDateConditions(
+            TraceSearchParameters p,
+            SqlCommand cmd,
+            ref string sql,
+            string alias)
+        {
+            if (p == null)
+                return;
+
+            if (p.From.HasValue)
+            {
+                sql += Environment.NewLine + "  AND " + alias + ".StartDate >= @From" + Environment.NewLine;
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+            }
+
+            if (p.To.HasValue)
+            {
+                sql += Environment.NewLine + "  AND " + alias + ".StartDate <= @To" + Environment.NewLine;
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+            }
+        }
+
         private void AppendStartNodeSearchConditionsForMaterialTableA(
     TraceSearchParameters p,
+    SqlCommand cmd,
     StringBuilder sql,
     string alias)
         {
-            if (!string.IsNullOrWhiteSpace(p.ProductionOrderNumber))
-            {
-                sql.AppendLine("  AND " + alias + ".ForeignKey LIKE @Order");
-            }
-
-            if (!string.IsNullOrWhiteSpace(p.LotNumber))
-            {
-                sql.AppendLine("  AND " + alias + ".LotNumber LIKE @Lot");
-            }
-
-            if (!string.IsNullOrWhiteSpace(p.ItemCode))
-            {
-                sql.AppendLine("  AND " + alias + ".ItemCode LIKE @ItemCode");
-            }
+            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
+            AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, alias, "ItemCode", "@ItemCode");
 
             // From / To は必要ならここ（MaterialTableAに列がある場合のみ）
 
@@ -355,6 +476,9 @@ AND SUBSTRING(
         {
             var list = new List<ProductionResultNode>();
             var uniqueNodeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (ShouldSkipMaterialTableAStartSearch(p))
+                return list;
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -429,25 +553,6 @@ AND SUBSTRING(
             var sql = new StringBuilder();
             bool first = true;
 
-            bool hasOrder = p != null && !string.IsNullOrWhiteSpace(p.ProductionOrderNumber);
-            bool hasLot = p != null && !string.IsNullOrWhiteSpace(p.LotNumber);
-            bool hasItemCode = p != null && !string.IsNullOrWhiteSpace(p.ItemCode);
-
-            if (hasOrder)
-            {
-                cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-            }
-
-            if (hasLot)
-            {
-                cmd.Parameters.AddWithValue("@Lot", "%" + p.LotNumber + "%");
-            }
-
-            if (hasItemCode)
-            {
-                cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-            }
-
             for (int i = 1; i <= 50; i++)
             {
                 string idx = i.ToString("00");
@@ -470,20 +575,9 @@ AND SUBSTRING(
                 sql.AppendLine("  AND ma.ManualInputLoadingAmount" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND ma.ManualInputLoadingAmount" + idx + " <> 0");
 
-                if (hasOrder)
-                {
-                    sql.AppendLine("  AND ma.ForeignKey LIKE @Order");
-                }
-
-                if (hasLot)
-                {
-                    sql.AppendLine("  AND ma.LotNumber LIKE @Lot");
-                }
-
-                if (hasItemCode)
-                {
-                    sql.AppendLine("  AND ma.ItemCode LIKE @ItemCode");
-                }
+                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
 
                 first = false;
             }
@@ -730,7 +824,7 @@ AND SUBSTRING(
                 raw.AddRange(d2);
             }
 
-            var adjusted = AdjustForwardStartDCandidatesForB(raw);
+            var adjusted = AdjustForwardStartDCandidatesForB(raw, p);
 
             AppendForwardStartDCandidatesDeduped(result, seen, adjusted);
 
@@ -808,17 +902,7 @@ AND SUBSTRING(
                 conn.Open();
 
                 cmd.CommandText = BuildForwardStartD1FromDrumSql(p);
-                cmd.Parameters.AddWithValue("@DrumLotNumber", p.LotNumber);
-
-                if (!string.IsNullOrWhiteSpace(p.ProductionOrderNumber))
-                {
-                    cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-                }
-
-                if (!string.IsNullOrWhiteSpace(p.ItemCode))
-                {
-                    cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-                }
+                AddSearchParameterValue(p.LotNumber, cmd, "@DrumLotNumber");
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -848,14 +932,15 @@ AND SUBSTRING(
         {
             var result = new List<ChildCandidate>();
 
+            if (ShouldSkipMaterialTableAStartSearch(p))
+                return FindForwardStartDToBCandidatesFromBHit(p);
+
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
 
                 cmd.CommandText = BuildForwardStartD2FromMaSql(p,cmd);
-
-                AppendForwardStartDSearchParametersForMaterialTableA(p, cmd);
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -880,8 +965,105 @@ AND SUBSTRING(
             return result;
         }
 
+        private List<ChildCandidate> FindForwardStartDToBCandidatesFromBHit(
+            TraceSearchParameters p)
+        {
+            var result = new List<ChildCandidate>();
+
+            if (p == null || !p.From.HasValue && !p.To.HasValue)
+                return result;
+
+            using (var conn = CreateConnection())
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+
+                cmd.CommandText = BuildForwardStartDToBFromBHitSql(p, cmd);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var childNode = BuildForwardStartDChildBNode(reader);
+                        var parentNode = BuildForwardStartDParentDrumNodeFromBHit(reader);
+
+                        var candidate = BuildForwardChildCandidate(
+                            parentNode,
+                            childNode,
+                            "STARTD2-B");
+
+                        if (candidate != null)
+                        {
+                            result.Add(candidate);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private string BuildForwardStartDToBFromBHitSql(
+            TraceSearchParameters p,
+            SqlCommand cmd)
+        {
+            var sql = new StringBuilder();
+            bool first = true;
+
+            for (int i = 1; i <= 5; i++)
+            {
+                string idx = i.ToString("00");
+
+                if (!first)
+                {
+                    sql.AppendLine("UNION ALL");
+                }
+
+                string part = @"
+SELECT
+    scp.ForeignKey,                                  -- 0 Child: ProductionOrderNumber
+    scp.LotNumber,                                   -- 1 Child: LotNumber
+    scp.ItemCode,                                    -- 2 Child: ItemCode
+    scp.StartDate,                                   -- 3 Child: StartDate
+    scp.Weight,                                      -- 4 Child: Weight
+    scp.MasterKey,                                   -- 5 Child: ControlMasterKey
+    ma.DrumcanLotNumber" + idx + @" AS DrumLotNumber,    -- 6 Parent: LotNumber
+    ma.DrumcanItemCode" + idx + @" AS DrumItemCode,      -- 7 Parent: ItemCode
+    ma.DrumcanLoadingAmount" + idx + @" AS DrumWeight,   -- 8 Parent: Weight
+    '" + idx + @"' AS SlotNo                              -- 9 Parent: InputSlotNo
+FROM dbo.SingleControlProcessTable scp
+INNER JOIN dbo.MaterialTableA ma
+        ON ma.LotNumber = scp.LotNumber
+WHERE 1 = 1
+  AND ma.DrumcanLoadingAmount" + idx + @" IS NOT NULL
+  AND ma.DrumcanLoadingAmount" + idx + @" <> 0
+  AND ma.DrumcanLotNumber" + idx + @" IS NOT NULL
+  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + @")) <> ''
+  AND scp.MasterKey LIKE '%[_]%'
+  AND SUBSTRING(
+        scp.MasterKey,
+        CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
+        1
+      ) IN ('2','3')
+  AND SUBSTRING(
+        scp.MasterKey,
+        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
+        1
+    ) IN ('4','7')
+";
+
+                AppendSingleControlProcessStartDateConditions(p, cmd, ref part, "scp");
+                sql.Append(part);
+
+                first = false;
+            }
+
+            return sql.ToString();
+        }
+
         private List<ChildCandidate> AdjustForwardStartDCandidatesForB(
-    List<ChildCandidate> source)
+    List<ChildCandidate> source,
+    TraceSearchParameters p)
         {
             var result = new List<ChildCandidate>();
 
@@ -897,9 +1079,16 @@ AND SUBSTRING(
                     continue;
                 }
 
+                if (string.Equals(candidate.ChildNode.RouteSystem, "B", StringComparison.OrdinalIgnoreCase))
+                {
+                    result.Add(candidate);
+                    continue;
+                }
+
                 var resolvedChild = ResolveForwardStartDChildToBNode(
                     candidate.ChildLotNumber,
-                    candidate.ChildNode.Depth);
+                    candidate.ChildNode.Depth,
+                    p);
 
                 if (resolvedChild != null)
                 {
@@ -919,7 +1108,8 @@ AND SUBSTRING(
 
         private ProductionResultNode ResolveForwardStartDChildToBNode(
     string childLotNumber,
-    int depth)
+    int depth,
+    TraceSearchParameters p)
         {
             if (string.IsNullOrWhiteSpace(childLotNumber))
                 return null;
@@ -929,7 +1119,7 @@ AND SUBSTRING(
             {
                 conn.Open();
 
-                cmd.CommandText = BuildForwardStartD25MaterialTableBSql();
+                cmd.CommandText = BuildForwardStartD25MaterialTableBSql(p, cmd);
                 cmd.Parameters.AddWithValue("@ChildLot", childLotNumber);
 
                 using (var reader = cmd.ExecuteReader())
@@ -975,9 +1165,11 @@ AND SUBSTRING(
             }
         }
 
-        private string BuildForwardStartD25MaterialTableBSql()
+        private string BuildForwardStartD25MaterialTableBSql(
+            TraceSearchParameters p,
+            SqlCommand cmd)
         {
-            return @"
+            var sql = @"
 SELECT
     scp.ForeignKey,   -- 0
     scp.LotNumber,    -- 1
@@ -998,33 +1190,16 @@ WHERE scp.LotNumber = @ChildLot
         LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
         1
     ) IN ('4','7')
+";
+
+            AppendSingleControlProcessStartDateConditions(p, cmd, ref sql, "scp");
+            sql += @"
 ORDER BY
     scp.StartDate,
     scp.MasterKey
 ";
+            return sql;
         }
-
-        private void AppendForwardStartDSearchParametersForMaterialTableA(
-            TraceSearchParameters p,
-            SqlCommand cmd)
-        {
-            if (!string.IsNullOrWhiteSpace(p.ProductionOrderNumber))
-            {
-                cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-            }
-
-            if (!string.IsNullOrWhiteSpace(p.ItemCode))
-            {
-                cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-            }
-
-            if (!string.IsNullOrWhiteSpace(p.LotNumber))
-            {
-                cmd.Parameters.AddWithValue("@Lot", "%" + p.LotNumber + "%");
-            }
-        }
-
-        
 
         private string BuildForwardStartD1FromDrumSql(
             TraceSearchParameters p )
@@ -1052,7 +1227,9 @@ ORDER BY
                 sql.AppendLine("    '" + idx + "' AS SlotNo                             -- 7");
                 sql.AppendLine("FROM dbo.MaterialTableA ma");
                 sql.AppendLine("WHERE 1 = 1");
-                sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " = @DrumLotNumber");
+                sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + (ContainsUserWildcard(p == null ? null : p.LotNumber)
+                    ? " LIKE @DrumLotNumber ESCAPE '\\'"
+                    : " = @DrumLotNumber"));
 
                 
 
@@ -1090,7 +1267,7 @@ ORDER BY
                 sql.AppendLine("FROM dbo.MaterialTableA ma");
                 sql.AppendLine("WHERE 1 = 1");
 
-                AppendStartNodeSearchConditionsForMaterialTableA(p, sql, "ma");
+                AppendStartNodeSearchConditionsForMaterialTableA(p, cmd, sql, "ma");
 
                 sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + ")) <> ''");
@@ -1491,6 +1668,104 @@ ORDER BY
                         drumLotNumber,
                         drumWeight,
                         slotNo);
+
+            node.Depth = 0;
+            node.NodeType = "Start";
+            node.ParentKey = null;
+            node.ParentMasterKey = null;
+
+            node.RouteSystem = "A";
+            node.InputSlotNo = slotNo;
+            node.InputSourceType = "Drumcan";
+
+            node.IsTraceTerminal = string.IsNullOrWhiteSpace(node.LotNumber);
+
+            return node;
+        }
+
+        private ProductionResultNode BuildForwardStartDChildBNode(SqlDataReader reader)
+        {
+            if (reader == null)
+                return null;
+
+            var node = new ProductionResultNode();
+
+            node.ProductionOrderNumber =
+                reader.IsDBNull(0) ? null : reader.GetString(0);
+
+            node.LotNumber =
+                reader.IsDBNull(1) ? null : reader.GetString(1);
+
+            node.ItemCode =
+                reader.IsDBNull(2) ? null : reader.GetString(2);
+
+            node.StartDate =
+                reader.IsDBNull(3) ? (DateTime?)null : reader.GetDateTime(3);
+
+            node.Weight =
+                reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
+
+            node.ControlMasterKey =
+                reader.IsDBNull(5) ? null : reader.GetString(5);
+
+            node.ItemName = null;
+            node.StartDateLabel = null;
+            node.EndDate = null;
+            node.ManufacturingProcessName = null;
+            node.ManufacturingTankName = null;
+
+            node.Depth = 1;
+            node.NodeType = "Middle";
+            node.ParentKey = null;
+            node.ParentMasterKey = null;
+
+            node.RouteSystem = "B";
+            node.InputSlotNo = 1;
+            node.InputSourceType = null;
+
+            node.IsTraceTerminal = string.IsNullOrWhiteSpace(node.LotNumber);
+
+            return node;
+        }
+
+        private ProductionResultNode BuildForwardStartDParentDrumNodeFromBHit(SqlDataReader reader)
+        {
+            if (reader == null)
+                return null;
+
+            string drumLotNumber =
+                reader.IsDBNull(6) ? null : reader.GetString(6);
+
+            string drumItemCode =
+                reader.IsDBNull(7) ? null : reader.GetString(7);
+
+            float? drumWeight =
+                reader.IsDBNull(8) ? (float?)null : Convert.ToSingle(reader.GetValue(8));
+
+            string slotNoText =
+                reader.IsDBNull(9) ? null : reader.GetString(9);
+
+            int slotNo = 0;
+            int.TryParse(slotNoText, out slotNo);
+
+            var node = new ProductionResultNode();
+
+            node.ProductionOrderNumber = null;
+            node.LotNumber = drumLotNumber;
+            node.ItemName = null;
+            node.ItemCode = drumItemCode;
+            node.StartDate = null;
+            node.StartDateLabel = null;
+            node.EndDate = null;
+            node.ManufacturingProcessName = null;
+            node.ManufacturingTankName = null;
+            node.Weight = drumWeight;
+
+            node.ControlMasterKey = BuildDrumcanSpecialNodeMasterKey(
+                drumItemCode,
+                drumLotNumber,
+                drumWeight,
+                slotNo);
 
             node.Depth = 0;
             node.NodeType = "Start";
@@ -2899,6 +3174,9 @@ WHERE scp.LotNumber = @ParentLotNumber
             if (p == null)
                 return result;
 
+            if (ShouldSkipMaterialTableAStartSearch(p))
+                return result;
+
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
             {
@@ -3023,25 +3301,6 @@ WHERE scp.LotNumber = @ParentLotNumber
             var sql = new StringBuilder();
             bool first = true;
 
-            bool hasOrder = p != null && !string.IsNullOrWhiteSpace(p.ProductionOrderNumber);
-            bool hasLot = p != null && !string.IsNullOrWhiteSpace(p.LotNumber);
-            bool hasItemCode = p != null && !string.IsNullOrWhiteSpace(p.ItemCode);
-
-            if (hasOrder)
-            {
-                cmd.Parameters.AddWithValue("@Order", "%" + p.ProductionOrderNumber + "%");
-            }
-
-            if (hasLot)
-            {
-                cmd.Parameters.AddWithValue("@Lot", "%" + p.LotNumber + "%");
-            }
-
-            if (hasItemCode)
-            {
-                cmd.Parameters.AddWithValue("@ItemCode", "%" + p.ItemCode + "%");
-            }
-
             for (int i = 1; i <= 5; i++)
             {
                 string idx = i.ToString("00");
@@ -3069,20 +3328,9 @@ WHERE scp.LotNumber = @ParentLotNumber
                 sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + ")) <> ''");
 
-                if (hasOrder)
-                {
-                    sql.AppendLine("  AND ma.ForeignKey LIKE @Order");
-                }
-
-                if (hasLot)
-                {
-                    sql.AppendLine("  AND ma.LotNumber LIKE @Lot");
-                }
-
-                if (hasItemCode)
-                {
-                    sql.AppendLine("  AND ma.ItemCode LIKE @ItemCode");
-                }
+                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
 
                 first = false;
             }
