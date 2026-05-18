@@ -2285,6 +2285,9 @@ namespace LotTraceApp.Services
                 {
                     if (!string.IsNullOrWhiteSpace(node.ParentDisplayNodeKey))
                         continue;
+
+                    if (ShouldSuppressBackwardStartBoundary(node, childrenMap))
+                        continue;
                 }
                 else
                 {
@@ -2308,6 +2311,50 @@ namespace LotTraceApp.Services
             }
 
             return result;
+        }
+
+        private bool ShouldSuppressBackwardStartBoundary(
+            DisplayLaneNode node,
+            IDictionary<string, List<DisplayLaneNode>> childrenMap)
+        {
+            if (node == null ||
+                node.XLevel > 0 ||
+                !string.IsNullOrWhiteSpace(node.ParentDisplayNodeKey))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(node.DisplayNodeKey) &&
+                childrenMap != null &&
+                childrenMap.TryGetValue(node.DisplayNodeKey, out var children) &&
+                children != null &&
+                children.Count > 0)
+            {
+                return false;
+            }
+
+            string nodeKey = node.SourceNode == null ? null : node.SourceNode.NodeIdentityKey;
+            if (string.IsNullOrWhiteSpace(nodeKey) ||
+                _currentBackwardCandidateGroups == null ||
+                _currentBackwardCandidateGroups.Count == 0)
+            {
+                return false;
+            }
+
+            return _currentBackwardCandidateGroups.Any(group =>
+                group != null &&
+                group.Level == 0 &&
+                group.ParentNodes != null &&
+                group.ParentNodes.Count > 0 &&
+                group.ChildNodes != null &&
+                group.ChildNodes
+                    .Where(x => x != null && !string.IsNullOrWhiteSpace(x.NodeIdentityKey))
+                    .Select(x => x.NodeIdentityKey)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Count() > 1 &&
+                group.ChildNodes.Any(x =>
+                    x != null &&
+                    string.Equals(x.NodeIdentityKey, nodeKey, StringComparison.OrdinalIgnoreCase)));
         }
 
         
