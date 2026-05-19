@@ -400,8 +400,8 @@ AND SUBSTRING(
 
         private bool ShouldSkipMaterialTableAStartSearch(TraceSearchParameters p)
         {
-            return HasMaterialTableAUnresolvableStartCondition(p) &&
-                !HasMaterialTableAResolvableStartCondition(p);
+            return HasMaterialTableAUnresolvableStartCondition(p); //&&
+                //!HasMaterialTableAResolvableStartCondition(p)//;
         }
 
         private bool HasMaterialTableAResolvableStartCondition(TraceSearchParameters p)
@@ -446,6 +446,16 @@ AND SUBSTRING(
                 if (!cmd.Parameters.Contains("@To"))
                     cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
+        }
+
+        private void AppendForwardDToBChildSearchConditions(
+            TraceSearchParameters p,
+            SqlCommand cmd,
+            ref string sql,
+            string alias)
+        {
+            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, alias, "ForeignKey", "@Order");
+            AppendSingleControlProcessStartDateConditions(p, cmd, ref sql, alias);
         }
 
         private void AppendStartNodeSearchConditionsForMaterialTableA(
@@ -1052,7 +1062,7 @@ WHERE 1 = 1
     ) IN ('4','7')
 ";
 
-                AppendSingleControlProcessStartDateConditions(p, cmd, ref part, "scp");
+                AppendForwardDToBChildSearchConditions(p, cmd, ref part, "scp");
                 sql.Append(part);
 
                 first = false;
@@ -1192,7 +1202,7 @@ WHERE scp.LotNumber = @ChildLot
     ) IN ('4','7')
 ";
 
-            AppendSingleControlProcessStartDateConditions(p, cmd, ref sql, "scp");
+            AppendForwardDToBChildSearchConditions(p, cmd, ref sql, "scp");
             sql += @"
 ORDER BY
     scp.StartDate,
