@@ -1146,7 +1146,7 @@ namespace LotTraceApp
         {
             var label = new Label();
             label.Name = "lblMiddleHeaderLv" + levelInfo.Level.ToString();
-            label.Text = GetMiddleGridGroupHeaderText(levelInfo.Level);
+            label.Text = GetMiddleGridGroupHeaderText(tab,levelInfo.Level);
             label.TextAlign = ContentAlignment.MiddleCenter;
             label.BackColor = _middleHeaderStyle.GroupBackColor;
             label.ForeColor = _middleHeaderStyle.GroupForeColor;
@@ -1757,9 +1757,9 @@ namespace LotTraceApp
             return count;
         }
 
-        private string GetMiddleGridGroupHeaderText(int level)
+        private string GetMiddleGridGroupHeaderText(TraceTabContext tab, int level)
         {
-            return string.Format("中間工程{0}[{1}]", level, GetMiddleLevelVisibleRowCount(dataGridMiddle, level));
+            return string.Format("中間工程{0}[{1}]", level, GetMiddleLevelVisibleRowCount( tab.GridMiddle, level));
         }
 
         
