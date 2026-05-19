@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using LotTraceApp.Models;
 using LotTraceApp.Repositories;
@@ -10,9 +12,42 @@ namespace LotTraceApp
 {
     internal static class Program
     {
+        private const string SingleInstanceMutexName = @"Local\LotTraceApp_8D80A746_BE3B_462A_A22B_A896F53AF1F8";
+        private const uint AttachParentProcess = 0xFFFFFFFF;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(uint dwProcessId);
+
         [STAThread]
         private static void Main(string[] args)
         {
+            bool createdNew;
+            using (var singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out createdNew))
+            {
+                if (!createdNew)
+                {
+                    MessageBox.Show("すでにアプリが起動しています",
+                                    "LotTraceApp",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                    return;
+                }
+
+                try
+                {
+                    Run(args);
+                }
+                finally
+                {
+                    singleInstanceMutex.ReleaseMutex();
+                }
+            }
+        }
+
+        private static void Run(string[] args)
+        {
+            AttachParentConsoleIfCommandLine(args);
+
             // 実行ファイルと同じフォルダにある INI ファイルを想定
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string iniPath = Path.Combine(baseDir, "LotTraceApp.ini");
@@ -98,8 +133,7 @@ namespace LotTraceApp
         {
             try
             {
-                string exportedPath = form.ExecuteCommandLineHeadless(options);
-                Console.WriteLine("CSV exported: " + exportedPath);
+                form.ExecuteCommandLineHeadless(options);
             }
             catch (Exception ex)
             {
@@ -109,6 +143,14 @@ namespace LotTraceApp
             {
                 form.Dispose();
             }
+        }
+
+        private static void AttachParentConsoleIfCommandLine(string[] args)
+        {
+            if (args == null || args.Length == 0)
+                return;
+
+            AttachConsole(AttachParentProcess);
         }
     }
 

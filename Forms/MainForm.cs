@@ -633,12 +633,19 @@ namespace LotTraceApp
                 throw new InvalidOperationException("検索タブを初期化できませんでした。");
 
             SetSearchParametersToControls(tab, options.SearchParameters);
+            WriteCommandLineLog("ロットトレース検索開始");
             TraceSearchWorkResult workResult = ExecuteTraceWork(
                 options.SearchParameters,
                 null,
                 CancellationToken.None);
+            WriteCommandLineLog("ロットトレース検索終了");
 
-            return ExportTraceWorkResultToDefaultCsv(workResult);
+            WriteCommandLineLog("ロットトレースCSV出力開始");
+            string exportedPath = ExportTraceWorkResultToDefaultCsv(workResult);
+            WriteCommandLineLog("ロットトレースCSV出力完了");
+            WriteCommandLineLog(exportedPath);
+
+            return exportedPath;
         }
 
         private async void MainForm_Shown(object sender, EventArgs e)
@@ -655,18 +662,24 @@ namespace LotTraceApp
 
             SetSearchParametersToControls(tab, options.SearchParameters);
 
+            WriteCommandLineLog("ロットトレース検索開始");
             bool traceSucceeded = await DoTraceAsync(tab, options.SearchParameters);
             if (!traceSucceeded)
                 return;
+            WriteCommandLineLog("ロットトレース検索終了");
 
             if (options.ExportsCsv)
             {
                 try
                 {
-                    ExportCsvForTabToDefaultFile(tab);
+                    WriteCommandLineLog("ロットトレースCSV出力開始");
+                    string exportedPath = ExportCsvForTabToDefaultFile(tab);
+                    WriteCommandLineLog("ロットトレースCSV出力完了");
+                    WriteCommandLineLog(exportedPath);
                 }
                 catch (Exception ex)
                 {
+                    Console.Error.WriteLine("CSV 出力に失敗しました: " + ex.Message);
                     MessageBox.Show(this,
                         "CSV 出力に失敗しました。\r\n" + ex.Message,
                         "CSV出力",
@@ -674,6 +687,12 @@ namespace LotTraceApp
                         MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private static void WriteCommandLineLog(string message)
+        {
+            Console.WriteLine(message);
+            Console.Out.Flush();
         }
 
         private void RegisterTracePeriodEvents()
