@@ -2410,16 +2410,6 @@ namespace LotTraceApp
         }
 
        
-
-        
-
-        
-
-        
-
-       
-       
-
         
 
         private void SyncGridScrollRow(DataGridView grid, int rowIndex)

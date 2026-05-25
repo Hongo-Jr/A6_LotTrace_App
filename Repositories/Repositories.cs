@@ -293,7 +293,7 @@ AND SUBSTRING(
             }
         }
 
-        private void AppendSearchParameterCondition(
+        public void AppendSearchParameterCondition(
             string rawValue,
             SqlCommand cmd,
             ref string sql,
@@ -361,12 +361,12 @@ AND SUBSTRING(
             cmd.Parameters.AddWithValue(parameterName, value);
         }
 
-        private bool ContainsUserWildcard(string value)
+        public bool ContainsUserWildcard(string value)
         {
             return !string.IsNullOrWhiteSpace(value) && value.IndexOf('*') >= 0;
         }
 
-        private string BuildSqlLikePatternFromUserWildcard(string value)
+        public string BuildSqlLikePatternFromUserWildcard(string value)
         {
             if (value == null)
                 return null;

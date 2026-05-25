@@ -1,66 +1,114 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Security.Cryptography.X509Certificates;
 
 namespace LotTraceApp.Models
 {
     /// <summary>
-    /// 瓶設備の 1 つの充填オーダを表すノード（検索始点用）
+    /// 瓶の実績Node
     /// </summary>
-    public class BottleOrderNode
+    public class Bottle_ProductionResultNode
     {
-        public string OrderNumber { get; set; }              // オーダ番号
-        public string ProcessType { get; set; }              // 工程種別
-        public string ProductItemName { get; set; }          // 製品名
-        public string ProductItemCode { get; set; }          // 製品コード
-        public string ProductLotNumber { get; set; }         // 製品ロット
-        public string MiddleProductItemCode { get; set; }    // 中間品コード
-        public string MiddleProductLotNumber { get; set; }   // 中間品ロット
-        public DateTime? StartDate { get; set; }             // オーダ開始日時
-        public DateTime? EndDate { get; set; }               // オーダ終了日時
-
-        public int Depth { get; set; } = 0;                  // 仕様書上は単段だが液設備と揃えておく
-        public string NodeType { get; set; } = "Start";      // 固定で Start
-    }
-
-    /// <summary>
-    /// 1 本のボトル or 1 本のドラム缶の充填結果
-    /// </summary>
-    public class BottleFillingNode
-    {
-        public string OrderNumber { get; set; }
         public string ProcessType { get; set; }
+        public string OrderNumber { get; set; }              // 指図番号＞＞FillingOrderResultから取れる
+        public string ProductItemName { get; set; }          // 製品名＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
+        public string ProductItemCode { get; set; }          // 製品コード＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
+        public string ProductLotNumber { get; set; }         // 製品ロット＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
+        public string MiddleProductItemCode { get; set; }    // 中間品コード＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
+        public string MiddleProductLotNumber { get; set; }   // 中間品ロット＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
+        public DateTime? StartDate { get; set; }             // 開始日時＞＞FillingOrderResultから取れる
+        public DateTime? EndDate { get; set; }               // 終了日時＞＞FillingOrderResultから取れる
+        public int FillingBottleNum_OK { get; set; }　　　 // 充填本数NG＞＞FillingOrderResultから取れる
+        public int FillingBottleNum_NG { get; set; }　　　 // 充填本数OK＞＞FillingOrderResultから取れる
+        public int FillingBottleNum_Total                   // 充填本数合計>>OKとNGの総数から合成
+        {
+            get { return FillingBottleNum_OK + FillingBottleNum_NG; }
+        }
 
-        // 製品
-        public string ProductItemCode { get; set; }
-        public string ProductLotNumber { get; set; }
+        public string RouteSystem { get; set; }　　　　　　 // FillngBottelTableからか、FillngDrumcanTableからか
 
-        // 中間品（液設備との連携で使う可能性あり）
-        public string MiddleProductItemCode { get; set; }
-        public string MiddleProductLotNumber { get; set; }
+        public int Depth { get; set; }
+        public string NodeType { get; set; }
 
-        // 識別子（ボトルID or ドラム番号）
-        public string BottleIdOrDrumcanNumber { get; set; }
+        public string NodeIdentifyKey
+        {
+            get
+            {
+                string orderNumber = string.IsNullOrWhiteSpace(OrderNumber) ? "" : OrderNumber.Trim().ToUpperInvariant();
+                string lotNumber = string.IsNullOrWhiteSpace(ProductLotNumber) ? "" : ProductLotNumber.Trim().ToUpperInvariant();
+                string itemcode = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
+                string routeSystem = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
+                string processType = string.IsNullOrWhiteSpace(ProcessType) ? "" : ProcessType.Trim().ToUpperInvariant();
 
-        public string FillingType { get; set; }   // "Bottle" or "Drumcan"
-        public int? FillingMachineNumber { get; set; }
-        public int? FillingNozzleNumber { get; set; }
-
-        public long? FillingWeight { get; set; }
-        public DateTime? FillingStartDate { get; set; }
-        public DateTime? FillingEndDate { get; set; }
-
-        public int Depth { get; set; } = 1;       // 始点の 1 段下
-        public string NodeType { get; set; } = "End";
+                return string.Join("|", routeSystem, orderNumber);
+            }
+        }
     }
 
-    /// <summary>
-    /// 瓶設備トレース結果
-    /// 「始点（オーダ）」＋「終点（ボトル／ドラム）」のみ
-    /// </summary>
-    public class BottleTraceResult
+
+    public class BottleCandidate
     {
-        // 修正後（C# 7.3 で使える書き方）
-        public List<BottleOrderNode> StartOrders { get; } = new List<BottleOrderNode>();
-        public List<BottleFillingNode> Fillings { get; } = new List<BottleFillingNode>();
+        public bool TraceDirection {  get; set; }
+
+        public List<ProductionResultNode> LiquidNodes {  get; set; }
+        public List<Bottle_ProductionResultNode> BottleNodes { get; set; }
+
+        public BottleCandidate()
+        {
+            LiquidNodes = new List<ProductionResultNode>();
+            BottleNodes = new List<Bottle_ProductionResultNode>();
+        }
+    }
+
+    public class BottleDisplayLaneNode
+    {
+        public int NodeType {  get; set; }
+
+        public string DisplayNodeKey { get; set; }
+
+        public ProductionResultNode SourceLiquidNode {  get; set; }
+        public Bottle_ProductionResultNode SourceBottleNode { get; set; }
+
+        public int YLane { get; set; }
+    }
+
+    public class BottleDisplayGroup
+    {
+        public List<BottleDisplayLaneNode> LiquidNodes { get; set; }
+        public List<BottleDisplayLaneNode> BottleNodes { get; set; }
+
+        public int StartY { get; set; }
+        public int EndY { get; set; }
+
+        public BottleDisplayGroup()
+        {
+            LiquidNodes = new List<BottleDisplayLaneNode>();
+            BottleNodes = new List<BottleDisplayLaneNode>();
+        }
+
+    }
+
+    public class BottleDisplayTables
+    {
+        public DataTable LiquidTable { get; set; }
+        public DataTable BottleTable { get; set; }
+
+        public List<BottleLineRanges> LineRanges { get; set; }
+
+        public BottleDisplayTables(DataTable liqied, DataTable bottle)
+        {
+            LiquidTable = liqied;
+            BottleTable = bottle; 
+            LineRanges = new List<BottleLineRanges>();
+        }
+    }
+   
+  
+
+    public class BottleLineRanges
+    {
+        public int BorderType { get; set; }
+        public int BorderIndex {  get; set; }
     }
 }
