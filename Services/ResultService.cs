@@ -295,10 +295,54 @@ namespace LotTraceApp.Services
         }
 
         // ★ 全列表示版（FilterTable向け）
+        // ★ 全列表示版（FilterTable向け）※値も入れる版
         public DataTable ToOrderAndActualHorizontal_AllColumns(DataTable src)
         {
             var dst = new DataTable();
             dst.Columns.Add("項目", typeof(string));
+
+
+
+            ///本郷のやつ
+            ///MasterKeyを見て、Columnsの構成を決める
+
+            //dst.Columns.Add("セット１");
+            //dst.Columns.Add("セット２");
+
+            ///
+
+            
+            ///縦のデータセットを作る
+            
+            ///
+
+
+
+
+            //List<string> filterDataSet = new List<string>();
+
+            //foreach (DataRow row in src.Rows)
+            //{
+
+            //    string value01 = row["FilterSetNumber01"].ToString();
+            //    string value02 = row["FilterSetNumber02"].ToString();
+
+            //    filterDataSet.Add(value01);
+               
+                
+            //}
+
+            /////
+
+            //dst.Rows.Add("フィルターセットNo.", filterDataSet[0]);
+
+            //dst.Rows.Add("フィルター品目コード", filterDataSet[1]);
+
+
+
+            ///ここまで本郷のやつ
+
+
 
             if (src == null || src.Rows.Count == 0 || src.Columns.Count == 0)
                 return dst;
@@ -306,51 +350,43 @@ namespace LotTraceApp.Services
             if (!src.Columns.Contains("DataCategory"))
                 return dst;
 
-            var indexed = src.Rows.Cast<DataRow>()
-                .Select((r, i) => new { Row = r, Index = i })
+            // 指図/実績だけ使う
+            var baseList = src.Rows
+                .Cast<DataRow>()
+                .Select((r, idx) => new { Row = r, Index = idx })
+                .Where(x =>
+                {
+                    var cat = Convert.ToString(x.Row["DataCategory"]);
+                    return string.Equals(cat, "指図", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(cat, "実績", StringComparison.OrdinalIgnoreCase);
+                })
                 .ToList();
 
-            var orders = indexed
-                .Where(x => string.Equals(Convert.ToString(x.Row["DataCategory"]), "指図", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            var actuals = indexed
-                .Where(x => string.Equals(Convert.ToString(x.Row["DataCategory"]), "実績", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            // FilterTableは日時が無い想定：元順（SQL側ORDERを尊重）
-            actuals.Sort((a, b) => a.Index.CompareTo(b.Index));
-
-            var merged = new List<DataRow>();
-            int oi = 0, ai = 0;
-            while (oi < orders.Count || ai < actuals.Count)
-            {
-                if (oi < orders.Count) merged.Add(orders[oi++].Row);
-                if (ai < actuals.Count) merged.Add(actuals[ai++].Row);
-            }
-
-            if (merged.Count == 0)
+            if (baseList.Count == 0)
                 return dst;
 
+            // FilterTableは日時が無い想定：SQL返却順を尊重してそのまま
+            var merged = baseList.OrderBy(x => x.Index).Select(x => x.Row).ToList();
+
+            // --- 列（指図1/実績1/…）を merged の順で作る ---
             var colNames = new List<string>();
             int orderNo = 0, actualNo = 0;
 
             foreach (var r in merged)
             {
-                var cat = Convert.ToString(r["DataCategory"]);
-                string header = null;
+                string cat = Convert.ToString(r["DataCategory"]);
+                string header;
 
-                if (cat == "指図") header = "指図" + (++orderNo);
-                else if (cat == "実績") header = "実績" + (++actualNo);
-                else continue;
+                if (string.Equals(cat, "指図", StringComparison.OrdinalIgnoreCase))
+                    header = "指図" + (++orderNo);
+                else
+                    header = "実績" + (++actualNo);
 
                 dst.Columns.Add(header, typeof(string));
                 colNames.Add(header);
             }
 
-            if (colNames.Count == 0)
-                return dst;
-
+            // --- 表示対象の項目（列）を決める：全列（ただしキー系は除外） ---
             var itemColumns = new List<DataColumn>();
             foreach (DataColumn c in src.Columns)
             {
@@ -361,6 +397,7 @@ namespace LotTraceApp.Services
                 itemColumns.Add(c);
             }
 
+            // --- 横持ち変換（★ここで値を詰める） ---
             foreach (var itemCol in itemColumns)
             {
                 var newRow = dst.NewRow();
@@ -376,6 +413,19 @@ namespace LotTraceApp.Services
                 else
                 {
                     newRow["項目"] = itemCol.ColumnName;
+                }
+
+                int colIndex = 0;
+                foreach (var r in merged)
+                {
+                    if (colIndex >= colNames.Count) break;
+
+                    string header = colNames[colIndex++];
+                    object v = r[itemCol];
+
+                    if (v == DBNull.Value) newRow[header] = "";
+                    else if (v is DateTime dt) newRow[header] = dt.ToString("yyyy/MM/dd HH:mm:ss");
+                    else newRow[header] = Convert.ToString(v);
                 }
 
                 dst.Rows.Add(newRow);
