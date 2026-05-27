@@ -577,6 +577,7 @@ namespace LotTraceApp
             _resultService = resultService;
 
             InitializeComponent();
+            ConfigureTraceTabOwnerDraw();
             InitializeTraceTabContexts();
             NormalizeTraceTabGridBounds();
             InitGrids();
@@ -615,6 +616,43 @@ namespace LotTraceApp
 
             Shown -= MainForm_Shown;
             Shown += MainForm_Shown;
+        }
+
+        private void ConfigureTraceTabOwnerDraw()
+        {
+            swichTab.DrawMode = TabDrawMode.OwnerDrawFixed;
+            swichTab.DrawItem -= SwichTab_DrawItem;
+            swichTab.DrawItem += SwichTab_DrawItem;
+        }
+
+        private void SwichTab_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var tabControl = sender as TabControl;
+            if (tabControl == null || e.Index < 0 || e.Index >= tabControl.TabPages.Count)
+                return;
+
+            var selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            var fillBounds = e.Bounds;
+            fillBounds.Inflate(-1, -1);
+            using (var brush = new SolidBrush(selected ? Color.White : Color.FromArgb(242, 242, 242)))
+            {
+                e.Graphics.FillRectangle(brush, fillBounds);
+            }
+
+            var tabPage = tabControl.TabPages[e.Index];
+            var textBounds = e.Bounds;
+            textBounds.Inflate(-8, 0);
+
+            var foreColor = selected ? tabControl.ForeColor : tabPage.ForeColor;
+            TextRenderer.DrawText(
+                e.Graphics,
+                tabPage.Text,
+                tabControl.Font,
+                textBounds,
+                foreColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.SingleLine);
+
+            e.DrawFocusRectangle();
         }
 
        

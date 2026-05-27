@@ -49,14 +49,24 @@ namespace LotTraceApp.Repositories
             var starts = new List<ProductionResultNode>();
 
             var startA = B_GetStartNodesFromA(p);
+            var startB = B_GetStartNodesFromB(p);
+            
+            if(startB != null && startB.Count != 0)
+            {
+                starts.AddRange(startB);
+            }
 
-            starts.AddRange(startA);
+            if (startA != null && startA.Count != 0)
+            {
+                starts.AddRange(startA);
+            }
 
+            if (starts != null && starts.Count != 0)
+            {
+                result = B_GetForwardBottleCandidate(starts);
+            }
 
-
-            result = B_GetForwardBottleCandidate(starts);
-
-
+            
             return result;
         }
 
@@ -70,37 +80,44 @@ namespace LotTraceApp.Repositories
                 conn.Open();
 
                 cmd.CommandText = B_BuildForwardStartA_SQL(p, cmd);
-                var uniqueMasterKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var uniqueKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 
-                    using (var reader = cmd.ExecuteReader())
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        var node = new ProductionResultNode();
+
+                        node.ProductionOrderNumber = reader.IsDBNull(0) ? null : reader.GetString(0);
+                        node.LotNumber = reader.IsDBNull(1) ? null : reader.GetString(1);
+                        node.ItemName = null;
+                        node.ItemCode = reader.IsDBNull(2) ? null : reader.GetString(2);
+                        node.StartDate = null;
+                        node.EndDate = null;
+                        node.ManufacturingProcessName = null;
+                        node.ManufacturingTankName = null;
+                        node.Weight = reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
+                        node.ControlMasterKey = reader.IsDBNull(3) ? null : reader.GetString(3);
+                        node.RouteSystem = reader.IsDBNull(5) ? null : reader.GetString(5);
+                        string SlotNoText = reader.IsDBNull(6) ? null : reader.GetString(6);
+                        int slotNo = 0;
+                        int.TryParse(SlotNoText, out slotNo);
+                        node.InputSlotNo = slotNo;
+                            
+                        node.Depth = 0;
+                        node.NodeType = "Start";
+                        node.ParentKey = null;
+                            
+                        string masterKey = node.ControlMasterKey ?? "";
+                        string CheckKey = string.Join("|", masterKey, SlotNoText);
+
+                        if (uniqueKeys.Add(CheckKey))
                         {
-                            var node = new ProductionResultNode();
-
-                            node.ProductionOrderNumber = reader.IsDBNull(0) ? null : reader.GetString(0);
-                            node.LotNumber = reader.IsDBNull(1) ? null : reader.GetString(1);
-                            node.ItemName = null;
-                            node.ItemCode = reader.IsDBNull(2) ? null : reader.GetString(2);
-                            node.StartDate = null;
-                            node.EndDate = null;
-                            node.ManufacturingProcessName = null;
-                            node.ManufacturingTankName = null;
-                            node.Weight = reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
-                            node.ControlMasterKey = reader.IsDBNull(3) ? null : reader.GetString(3);
-                            node.Depth = 0;
-                            node.NodeType = "Start";
-                            node.ParentKey = null;
-
-                            string masterKey = node.ControlMasterKey ?? "";
-
-                            if (uniqueMasterKeys.Add(masterKey))
-                            {
-                                result.Add(node);
-                            }
+                            result.Add(node);
                         }
-                   
                     }
+                   
+                }
             }
             return result;
         }
@@ -143,6 +160,107 @@ namespace LotTraceApp.Repositories
             return sql.ToString();
         }
 
+        public List<ProductionResultNode> B_GetStartNodesFromB(TraceSearchParameters p)
+        {
+            var result = new List<ProductionResultNode>();
+
+            using (var conn = CreateConnection())
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+
+                cmd.CommandText = B_BuildForwardStartB_SQL(p, cmd);
+                var uniqueKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var node = new ProductionResultNode();
+
+                        node.ProductionOrderNumber = reader.IsDBNull(0) ? null : reader.GetString(0);
+                        node.LotNumber = reader.IsDBNull(1) ? null : reader.GetString(1);
+                        node.ItemName = null;
+                        node.ItemCode = reader.IsDBNull(2) ? null : reader.GetString(2);
+                        node.StartDate = reader.IsDBNull(3) ? (DateTime?)null : reader.GetDateTime(3);
+                        node.EndDate = null;
+                        node.ManufacturingProcessName = null;
+                        node.ManufacturingTankName = null;
+                        node.Weight = reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
+                        node.ControlMasterKey = reader.IsDBNull(5) ? null : reader.GetString(5);
+                        node.RouteSystem = "B";
+                        node.InputSlotNo = 0;
+
+                        node.Depth = 0;
+                        node.NodeType = "Start";
+                        node.ParentKey = null;
+
+
+                        string masterKey = node.ControlMasterKey ?? "";
+                        string CheckKey = string.Join("|", masterKey, "0");
+
+                        if (uniqueKeys.Add(CheckKey))
+                        {
+                            result.Add(node);
+                        }
+                    }
+
+                }
+            }
+
+            return result;
+        }
+
+        public string B_BuildForwardStartB_SQL(TraceSearchParameters p, SqlCommand cmd)
+        {
+            var sql = new StringBuilder();
+            
+            sql.AppendLine("SELECT");
+            sql.AppendLine("    scp.ForeignKey,                                -- 0");
+            sql.AppendLine("    scp.LotNumber,                                 -- 1");
+            sql.AppendLine("    scp.ItemCode,                                  -- 2");
+            sql.AppendLine("    scp.StartDate,                                 -- 3");
+            sql.AppendLine("    scp.Weight,                                    -- 4");
+            sql.AppendLine("    scp.MasterKey                                  -- 5");
+            
+            sql.AppendLine("FROM MES31.dbo.SingleControlProcessTable scp");
+            sql.AppendLine("WHERE 1 = 1");
+            sql.AppendLine("AND SUBSTRING(scp.MasterKey,LEN(scp.MasterKey) - CHARINDEX('_', scp.MasterKey),1)='G'");
+            sql.AppendLine("AND SUBSTRING(scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2,1)='2'");
+            sql.AppendLine("AND SUBSTRING(scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),1) IN ('4','7')");
+
+
+            B_AppendStartNodeSearchConditions(p, cmd, sql, "scp");
+
+            return sql.ToString();
+        }
+
+        private void B_AppendStartNodeSearchConditions(
+    TraceSearchParameters p,
+    SqlCommand cmd,
+    StringBuilder sql,
+    string alias)
+        {
+            B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+            B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
+            B_AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, alias, "ItemCode", "@ItemCode");
+
+            if (p != null && p.From.HasValue)
+            {
+
+                sql.AppendLine(" AND " + alias + ".StartDate >= @From");
+                cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+            }
+
+            if (p != null && p.To.HasValue)
+            {
+                sql.AppendLine(" AND " + alias + ".StartDate <= @To");
+                cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+            }
+        }
+
+
+
         public void B_AppendSearchParameterCondition(
             string rawValue,
             SqlCommand cmd,
@@ -180,9 +298,26 @@ namespace LotTraceApp.Repositories
             {
 
                 var liquidNodes = group.ToList();
-                var BottleNodes = B_FindForwardBottleNodes(group.Key);
 
-                result.Add(B_BuildForwardCandidate(liquidNodes, BottleNodes));
+                var bottleNodes = new List<Bottle_ProductionResultNode>();
+                bottleNodes.AddRange(B_FindForwardBottleNodes(group.Key));
+                bottleNodes.AddRange(B_FindForwardBottleNodes(group.Key));
+
+                var BottleNodes = B_FindForwardBottleNodes(group.Key);
+                var DrumNodes = B_FindForwardDrumNodes(group.Key);
+
+                var fillNodes = new List<Bottle_ProductionResultNode>();
+                if( BottleNodes != null && BottleNodes.Count != 0)
+                {
+                    fillNodes.AddRange(BottleNodes);
+                }
+
+                if (DrumNodes != null && DrumNodes.Count != 0)
+                {
+                    fillNodes.AddRange(DrumNodes);
+                }
+
+                result.Add(B_BuildForwardCandidate(liquidNodes, fillNodes));
             }
 
             return result;
@@ -232,6 +367,52 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" FROM FillingBottleTable WHERE MiddleProductLotNumber = @lotNo) fb");
             sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber;");
             
+            return sql.ToString();
+        }
+        private List<Bottle_ProductionResultNode> B_FindForwardDrumNodes(string midLot)
+        {
+            var result = new List<Bottle_ProductionResultNode>();
+
+            using (var conn = CreateConnection())
+            using (var cmd = conn.CreateCommand())
+            {
+                conn.Open();
+
+                cmd.CommandText = B_BuildForwardDrumNodeSQL();
+                cmd.Parameters.AddWithValue("@lotNo", midLot);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var BottleNode = new Bottle_ProductionResultNode();
+
+                        BottleNode.OrderNumber = reader.IsDBNull(0) ? null : reader.GetString(0);
+                        BottleNode.ProductLotNumber = reader.IsDBNull(1) ? null : reader.GetString(1);
+                        BottleNode.ProductItemCode = reader.IsDBNull(2) ? null : reader.GetString(2);
+                        BottleNode.FillingBottleNum_OK = reader.IsDBNull(3) ? 0 : reader.GetInt32(3);
+                        BottleNode.FillingBottleNum_NG = reader.IsDBNull(4) ? 0 : reader.GetInt32(4);
+                        BottleNode.StartDate = reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5);
+                        BottleNode.EndDate = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6);
+
+                        result.Add(BottleNode);
+
+                    }
+                }
+                return result;
+            }
+        }
+
+        private string B_BuildForwardDrumNodeSQL()
+        {
+            var sql = new StringBuilder();
+
+            sql.AppendLine("SELECT fo.OrderNumber,fd.ProductLotNumber,fd.ProductItemCode,fo.FillingBottleNumberResult_OK,fo.FillingBottleNumberResult_NG,fo.StartDate,fo.EndDate");
+            sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
+            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode");
+            sql.AppendLine(" FROM FillingDrumcanTable WHERE MiddleProductLotNumber = @lotNo) fd");
+            sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber;");
+
             return sql.ToString();
         }
 

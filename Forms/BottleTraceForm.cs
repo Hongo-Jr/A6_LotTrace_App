@@ -80,12 +80,50 @@ namespace LotTraceApp
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
             InitializeComponent();
+            ConfigureBottleTraceTabOwnerDraw();
 
             InitializeBottleTraceTabContexts();
             InitializeBottleTraceTabs();
 
             swichBottleTab.SelectedIndexChanged -= SwichBottleTab_SelectedIndexChanged;
             swichBottleTab.SelectedIndexChanged += SwichBottleTab_SelectedIndexChanged;
+        }
+
+        private void ConfigureBottleTraceTabOwnerDraw()
+        {
+            swichBottleTab.DrawMode = TabDrawMode.OwnerDrawFixed;
+            swichBottleTab.DrawItem -= SwichBottleTab_DrawItem;
+            swichBottleTab.DrawItem += SwichBottleTab_DrawItem;
+        }
+
+        private void SwichBottleTab_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var tabControl = sender as TabControl;
+            if (tabControl == null || e.Index < 0 || e.Index >= tabControl.TabPages.Count)
+                return;
+
+            var selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            var fillBounds = e.Bounds;
+            fillBounds.Inflate(-1, -1);
+            using (var brush = new SolidBrush(selected ? Color.White : Color.FromArgb(242, 242, 242)))
+            {
+                e.Graphics.FillRectangle(brush, fillBounds);
+            }
+
+            var tabPage = tabControl.TabPages[e.Index];
+            var textBounds = e.Bounds;
+            textBounds.Inflate(-8, 0);
+
+            var foreColor = selected ? tabControl.ForeColor : tabPage.ForeColor;
+            TextRenderer.DrawText(
+                e.Graphics,
+                tabPage.Text,
+                tabControl.Font,
+                textBounds,
+                foreColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.SingleLine);
+
+            e.DrawFocusRectangle();
         }
 
         private int GetCurrentBottleTraceTabNo()
