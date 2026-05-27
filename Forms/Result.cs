@@ -228,7 +228,6 @@ namespace LotTraceApp.Forms
 
 
             DataTable view;
-
             if (string.Equals(id, ResultService.FilterId, StringComparison.OrdinalIgnoreCase))
             {
                 // ★ FilterTable表示
@@ -239,7 +238,11 @@ namespace LotTraceApp.Forms
                 ResultView.RowHeadersVisible = false;
                 ResultView.DataSource = view;
 
-                // FilterTableは列変換CSVが別物の可能性が高いので適用しない（必要なら別途対応）
+                // ★制御工程と同じ見た目・ソート不可を適用
+                ApplyResultGridStyle();
+                ApplyFilterHeaderWithoutSequence();  // ★通し番を表示しない
+
+                // ★指図/実績の表示切替はFilterには不要なので呼ばない
                 return;
             }
 
@@ -396,6 +399,65 @@ namespace LotTraceApp.Forms
             itemCol.Width = target;
             itemCol.MinimumWidth = target;
         }
+        private void AdjustAllColumnsWidth_NoAuto_ForFilter(int maxRowsToScan = 200)
+        {
+            var g = ResultView;
+            if (g.Columns.Count == 0) return;
+
+            g.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            foreach (DataGridViewColumn c in g.Columns)
+                c.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+
+            var headerFont = g.ColumnHeadersDefaultCellStyle.Font ?? g.Font;
+            const int safety = 18;
+            const int maxWidth = 700; // 長文で極端に広がり過ぎない上限（必要なら調整）
+
+            using (var gr = g.CreateGraphics())
+            {
+                foreach (DataGridViewColumn col in g.Columns)
+                {
+                    if (!col.Visible) continue;
+
+                    int max = 0;
+
+                    // header
+                    var hsz = TextRenderer.MeasureText(
+                        gr, col.HeaderText ?? "", headerFont,
+                        new Size(int.MaxValue, int.MaxValue),
+                        TextFormatFlags.SingleLine | TextFormatFlags.NoClipping | TextFormatFlags.LeftAndRightPadding);
+                    max = Math.Max(max, hsz.Width);
+
+                    // cells (先頭から最大maxRowsToScan行だけ)
+                    int scanned = 0;
+                    foreach (DataGridViewRow r in g.Rows)
+                    {
+                        if (r.IsNewRow) continue;
+
+                        string text = Convert.ToString(r.Cells[col.Index].Value) ?? "";
+                        if (text.Length == 0) continue;
+
+                        var f = r.Cells[col.Index].InheritedStyle.Font ?? g.Font;
+                        var sz = TextRenderer.MeasureText(
+                            gr, text, f,
+                            new Size(int.MaxValue, int.MaxValue),
+                            TextFormatFlags.SingleLine | TextFormatFlags.NoClipping | TextFormatFlags.LeftAndRightPadding);
+
+                        max = Math.Max(max, sz.Width);
+
+                        if (++scanned >= maxRowsToScan) break;
+                    }
+
+                    int target = Math.Min(max + safety, maxWidth);
+                    if (target < col.MinimumWidth) target = col.MinimumWidth;
+
+                    if (col.Width < target)
+                    {
+                        col.Width = target;
+                        col.MinimumWidth = target;
+                    }
+                }
+            }
+        }
 
 
         private void ResultView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -420,8 +482,19 @@ namespace LotTraceApp.Forms
         {
             BeginInvoke(new Action(() =>
             {
-                AdjustItemColumnWidth_NoAuto();                 // ★追加（項目列）
-                AdjustActualColumnsWidth_ByStartEnd_SmallFont_NoAuto(); // 既存（実績列）
+                AdjustItemColumnWidth_NoAuto(); // 項目列は共通
+
+                string id = Convert.ToString(cmbTarget.SelectedValue);
+                if (string.Equals(id, ResultService.FilterId, StringComparison.OrdinalIgnoreCase))
+                {
+                    // ★Filterは全列を計測して見切れにくくする
+                    AdjustAllColumnsWidth_NoAuto_ForFilter();
+                }
+                else
+                {
+                    // ★制御工程は従来通り（開始/終了行ベースで実績列幅を広げる）
+                    AdjustActualColumnsWidth_ByStartEnd_SmallFont_NoAuto();
+                }
             }));
         }
         private void AdjustActualColumnsWidth_ByStartEnd_SmallFont_NoAuto()
@@ -499,6 +572,25 @@ namespace LotTraceApp.Forms
                         col.Width = targetWidth;
                         col.MinimumWidth = targetWidth;
                     }
+                }
+            }
+        }
+        private void ApplyFilterHeaderWithoutSequence()
+        {
+            foreach (DataGridViewColumn col in ResultView.Columns)
+            {
+                if (col == null) continue;
+                if (col.Name == "項目") continue;
+
+                var header = col.HeaderText ?? "";
+
+                if (header.StartsWith("指図", StringComparison.OrdinalIgnoreCase))
+                {
+                    col.HeaderText = "指図";
+                }
+                else if (header.StartsWith("実績", StringComparison.OrdinalIgnoreCase))
+                {
+                    col.HeaderText = "実績";
                 }
             }
         }
