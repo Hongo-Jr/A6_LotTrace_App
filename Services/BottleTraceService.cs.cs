@@ -18,10 +18,13 @@ namespace LotTraceApp.Services
     public class BottleTraceService
     {
         private readonly BottleTraceRepository _repo;
+        private readonly ICustomerItemMasterRepository _customerItemMasterRepository;
 
-        public BottleTraceService(BottleTraceRepository repo)
+     
+        public BottleTraceService(BottleTraceRepository repo, ICustomerItemMasterRepository customerItemMasterRepository)
         {
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+            _customerItemMasterRepository = customerItemMasterRepository;
         }
 
         #region フォワード
@@ -33,16 +36,47 @@ namespace LotTraceApp.Services
             var candidate = _repo.B_FindForwardCandidate(p);
 
             //Candidateをグループ化したDisplayNodeにする。
-            var displayGroups = BuildForwardDisplaylane(candidate);
+            var displayGroups = B_BuildDisplaylane(candidate);
+
+            ResolveLiquidNodeComplements(displayGroups);
 
             var result = B_BuildDisplayTable(displayGroups);
 
             return result;
 
+        }
+
+
+        #endregion
+
+        #region バック
+
+        public BottleDisplayTables B_TraceBackward(TraceSearchParameters p)
+        {
+
+            //検索条件からCandidates作成
+            var candidate = _repo.B_FindBackwardCandidate(p);
+
+            //Candidateをグループ化したDisplayNodeにする。
+            var displayGroups = B_BuildDisplaylane(candidate);
+
+            ResolveLiquidNodeComplements(displayGroups);
+
+            var result = B_BuildDisplayTable(displayGroups);
+
+            return result;
 
         }
 
-        private List<BottleDisplayGroup> BuildForwardDisplaylane(List<BottleCandidate> candidates)
+        #endregion
+
+
+
+
+        #region 汎用
+
+
+        private List<BottleDisplayGroup> B_BuildDisplaylane(List<BottleCandidate> candidates)
         {
             var result = new List<BottleDisplayGroup>();
             int StartY = 0;
@@ -50,7 +84,7 @@ namespace LotTraceApp.Services
             foreach (var candidate in candidates)
             {
                 var DisplayGroup = new BottleDisplayGroup();
-                DisplayGroup.LiquidNodes.AddRange(BuildDisplayNodes(candidate.LiquidNodes,StartY));
+                DisplayGroup.LiquidNodes.AddRange(BuildDisplayNodes(candidate.LiquidNodes, StartY));
                 DisplayGroup.BottleNodes.AddRange(BuildDisplayNodes(candidate.BottleNodes, StartY));
                 DisplayGroup.StartY = StartY;
 
@@ -65,15 +99,108 @@ namespace LotTraceApp.Services
                 result.Add(DisplayGroup);
 
             }
-            
-            return result;  
+
+            return result;
         }
 
-        #endregion
+        private void ResolveLiquidNodeComplements(List<BottleDisplayGroup> displayGroups)
+        {
+            if (displayGroups == null || displayGroups.Count == 0)
+                return;
 
+            var nodes = displayGroups
+                .Where(g => g != null && g.LiquidNodes != null)
+                .SelectMany(g => g.LiquidNodes)
+                .Where(x => x != null && x.SourceLiquidNode != null)
+                .Select(x => x.SourceLiquidNode)
+                .ToList();
 
+            if (nodes.Count == 0)
+                return;
 
-        #region 汎用
+            ResolveLiquidItemNames(nodes);
+            ResolveLiquidStartDateLabels(nodes.Where(IsRouteSystemA));
+        }
+
+        private bool IsRouteSystemA(ProductionResultNode node)
+        {
+            return node != null &&
+                string.Equals(node.RouteSystem, "A", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void ResolveLiquidItemNames(IEnumerable<ProductionResultNode> nodes)
+        {
+            if (nodes == null || _customerItemMasterRepository == null)
+                return;
+
+            var nodeList = nodes
+                .Where(n => n != null && !string.IsNullOrWhiteSpace(n.ItemCode))
+                .ToList();
+
+            if (nodeList.Count == 0)
+                return;
+
+            var itemCodes = nodeList
+                .Select(n => n.ItemCode.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (itemCodes.Count == 0)
+                return;
+
+            Dictionary<string, string> itemNameMap;
+
+            try
+            {
+                itemNameMap = _customerItemMasterRepository.GetItemNamesByCodes(itemCodes);
+            }
+            catch
+            {
+                return;
+            }
+
+            foreach (var node in nodeList)
+            {
+                string itemName;
+                if (itemNameMap.TryGetValue(node.ItemCode.Trim(), out itemName))
+                {
+                    node.ItemName = itemName;
+                }
+            }
+        }
+
+        private void ResolveLiquidStartDateLabels(IEnumerable<ProductionResultNode> nodes)
+        {
+            if (nodes == null)
+                return;
+
+            foreach (var node in nodes)
+            {
+                if (node == null)
+                    continue;
+
+                if (!IsRouteSystemA(node))
+                    continue;
+
+                if (!string.IsNullOrWhiteSpace(node.StartDateLabel))
+                    continue;
+
+                if (node.StartDate.HasValue)
+                    continue;
+
+                switch (node.InputSourceType)
+                {
+                    case "ManualInput":
+                        node.StartDateLabel = "手投入";
+                        break;
+                    case "Drumcan":
+                        node.StartDateLabel = "ドラム缶";
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
 
         private List<BottleDisplayLaneNode > BuildDisplayNodes(List<ProductionResultNode> liquidNodes, int BaseY)
         {
@@ -140,6 +267,10 @@ namespace LotTraceApp.Services
                 
             }
 
+            B_AdjustTableRow(tables);
+
+
+
             return tables;
         }
 
@@ -155,6 +286,8 @@ namespace LotTraceApp.Services
 
             tables.LiquidTable.Columns.Add("NodeKey", typeof(string));
             tables.LiquidTable.Columns.Add("DisplayKey", typeof(string));
+            tables.LiquidTable.Columns.Add("ItemCode", typeof(string));
+
 
             //瓶
             tables.BottleTable.Columns.Add("OrderNumber",typeof(string)).Caption = "指図番号";
@@ -167,6 +300,9 @@ namespace LotTraceApp.Services
 
             tables.BottleTable.Columns.Add("NodeKey", typeof(string));
             tables.BottleTable  .Columns.Add("DisplayKey", typeof(string));
+            tables.BottleTable.Columns.Add("ItemCode", typeof(string));
+
+
 
         }
 
@@ -197,13 +333,15 @@ namespace LotTraceApp.Services
             string OrderNumber = liquid.SourceLiquidNode.ProductionOrderNumber;
             string Lot = liquid.SourceLiquidNode.LotNumber;
             string ItemName = liquid.SourceLiquidNode.ItemName;
-            string StartDate = liquid.SourceLiquidNode.StartDate.ToString();
+            string StartDate = liquid.SourceLiquidNode.StartDate.HasValue
+                ? liquid.SourceLiquidNode.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
+                : liquid.SourceLiquidNode.StartDateLabel;
             object Weight = liquid.SourceLiquidNode.Weight == null ? (object)DBNull.Value: liquid.SourceLiquidNode.Weight;
             string NodeKey = liquid.SourceLiquidNode.NodeIdentityKey;
             string DisplayKey = liquid.DisplayNodeKey;
+            string ItemCode = liquid.SourceLiquidNode.ItemCode;
 
-
-            tables.LiquidTable.Rows.Add(OrderNumber,Lot, ItemName, StartDate, Weight,NodeKey,DisplayKey);
+            tables.LiquidTable.Rows.Add(OrderNumber, Lot, ItemName, StartDate, Weight, NodeKey, DisplayKey, ItemCode);
 
         }
 
@@ -244,9 +382,27 @@ namespace LotTraceApp.Services
 
             string NodeKey = bottle.SourceBottleNode.NodeIdentifyKey;
             string DisplayKey = bottle.DisplayNodeKey;
+            string ItemCode = bottle.SourceBottleNode.ProductItemCode;
 
-            tables.BottleTable.Rows.Add(OrderNumber, Lot, ItemName, StartDate,OK_Num,NG_Num, Total_Num,NodeKey,DisplayKey);
+            tables.BottleTable.Rows.Add( OrderNumber, Lot, ItemName, StartDate, OK_Num, NG_Num, Total_Num, NodeKey, DisplayKey, ItemCode);
         }
+
+        private void B_AdjustTableRow(BottleDisplayTables tables)
+        {
+            int MaxRows = Math.Max(tables.LiquidTable.Rows.Count, tables.BottleTable.Rows.Count);
+
+            while (tables.BottleTable.Rows.Count < MaxRows)
+            {
+                tables.BottleTable.Rows.Add(tables.BottleTable.NewRow());
+            }
+
+            while (tables.LiquidTable.Rows.Count < MaxRows)
+            {
+                tables.LiquidTable.Rows.Add(tables.LiquidTable.NewRow());
+            }
+
+        }
+
 
         #endregion
     }

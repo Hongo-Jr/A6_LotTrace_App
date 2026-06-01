@@ -97,7 +97,7 @@ namespace LotTraceApp
             var resultService = new ResultService(resultRepo);
             
             var bottleRepo = new BottleTraceRepository(connBottle,liquidRepo);
-            var bottleService = new BottleTraceService(bottleRepo);
+            var bottleService = new BottleTraceService(bottleRepo, customerItemRepo);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

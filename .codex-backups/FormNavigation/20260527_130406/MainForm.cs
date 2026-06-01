@@ -25,8 +25,6 @@ namespace LotTraceApp
         private readonly BottleTraceService _bottleService;
         private readonly ResultService _resultService;
         private CommandLineOptions _commandLineStartupOptions;
-        private BottleTraceForm _bottleTraceForm;
-        private bool _disposingBottleTraceForm;
 
         
         // タブ番号 → トレース結果（交点検出・EXCEL出力用）
@@ -618,9 +616,6 @@ namespace LotTraceApp
 
             Shown -= MainForm_Shown;
             Shown += MainForm_Shown;
-
-            FormClosing -= MainForm_FormClosing;
-            FormClosing += MainForm_FormClosing;
         }
 
         private void ConfigureTraceTabOwnerDraw()
@@ -3696,76 +3691,16 @@ namespace LotTraceApp
 
         private void btnBottleTrace_Click(object sender, EventArgs e)
         {
-            var form = GetOrCreateBottleTraceForm();
-
             Hide();
 
-            try
+            using (var form = new BottleTraceForm(_bottleService))
             {
                 form.ShowDialog(this);
             }
-            finally
-            {
-                if (!IsDisposed && !Disposing)
-                {
-                    Show();
-                    Activate();
-                }
-            }
+            this.Show();
+            this.Activate();
         }
 
-        private BottleTraceForm GetOrCreateBottleTraceForm()
-        {
-            if (_bottleTraceForm == null || _bottleTraceForm.IsDisposed)
-            {
-                _bottleTraceForm = new BottleTraceForm(_bottleService);
-                _bottleTraceForm.FormClosing -= BottleTraceForm_FormClosing;
-                _bottleTraceForm.FormClosing += BottleTraceForm_FormClosing;
-            }
-
-            return _bottleTraceForm;
-        }
-
-        private void BottleTraceForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (_disposingBottleTraceForm)
-                return;
-
-            e.Cancel = true;
-
-            var form = sender as Form;
-            if (form != null)
-                form.Hide();
-        }
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            DisposeBottleTraceForm();
-        }
-
-        private void DisposeBottleTraceForm()
-        {
-            if (_bottleTraceForm == null)
-                return;
-
-            if (_bottleTraceForm.IsDisposed)
-            {
-                _bottleTraceForm = null;
-                return;
-            }
-
-            _disposingBottleTraceForm = true;
-            try
-            {
-                _bottleTraceForm.FormClosing -= BottleTraceForm_FormClosing;
-                _bottleTraceForm.Dispose();
-            }
-            finally
-            {
-                _disposingBottleTraceForm = false;
-                _bottleTraceForm = null;
-            }
-        }
 
         #endregion
 

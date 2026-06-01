@@ -20,286 +20,286 @@ namespace LotTraceApp
         private void InitializeComponent()
         {
             this.btnBackToLiquid = new System.Windows.Forms.Button();
-            this.bottoleIntersectionTab = new System.Windows.Forms.TabPage();
+            this.BottleIntersectionTab = new System.Windows.Forms.TabPage();
             this.dataGridIntersection = new System.Windows.Forms.DataGridView();
-            this.tabBottolePage2 = new System.Windows.Forms.TabPage();
+            this.tabBottlePage2 = new System.Windows.Forms.TabPage();
             this.dgvStartBottle_2 = new System.Windows.Forms.DataGridView();
             this.dgvEndBottle_2 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_2 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_2 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_2 = new System.Windows.Forms.Label();
-            this.panelStartBottole_2 = new System.Windows.Forms.Panel();
-            this.panelEndBottole_2 = new System.Windows.Forms.Panel();
-            this.txtBottoleOrderNo_2 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_2 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_2 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_2 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_2 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_2 = new System.Windows.Forms.Label();
+            this.panelStartBottle_2 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_2 = new System.Windows.Forms.Panel();
+            this.txtBottleOrderNo_2 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_2 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_2 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_2 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_2 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_2 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_2 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_2 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_2 = new System.Windows.Forms.Label();
             this.timeCheck_2 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_2 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_2 = new System.Windows.Forms.Label();
-            this.endBottoleTime_2 = new System.Windows.Forms.DateTimePicker();
-            this.btnClearBottole_2 = new System.Windows.Forms.Button();
-            this.btnCsvOutputBottole_2 = new System.Windows.Forms.Button();
-            this.btnBottoleTraceSearch_2 = new System.Windows.Forms.Button();
+            this.startBottleTime_2 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_2 = new System.Windows.Forms.Label();
+            this.endBottleTime_2 = new System.Windows.Forms.DateTimePicker();
+            this.btnClearBottle_2 = new System.Windows.Forms.Button();
+            this.btnCsvOutputBottle_2 = new System.Windows.Forms.Button();
+            this.btnBottleTraceSearch_2 = new System.Windows.Forms.Button();
             this.swichBottleTab = new System.Windows.Forms.TabControl();
-            this.tabBottolePage1 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole = new System.Windows.Forms.Panel();
+            this.tabBottlePage1 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle = new System.Windows.Forms.Panel();
             this.dgvStartBottle = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole = new System.Windows.Forms.Panel();
+            this.panelEndBottle = new System.Windows.Forms.Panel();
             this.dgvEndBottle = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName = new System.Windows.Forms.Label();
             this.lblBottleItemCode = new System.Windows.Forms.Label();
             this.lblBottleLotNo = new System.Windows.Forms.Label();
-            this.lblTargetBottole = new System.Windows.Forms.Label();
+            this.lblTargetBottle = new System.Windows.Forms.Label();
             this.timeCheck = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime = new System.Windows.Forms.DateTimePicker();
             this.lblTilde = new System.Windows.Forms.Label();
-            this.endBottoleTime = new System.Windows.Forms.DateTimePicker();
+            this.endBottleTime = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle = new System.Windows.Forms.Button();
-            this.btnBottoleTraceSearch = new System.Windows.Forms.Button();
-            this.tabBottolePage3 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_3 = new System.Windows.Forms.Panel();
+            this.btnBottleTraceSearch = new System.Windows.Forms.Button();
+            this.tabBottlePage3 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_3 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_3 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_3 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_3 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_3 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_3 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_3 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_3 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_3 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_3 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_3 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_3 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_3 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_3 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_3 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_3 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_3 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_3 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_3 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_3 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_3 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_3 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_3 = new System.Windows.Forms.Label();
             this.timeCheck_3 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_3 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_3 = new System.Windows.Forms.Label();
-            this.endBottoleTime_3 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_3 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_3 = new System.Windows.Forms.Label();
+            this.endBottleTime_3 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_3 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_3 = new System.Windows.Forms.Button();
             this.btnTraceSearch_3 = new System.Windows.Forms.Button();
-            this.tabBottolePage4 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_4 = new System.Windows.Forms.Panel();
+            this.tabBottlePage4 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_4 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_4 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_4 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_4 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_4 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_4 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_4 = new System.Windows.Forms.RadioButton();
             this.lblOrderNumber_4 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_4 = new System.Windows.Forms.TextBox();
+            this.txtBottleOrderNo_4 = new System.Windows.Forms.TextBox();
             this.textBox7 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_4 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_4 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_4 = new System.Windows.Forms.Label();
+            this.txtBottleItemCode_4 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_4 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_4 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_4 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_4 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_4 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_4 = new System.Windows.Forms.Label();
             this.timeCheck_4 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_4 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_4 = new System.Windows.Forms.Label();
-            this.endBottoleTime_4 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_4 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_4 = new System.Windows.Forms.Label();
+            this.endBottleTime_4 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_4 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_4 = new System.Windows.Forms.Button();
             this.btnTraceSearch_4 = new System.Windows.Forms.Button();
-            this.tabBottolePage5 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_5 = new System.Windows.Forms.Panel();
+            this.tabBottlePage5 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_5 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_5 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_5 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_5 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_5 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_5 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_5 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_5 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_5 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_5 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_5 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_5 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_5 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_5 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_5 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_5 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_5 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_5 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_5 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_5 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_5 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_5 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_5 = new System.Windows.Forms.Label();
             this.timeCheck_5 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_5 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_5 = new System.Windows.Forms.Label();
-            this.endBottoleTime_5 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_5 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_5 = new System.Windows.Forms.Label();
+            this.endBottleTime_5 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_5 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_5 = new System.Windows.Forms.Button();
             this.btnTraceSearch_5 = new System.Windows.Forms.Button();
-            this.tabBottolePage6 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_6 = new System.Windows.Forms.Panel();
+            this.tabBottlePage6 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_6 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_6 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_6 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_6 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_6 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_6 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_6 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_6 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_6 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_6 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_6 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_6 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_6 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_6 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_6 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_6 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_6 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_6 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_6 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_6 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_6 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_6 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_6 = new System.Windows.Forms.Label();
             this.timeCheck_6 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_6 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_6 = new System.Windows.Forms.Label();
-            this.endBottoleTime_6 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_6 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_6 = new System.Windows.Forms.Label();
+            this.endBottleTime_6 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_6 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_6 = new System.Windows.Forms.Button();
             this.btnTraceSearch_6 = new System.Windows.Forms.Button();
-            this.tabBottolePage7 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_7 = new System.Windows.Forms.Panel();
+            this.tabBottlePage7 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_7 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_7 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_7 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_7 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_7 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_7 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_7 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_7 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_7 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_7 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_7 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_7 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_7 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_7 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_7 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_7 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_7 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_7 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_7 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_7 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_7 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_7 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_7 = new System.Windows.Forms.Label();
             this.timeCheck_7 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_7 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_7 = new System.Windows.Forms.Label();
-            this.endBottoleTime_7 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_7 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_7 = new System.Windows.Forms.Label();
+            this.endBottleTime_7 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_7 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_7 = new System.Windows.Forms.Button();
             this.btnTraceSearch_7 = new System.Windows.Forms.Button();
-            this.tabBottolePage8 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_8 = new System.Windows.Forms.Panel();
+            this.tabBottlePage8 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_8 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_8 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_8 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_8 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_8 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_8 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_8 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_8 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_8 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_8 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_8 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_8 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_8 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_8 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_8 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_8 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_8 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_8 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_8 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_8 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_8 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_8 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_8 = new System.Windows.Forms.Label();
             this.timeCheck_8 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_8 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_8 = new System.Windows.Forms.Label();
-            this.endBottoleTime_8 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_8 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_8 = new System.Windows.Forms.Label();
+            this.endBottleTime_8 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_8 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_8 = new System.Windows.Forms.Button();
             this.btnTraceSearch_8 = new System.Windows.Forms.Button();
-            this.tabBottolePage9 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_9 = new System.Windows.Forms.Panel();
+            this.tabBottlePage9 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_9 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_9 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_9 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_9 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_9 = new System.Windows.Forms.DataGridView();
             this.rdoBackwardBottle_9 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_9 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_9 = new System.Windows.Forms.Label();
-            this.txtBottoleOrderNo_9 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_9 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_9 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_9 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_9 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_9 = new System.Windows.Forms.Label();
+            this.txtBottleOrderNo_9 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemName_9 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_9 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_9 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_9 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_9 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_9 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_9 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_9 = new System.Windows.Forms.Label();
             this.timeCheck_9 = new System.Windows.Forms.CheckBox();
-            this.startBottoleTime_9 = new System.Windows.Forms.DateTimePicker();
-            this.lblBottole_9 = new System.Windows.Forms.Label();
-            this.endBottoleTime_9 = new System.Windows.Forms.DateTimePicker();
+            this.startBottleTime_9 = new System.Windows.Forms.DateTimePicker();
+            this.lblBottle_9 = new System.Windows.Forms.Label();
+            this.endBottleTime_9 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_9 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_9 = new System.Windows.Forms.Button();
             this.btnTraceSearch_9 = new System.Windows.Forms.Button();
-            this.tabBottolePage10 = new System.Windows.Forms.TabPage();
-            this.panelStartBottole_10 = new System.Windows.Forms.Panel();
+            this.tabBottlePage10 = new System.Windows.Forms.TabPage();
+            this.panelStartBottle_10 = new System.Windows.Forms.Panel();
             this.dgvStartBottle_10 = new System.Windows.Forms.DataGridView();
-            this.panelEndBottole_10 = new System.Windows.Forms.Panel();
+            this.panelEndBottle_10 = new System.Windows.Forms.Panel();
             this.dgvEndBottle_10 = new System.Windows.Forms.DataGridView();
             this.radioButton5 = new System.Windows.Forms.RadioButton();
             this.rdoForwardBottle_10 = new System.Windows.Forms.RadioButton();
-            this.lblBottoleOrderNo_10 = new System.Windows.Forms.Label();
+            this.lblBottleOrderNo_10 = new System.Windows.Forms.Label();
             this.textBox10 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemName_10 = new System.Windows.Forms.TextBox();
-            this.txtBottoleItemCode_10 = new System.Windows.Forms.TextBox();
-            this.txtBottoleLotNo_10 = new System.Windows.Forms.TextBox();
-            this.lblBottoleItemName_10 = new System.Windows.Forms.Label();
+            this.txtBottleItemName_10 = new System.Windows.Forms.TextBox();
+            this.txtBottleItemCode_10 = new System.Windows.Forms.TextBox();
+            this.txtBottleLotNo_10 = new System.Windows.Forms.TextBox();
+            this.lblBottleItemName_10 = new System.Windows.Forms.Label();
             this.lblBottleItemCode_10 = new System.Windows.Forms.Label();
             this.lblBottleLotNo_10 = new System.Windows.Forms.Label();
-            this.lblTargetBottole_10 = new System.Windows.Forms.Label();
+            this.lblTargetBottle_10 = new System.Windows.Forms.Label();
             this.timeCheck_10 = new System.Windows.Forms.CheckBox();
             this.dateTimePicker5 = new System.Windows.Forms.DateTimePicker();
             this.label18 = new System.Windows.Forms.Label();
-            this.endBottoleTime_10 = new System.Windows.Forms.DateTimePicker();
+            this.endBottleTime_10 = new System.Windows.Forms.DateTimePicker();
             this.btnClearBottle_10 = new System.Windows.Forms.Button();
             this.btnCsvOutputBottle_10 = new System.Windows.Forms.Button();
             this.btnTraceSearch_10 = new System.Windows.Forms.Button();
-            this.bottoleTitle = new System.Windows.Forms.Label();
-            this.rdoBottoleTabNameItemCode = new System.Windows.Forms.RadioButton();
-            this.selectBottole = new System.Windows.Forms.Label();
-            this.rdoBottoleTabNameOrder = new System.Windows.Forms.RadioButton();
-            this.btnBottoleExcelOutput = new System.Windows.Forms.Button();
-            this.btnBottoleDetectCrossPoints = new System.Windows.Forms.Button();
-            this.checkBottole1 = new System.Windows.Forms.CheckBox();
-            this.checkBottole2 = new System.Windows.Forms.CheckBox();
-            this.checkBottole3 = new System.Windows.Forms.CheckBox();
-            this.checkBottole4 = new System.Windows.Forms.CheckBox();
-            this.checkBottole5 = new System.Windows.Forms.CheckBox();
-            this.checkBottole6 = new System.Windows.Forms.CheckBox();
-            this.checkBottole7 = new System.Windows.Forms.CheckBox();
-            this.checkBottole8 = new System.Windows.Forms.CheckBox();
-            this.checkBottole9 = new System.Windows.Forms.CheckBox();
-            this.checkBottole10 = new System.Windows.Forms.CheckBox();
-            this.bottoleIntersectionTab.SuspendLayout();
+            this.BottleTitle = new System.Windows.Forms.Label();
+            this.rdoBottleTabNameItemCode = new System.Windows.Forms.RadioButton();
+            this.selectBottle = new System.Windows.Forms.Label();
+            this.rdoBottleTabNameOrder = new System.Windows.Forms.RadioButton();
+            this.btnBottleExcelOutput = new System.Windows.Forms.Button();
+            this.btnBottleDetectCrossPoints = new System.Windows.Forms.Button();
+            this.checkBottle1 = new System.Windows.Forms.CheckBox();
+            this.checkBottle2 = new System.Windows.Forms.CheckBox();
+            this.checkBottle3 = new System.Windows.Forms.CheckBox();
+            this.checkBottle4 = new System.Windows.Forms.CheckBox();
+            this.checkBottle5 = new System.Windows.Forms.CheckBox();
+            this.checkBottle6 = new System.Windows.Forms.CheckBox();
+            this.checkBottle7 = new System.Windows.Forms.CheckBox();
+            this.checkBottle8 = new System.Windows.Forms.CheckBox();
+            this.checkBottle9 = new System.Windows.Forms.CheckBox();
+            this.checkBottle10 = new System.Windows.Forms.CheckBox();
+            this.BottleIntersectionTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridIntersection)).BeginInit();
-            this.tabBottolePage2.SuspendLayout();
+            this.tabBottlePage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_2)).BeginInit();
             this.swichBottleTab.SuspendLayout();
-            this.tabBottolePage1.SuspendLayout();
+            this.tabBottlePage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle)).BeginInit();
-            this.tabBottolePage3.SuspendLayout();
+            this.tabBottlePage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_3)).BeginInit();
-            this.tabBottolePage4.SuspendLayout();
+            this.tabBottlePage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_4)).BeginInit();
-            this.tabBottolePage5.SuspendLayout();
+            this.tabBottlePage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_5)).BeginInit();
-            this.tabBottolePage6.SuspendLayout();
+            this.tabBottlePage6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_6)).BeginInit();
-            this.tabBottolePage7.SuspendLayout();
+            this.tabBottlePage7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_7)).BeginInit();
-            this.tabBottolePage8.SuspendLayout();
+            this.tabBottlePage8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_8)).BeginInit();
-            this.tabBottolePage9.SuspendLayout();
+            this.tabBottlePage9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_9)).BeginInit();
-            this.tabBottolePage10.SuspendLayout();
+            this.tabBottlePage10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_10)).BeginInit();
             this.SuspendLayout();
@@ -314,16 +314,16 @@ namespace LotTraceApp
             this.btnBackToLiquid.Text = "液設備";
             this.btnBackToLiquid.Click += new System.EventHandler(this.btnBackToLiquid_Click);
             // 
-            // bottoleIntersectionTab
+            // BottleIntersectionTab
             // 
-            this.bottoleIntersectionTab.Controls.Add(this.dataGridIntersection);
-            this.bottoleIntersectionTab.Location = new System.Drawing.Point(4, 34);
-            this.bottoleIntersectionTab.Name = "bottoleIntersectionTab";
-            this.bottoleIntersectionTab.Padding = new System.Windows.Forms.Padding(3);
-            this.bottoleIntersectionTab.Size = new System.Drawing.Size(1896, 902);
-            this.bottoleIntersectionTab.TabIndex = 3;
-            this.bottoleIntersectionTab.Text = "交点検出結果";
-            this.bottoleIntersectionTab.UseVisualStyleBackColor = true;
+            this.BottleIntersectionTab.Controls.Add(this.dataGridIntersection);
+            this.BottleIntersectionTab.Location = new System.Drawing.Point(4, 34);
+            this.BottleIntersectionTab.Name = "BottleIntersectionTab";
+            this.BottleIntersectionTab.Padding = new System.Windows.Forms.Padding(3);
+            this.BottleIntersectionTab.Size = new System.Drawing.Size(1896, 902);
+            this.BottleIntersectionTab.TabIndex = 3;
+            this.BottleIntersectionTab.Text = "交点検出結果";
+            this.BottleIntersectionTab.UseVisualStyleBackColor = true;
             // 
             // dataGridIntersection
             // 
@@ -337,38 +337,38 @@ namespace LotTraceApp
             this.dataGridIntersection.Size = new System.Drawing.Size(1864, 870);
             this.dataGridIntersection.TabIndex = 0;
             // 
-            // tabBottolePage2
+            // tabBottlePage2
             // 
-            this.tabBottolePage2.Controls.Add(this.dgvStartBottle_2);
-            this.tabBottolePage2.Controls.Add(this.dgvEndBottle_2);
-            this.tabBottolePage2.Controls.Add(this.rdoBackwardBottle_2);
-            this.tabBottolePage2.Controls.Add(this.rdoForwardBottle_2);
-            this.tabBottolePage2.Controls.Add(this.lblBottoleOrderNo_2);
-            this.tabBottolePage2.Controls.Add(this.panelStartBottole_2);
-            this.tabBottolePage2.Controls.Add(this.panelEndBottole_2);
-            this.tabBottolePage2.Controls.Add(this.txtBottoleOrderNo_2);
-            this.tabBottolePage2.Controls.Add(this.txtBottoleItemName_2);
-            this.tabBottolePage2.Controls.Add(this.txtBottoleItemCode_2);
-            this.tabBottolePage2.Controls.Add(this.txtBottoleLotNo_2);
-            this.tabBottolePage2.Controls.Add(this.lblBottoleItemName_2);
-            this.tabBottolePage2.Controls.Add(this.lblBottleItemCode_2);
-            this.tabBottolePage2.Controls.Add(this.lblBottleLotNo_2);
-            this.tabBottolePage2.Controls.Add(this.lblTargetBottole_2);
-            this.tabBottolePage2.Controls.Add(this.timeCheck_2);
-            this.tabBottolePage2.Controls.Add(this.startBottoleTime_2);
-            this.tabBottolePage2.Controls.Add(this.lblBottole_2);
-            this.tabBottolePage2.Controls.Add(this.endBottoleTime_2);
-            this.tabBottolePage2.Controls.Add(this.btnClearBottole_2);
-            this.tabBottolePage2.Controls.Add(this.btnCsvOutputBottole_2);
-            this.tabBottolePage2.Controls.Add(this.btnBottoleTraceSearch_2);
-            this.tabBottolePage2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage2.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage2.Name = "tabBottolePage2";
-            this.tabBottolePage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage2.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage2.TabIndex = 13;
-            this.tabBottolePage2.Text = "(02)_未設定";
-            this.tabBottolePage2.UseVisualStyleBackColor = true;
+            this.tabBottlePage2.Controls.Add(this.dgvStartBottle_2);
+            this.tabBottlePage2.Controls.Add(this.dgvEndBottle_2);
+            this.tabBottlePage2.Controls.Add(this.rdoBackwardBottle_2);
+            this.tabBottlePage2.Controls.Add(this.rdoForwardBottle_2);
+            this.tabBottlePage2.Controls.Add(this.lblBottleOrderNo_2);
+            this.tabBottlePage2.Controls.Add(this.panelStartBottle_2);
+            this.tabBottlePage2.Controls.Add(this.panelEndBottle_2);
+            this.tabBottlePage2.Controls.Add(this.txtBottleOrderNo_2);
+            this.tabBottlePage2.Controls.Add(this.txtBottleItemName_2);
+            this.tabBottlePage2.Controls.Add(this.txtBottleItemCode_2);
+            this.tabBottlePage2.Controls.Add(this.txtBottleLotNo_2);
+            this.tabBottlePage2.Controls.Add(this.lblBottleItemName_2);
+            this.tabBottlePage2.Controls.Add(this.lblBottleItemCode_2);
+            this.tabBottlePage2.Controls.Add(this.lblBottleLotNo_2);
+            this.tabBottlePage2.Controls.Add(this.lblTargetBottle_2);
+            this.tabBottlePage2.Controls.Add(this.timeCheck_2);
+            this.tabBottlePage2.Controls.Add(this.startBottleTime_2);
+            this.tabBottlePage2.Controls.Add(this.lblBottle_2);
+            this.tabBottlePage2.Controls.Add(this.endBottleTime_2);
+            this.tabBottlePage2.Controls.Add(this.btnClearBottle_2);
+            this.tabBottlePage2.Controls.Add(this.btnCsvOutputBottle_2);
+            this.tabBottlePage2.Controls.Add(this.btnBottleTraceSearch_2);
+            this.tabBottlePage2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage2.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage2.Name = "tabBottlePage2";
+            this.tabBottlePage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage2.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage2.TabIndex = 13;
+            this.tabBottlePage2.Text = "(02)_未設定";
+            this.tabBottlePage2.UseVisualStyleBackColor = true;
             // 
             // dgvStartBottle_2
             // 
@@ -408,71 +408,71 @@ namespace LotTraceApp
             this.rdoForwardBottle_2.TabStop = true;
             this.rdoForwardBottle_2.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_2
+            // lblBottleOrderNo_2
             // 
-            this.lblBottoleOrderNo_2.AutoSize = true;
-            this.lblBottoleOrderNo_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_2.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_2.Name = "lblBottoleOrderNo_2";
-            this.lblBottoleOrderNo_2.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_2.TabIndex = 1;
-            this.lblBottoleOrderNo_2.Text = "製造指図番号";
+            this.lblBottleOrderNo_2.AutoSize = true;
+            this.lblBottleOrderNo_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_2.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_2.Name = "lblBottleOrderNo_2";
+            this.lblBottleOrderNo_2.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_2.TabIndex = 1;
+            this.lblBottleOrderNo_2.Text = "製造指図番号";
             // 
-            // panelStartBottole_2
+            // panelStartBottle_2
             // 
-            this.panelStartBottole_2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_2.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_2.Name = "panelStartBottole_2";
-            this.panelStartBottole_2.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_2.TabIndex = 28;
+            this.panelStartBottle_2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_2.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_2.Name = "panelStartBottle_2";
+            this.panelStartBottle_2.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_2.TabIndex = 28;
             // 
-            // panelEndBottole_2
+            // panelEndBottle_2
             // 
-            this.panelEndBottole_2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_2.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_2.Name = "panelEndBottole_2";
-            this.panelEndBottole_2.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_2.TabIndex = 30;
+            this.panelEndBottle_2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_2.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_2.Name = "panelEndBottle_2";
+            this.panelEndBottle_2.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_2.TabIndex = 30;
             // 
-            // txtBottoleOrderNo_2
+            // txtBottleOrderNo_2
             // 
-            this.txtBottoleOrderNo_2.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_2.Name = "txtBottoleOrderNo_2";
-            this.txtBottoleOrderNo_2.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_2.TabIndex = 2;
+            this.txtBottleOrderNo_2.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_2.Name = "txtBottleOrderNo_2";
+            this.txtBottleOrderNo_2.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_2.TabIndex = 2;
             // 
-            // txtBottoleItemName_2
+            // txtBottleItemName_2
             // 
-            this.txtBottoleItemName_2.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_2.Name = "txtBottoleItemName_2";
-            this.txtBottoleItemName_2.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_2.TabIndex = 4;
+            this.txtBottleItemName_2.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_2.Name = "txtBottleItemName_2";
+            this.txtBottleItemName_2.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_2.TabIndex = 4;
             // 
-            // txtBottoleItemCode_2
+            // txtBottleItemCode_2
             // 
-            this.txtBottoleItemCode_2.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_2.Name = "txtBottoleItemCode_2";
-            this.txtBottoleItemCode_2.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_2.TabIndex = 6;
+            this.txtBottleItemCode_2.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_2.Name = "txtBottleItemCode_2";
+            this.txtBottleItemCode_2.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_2.TabIndex = 6;
             // 
-            // txtBottoleLotNo_2
+            // txtBottleLotNo_2
             // 
-            this.txtBottoleLotNo_2.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_2.Name = "txtBottoleLotNo_2";
-            this.txtBottoleLotNo_2.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_2.TabIndex = 8;
+            this.txtBottleLotNo_2.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_2.Name = "txtBottleLotNo_2";
+            this.txtBottleLotNo_2.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_2.TabIndex = 8;
             // 
-            // lblBottoleItemName_2
+            // lblBottleItemName_2
             // 
-            this.lblBottoleItemName_2.AutoSize = true;
-            this.lblBottoleItemName_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_2.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_2.Name = "lblBottoleItemName_2";
-            this.lblBottoleItemName_2.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_2.TabIndex = 3;
-            this.lblBottoleItemName_2.Text = "品目名";
+            this.lblBottleItemName_2.AutoSize = true;
+            this.lblBottleItemName_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_2.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_2.Name = "lblBottleItemName_2";
+            this.lblBottleItemName_2.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_2.TabIndex = 3;
+            this.lblBottleItemName_2.Text = "品目名";
             // 
             // lblBottleItemCode_2
             // 
@@ -494,15 +494,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_2.TabIndex = 7;
             this.lblBottleLotNo_2.Text = "ロット番号";
             // 
-            // lblTargetBottole_2
+            // lblTargetBottle_2
             // 
-            this.lblTargetBottole_2.AutoSize = true;
-            this.lblTargetBottole_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_2.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_2.Name = "lblTargetBottole_2";
-            this.lblTargetBottole_2.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_2.TabIndex = 9;
-            this.lblTargetBottole_2.Text = "対象期間";
+            this.lblTargetBottle_2.AutoSize = true;
+            this.lblTargetBottle_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_2.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_2.Name = "lblTargetBottle_2";
+            this.lblTargetBottle_2.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_2.TabIndex = 9;
+            this.lblTargetBottle_2.Text = "対象期間";
             // 
             // timeCheck_2
             // 
@@ -511,76 +511,76 @@ namespace LotTraceApp
             this.timeCheck_2.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_2.TabIndex = 10;
             // 
-            // startBottoleTime_2
+            // startBottleTime_2
             // 
-            this.startBottoleTime_2.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_2.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_2.Name = "startBottoleTime_2";
-            this.startBottoleTime_2.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_2.TabIndex = 11;
+            this.startBottleTime_2.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_2.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_2.Name = "startBottleTime_2";
+            this.startBottleTime_2.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_2.TabIndex = 11;
             // 
-            // lblBottole_2
+            // lblBottle_2
             // 
-            this.lblBottole_2.AutoSize = true;
-            this.lblBottole_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_2.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_2.Name = "lblBottole_2";
-            this.lblBottole_2.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_2.TabIndex = 12;
-            this.lblBottole_2.Text = "～";
+            this.lblBottle_2.AutoSize = true;
+            this.lblBottle_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_2.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_2.Name = "lblBottle_2";
+            this.lblBottle_2.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_2.TabIndex = 12;
+            this.lblBottle_2.Text = "～";
             // 
-            // endBottoleTime_2
+            // endBottleTime_2
             // 
-            this.endBottoleTime_2.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_2.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_2.Name = "endBottoleTime_2";
-            this.endBottoleTime_2.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_2.TabIndex = 14;
+            this.endBottleTime_2.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_2.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_2.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_2.Name = "endBottleTime_2";
+            this.endBottleTime_2.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_2.TabIndex = 14;
             // 
-            // btnClearBottole_2
+            // btnClearBottle_2
             // 
-            this.btnClearBottole_2.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.btnClearBottole_2.Location = new System.Drawing.Point(1377, 15);
-            this.btnClearBottole_2.Name = "btnClearBottole_2";
-            this.btnClearBottole_2.Size = new System.Drawing.Size(150, 50);
-            this.btnClearBottole_2.TabIndex = 18;
-            this.btnClearBottole_2.Text = "クリア";
+            this.btnClearBottle_2.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.btnClearBottle_2.Location = new System.Drawing.Point(1377, 15);
+            this.btnClearBottle_2.Name = "btnClearBottle_2";
+            this.btnClearBottle_2.Size = new System.Drawing.Size(150, 50);
+            this.btnClearBottle_2.TabIndex = 18;
+            this.btnClearBottle_2.Text = "クリア";
             // 
-            // btnCsvOutputBottole_2
+            // btnCsvOutputBottle_2
             // 
-            this.btnCsvOutputBottole_2.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.btnCsvOutputBottole_2.Location = new System.Drawing.Point(1548, 15);
-            this.btnCsvOutputBottole_2.Name = "btnCsvOutputBottole_2";
-            this.btnCsvOutputBottole_2.Size = new System.Drawing.Size(150, 50);
-            this.btnCsvOutputBottole_2.TabIndex = 19;
-            this.btnCsvOutputBottole_2.Text = "CSV出力";
+            this.btnCsvOutputBottle_2.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.btnCsvOutputBottle_2.Location = new System.Drawing.Point(1548, 15);
+            this.btnCsvOutputBottle_2.Name = "btnCsvOutputBottle_2";
+            this.btnCsvOutputBottle_2.Size = new System.Drawing.Size(150, 50);
+            this.btnCsvOutputBottle_2.TabIndex = 19;
+            this.btnCsvOutputBottle_2.Text = "CSV出力";
             // 
-            // btnBottoleTraceSearch_2
+            // btnBottleTraceSearch_2
             // 
-            this.btnBottoleTraceSearch_2.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.btnBottoleTraceSearch_2.Location = new System.Drawing.Point(1720, 15);
-            this.btnBottoleTraceSearch_2.Name = "btnBottoleTraceSearch_2";
-            this.btnBottoleTraceSearch_2.Size = new System.Drawing.Size(150, 50);
-            this.btnBottoleTraceSearch_2.TabIndex = 22;
-            this.btnBottoleTraceSearch_2.Text = "トレース検索";
+            this.btnBottleTraceSearch_2.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.btnBottleTraceSearch_2.Location = new System.Drawing.Point(1720, 15);
+            this.btnBottleTraceSearch_2.Name = "btnBottleTraceSearch_2";
+            this.btnBottleTraceSearch_2.Size = new System.Drawing.Size(150, 50);
+            this.btnBottleTraceSearch_2.TabIndex = 22;
+            this.btnBottleTraceSearch_2.Text = "トレース検索";
             // 
             // swichBottleTab
             // 
-            this.swichBottleTab.Controls.Add(this.tabBottolePage1);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage2);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage3);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage4);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage5);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage6);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage7);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage8);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage9);
-            this.swichBottleTab.Controls.Add(this.tabBottolePage10);
-            this.swichBottleTab.Controls.Add(this.bottoleIntersectionTab);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage1);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage2);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage3);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage4);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage5);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage6);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage7);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage8);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage9);
+            this.swichBottleTab.Controls.Add(this.tabBottlePage10);
+            this.swichBottleTab.Controls.Add(this.BottleIntersectionTab);
             this.swichBottleTab.Font = new System.Drawing.Font("游ゴシック", 10F);
             this.swichBottleTab.ItemSize = new System.Drawing.Size(172, 30);
             this.swichBottleTab.Location = new System.Drawing.Point(8, 85);
@@ -590,47 +590,47 @@ namespace LotTraceApp
             this.swichBottleTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.swichBottleTab.TabIndex = 49;
             // 
-            // tabBottolePage1
+            // tabBottlePage1
             // 
-            this.tabBottolePage1.Controls.Add(this.panelStartBottole);
-            this.tabBottolePage1.Controls.Add(this.dgvStartBottle);
-            this.tabBottolePage1.Controls.Add(this.panelEndBottole);
-            this.tabBottolePage1.Controls.Add(this.dgvEndBottle);
-            this.tabBottolePage1.Controls.Add(this.rdoBackwardBottle);
-            this.tabBottolePage1.Controls.Add(this.rdoForwardBottle);
-            this.tabBottolePage1.Controls.Add(this.lblBottoleOrderNo);
-            this.tabBottolePage1.Controls.Add(this.txtBottoleOrderNo);
-            this.tabBottolePage1.Controls.Add(this.txtBottoleItemName);
-            this.tabBottolePage1.Controls.Add(this.txtBottoleItemCode);
-            this.tabBottolePage1.Controls.Add(this.txtBottoleLotNo);
-            this.tabBottolePage1.Controls.Add(this.lblBottoleItemName);
-            this.tabBottolePage1.Controls.Add(this.lblBottleItemCode);
-            this.tabBottolePage1.Controls.Add(this.lblBottleLotNo);
-            this.tabBottolePage1.Controls.Add(this.lblTargetBottole);
-            this.tabBottolePage1.Controls.Add(this.timeCheck);
-            this.tabBottolePage1.Controls.Add(this.startBottoleTime);
-            this.tabBottolePage1.Controls.Add(this.lblTilde);
-            this.tabBottolePage1.Controls.Add(this.endBottoleTime);
-            this.tabBottolePage1.Controls.Add(this.btnClearBottle);
-            this.tabBottolePage1.Controls.Add(this.btnCsvOutputBottle);
-            this.tabBottolePage1.Controls.Add(this.btnBottoleTraceSearch);
-            this.tabBottolePage1.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage1.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage1.Name = "tabBottolePage1";
-            this.tabBottolePage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage1.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage1.TabIndex = 0;
-            this.tabBottolePage1.Text = "(01)_未設定";
-            this.tabBottolePage1.UseVisualStyleBackColor = true;
+            this.tabBottlePage1.Controls.Add(this.panelStartBottle);
+            this.tabBottlePage1.Controls.Add(this.dgvStartBottle);
+            this.tabBottlePage1.Controls.Add(this.panelEndBottle);
+            this.tabBottlePage1.Controls.Add(this.dgvEndBottle);
+            this.tabBottlePage1.Controls.Add(this.rdoBackwardBottle);
+            this.tabBottlePage1.Controls.Add(this.rdoForwardBottle);
+            this.tabBottlePage1.Controls.Add(this.lblBottleOrderNo);
+            this.tabBottlePage1.Controls.Add(this.txtBottleOrderNo);
+            this.tabBottlePage1.Controls.Add(this.txtBottleItemName);
+            this.tabBottlePage1.Controls.Add(this.txtBottleItemCode);
+            this.tabBottlePage1.Controls.Add(this.txtBottleLotNo);
+            this.tabBottlePage1.Controls.Add(this.lblBottleItemName);
+            this.tabBottlePage1.Controls.Add(this.lblBottleItemCode);
+            this.tabBottlePage1.Controls.Add(this.lblBottleLotNo);
+            this.tabBottlePage1.Controls.Add(this.lblTargetBottle);
+            this.tabBottlePage1.Controls.Add(this.timeCheck);
+            this.tabBottlePage1.Controls.Add(this.startBottleTime);
+            this.tabBottlePage1.Controls.Add(this.lblTilde);
+            this.tabBottlePage1.Controls.Add(this.endBottleTime);
+            this.tabBottlePage1.Controls.Add(this.btnClearBottle);
+            this.tabBottlePage1.Controls.Add(this.btnCsvOutputBottle);
+            this.tabBottlePage1.Controls.Add(this.btnBottleTraceSearch);
+            this.tabBottlePage1.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage1.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage1.Name = "tabBottlePage1";
+            this.tabBottlePage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage1.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage1.TabIndex = 0;
+            this.tabBottlePage1.Text = "(01)_未設定";
+            this.tabBottlePage1.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole
+            // panelStartBottle
             // 
-            this.panelStartBottole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole.Name = "panelStartBottole";
-            this.panelStartBottole.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole.TabIndex = 28;
+            this.panelStartBottle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle.Name = "panelStartBottle";
+            this.panelStartBottle.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle.TabIndex = 28;
             // 
             // dgvStartBottle
             // 
@@ -641,14 +641,14 @@ namespace LotTraceApp
             this.dgvStartBottle.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle.TabIndex = 29;
             // 
-            // panelEndBottole
+            // panelEndBottle
             // 
-            this.panelEndBottole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole.Name = "panelEndBottole";
-            this.panelEndBottole.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole.TabIndex = 30;
+            this.panelEndBottle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle.Name = "panelEndBottle";
+            this.panelEndBottle.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle.TabIndex = 30;
             // 
             // dgvEndBottle
             // 
@@ -679,53 +679,53 @@ namespace LotTraceApp
             this.rdoForwardBottle.TabStop = true;
             this.rdoForwardBottle.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo
+            // lblBottleOrderNo
             // 
-            this.lblBottoleOrderNo.AutoSize = true;
-            this.lblBottoleOrderNo.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo.Name = "lblBottoleOrderNo";
-            this.lblBottoleOrderNo.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo.TabIndex = 1;
-            this.lblBottoleOrderNo.Text = "製造指図番号";
+            this.lblBottleOrderNo.AutoSize = true;
+            this.lblBottleOrderNo.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo.Name = "lblBottleOrderNo";
+            this.lblBottleOrderNo.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo.TabIndex = 1;
+            this.lblBottleOrderNo.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo
+            // txtBottleOrderNo
             // 
-            this.txtBottoleOrderNo.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo.Name = "txtBottoleOrderNo";
-            this.txtBottoleOrderNo.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo.TabIndex = 2;
+            this.txtBottleOrderNo.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo.Name = "txtBottleOrderNo";
+            this.txtBottleOrderNo.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo.TabIndex = 2;
             // 
-            // txtBottoleItemName
+            // txtBottleItemName
             // 
-            this.txtBottoleItemName.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName.Name = "txtBottoleItemName";
-            this.txtBottoleItemName.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName.TabIndex = 4;
+            this.txtBottleItemName.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName.Name = "txtBottleItemName";
+            this.txtBottleItemName.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName.TabIndex = 4;
             // 
-            // txtBottoleItemCode
+            // txtBottleItemCode
             // 
-            this.txtBottoleItemCode.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode.Name = "txtBottoleItemCode";
-            this.txtBottoleItemCode.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode.TabIndex = 6;
+            this.txtBottleItemCode.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode.Name = "txtBottleItemCode";
+            this.txtBottleItemCode.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode.TabIndex = 6;
             // 
-            // txtBottoleLotNo
+            // txtBottleLotNo
             // 
-            this.txtBottoleLotNo.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo.Name = "txtBottoleLotNo";
-            this.txtBottoleLotNo.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo.TabIndex = 8;
+            this.txtBottleLotNo.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo.Name = "txtBottleLotNo";
+            this.txtBottleLotNo.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo.TabIndex = 8;
             // 
-            // lblBottoleItemName
+            // lblBottleItemName
             // 
-            this.lblBottoleItemName.AutoSize = true;
-            this.lblBottoleItemName.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName.Name = "lblBottoleItemName";
-            this.lblBottoleItemName.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName.TabIndex = 3;
-            this.lblBottoleItemName.Text = "品目名";
+            this.lblBottleItemName.AutoSize = true;
+            this.lblBottleItemName.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName.Name = "lblBottleItemName";
+            this.lblBottleItemName.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName.TabIndex = 3;
+            this.lblBottleItemName.Text = "品目名";
             // 
             // lblBottleItemCode
             // 
@@ -747,15 +747,15 @@ namespace LotTraceApp
             this.lblBottleLotNo.TabIndex = 7;
             this.lblBottleLotNo.Text = "ロット番号";
             // 
-            // lblTargetBottole
+            // lblTargetBottle
             // 
-            this.lblTargetBottole.AutoSize = true;
-            this.lblTargetBottole.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole.Name = "lblTargetBottole";
-            this.lblTargetBottole.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole.TabIndex = 9;
-            this.lblTargetBottole.Text = "対象期間";
+            this.lblTargetBottle.AutoSize = true;
+            this.lblTargetBottle.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle.Name = "lblTargetBottle";
+            this.lblTargetBottle.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle.TabIndex = 9;
+            this.lblTargetBottle.Text = "対象期間";
             // 
             // timeCheck
             // 
@@ -764,15 +764,15 @@ namespace LotTraceApp
             this.timeCheck.Size = new System.Drawing.Size(15, 14);
             this.timeCheck.TabIndex = 10;
             // 
-            // startBottoleTime
+            // startBottleTime
             // 
-            this.startBottoleTime.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime.Name = "startBottoleTime";
-            this.startBottoleTime.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime.TabIndex = 11;
+            this.startBottleTime.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime.Name = "startBottleTime";
+            this.startBottleTime.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime.TabIndex = 11;
             // 
             // lblTilde
             // 
@@ -784,15 +784,15 @@ namespace LotTraceApp
             this.lblTilde.TabIndex = 12;
             this.lblTilde.Text = "～";
             // 
-            // endBottoleTime
+            // endBottleTime
             // 
-            this.endBottoleTime.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime.Name = "endBottoleTime";
-            this.endBottoleTime.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime.TabIndex = 14;
+            this.endBottleTime.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime.Name = "endBottleTime";
+            this.endBottleTime.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime.TabIndex = 14;
             // 
             // btnClearBottle
             // 
@@ -812,56 +812,56 @@ namespace LotTraceApp
             this.btnCsvOutputBottle.TabIndex = 19;
             this.btnCsvOutputBottle.Text = "CSV出力";
             // 
-            // btnBottoleTraceSearch
+            // btnBottleTraceSearch
             // 
-            this.btnBottoleTraceSearch.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.btnBottoleTraceSearch.Location = new System.Drawing.Point(1720, 15);
-            this.btnBottoleTraceSearch.Name = "btnBottoleTraceSearch";
-            this.btnBottoleTraceSearch.Size = new System.Drawing.Size(150, 50);
-            this.btnBottoleTraceSearch.TabIndex = 22;
-            this.btnBottoleTraceSearch.Text = "トレース検索";
+            this.btnBottleTraceSearch.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.btnBottleTraceSearch.Location = new System.Drawing.Point(1720, 15);
+            this.btnBottleTraceSearch.Name = "btnBottleTraceSearch";
+            this.btnBottleTraceSearch.Size = new System.Drawing.Size(150, 50);
+            this.btnBottleTraceSearch.TabIndex = 22;
+            this.btnBottleTraceSearch.Text = "トレース検索";
             // 
-            // tabBottolePage3
+            // tabBottlePage3
             // 
-            this.tabBottolePage3.Controls.Add(this.panelStartBottole_3);
-            this.tabBottolePage3.Controls.Add(this.dgvStartBottle_3);
-            this.tabBottolePage3.Controls.Add(this.panelEndBottole_3);
-            this.tabBottolePage3.Controls.Add(this.dgvEndBottle_3);
-            this.tabBottolePage3.Controls.Add(this.rdoBackwardBottle_3);
-            this.tabBottolePage3.Controls.Add(this.rdoForwardBottle_3);
-            this.tabBottolePage3.Controls.Add(this.lblBottoleOrderNo_3);
-            this.tabBottolePage3.Controls.Add(this.txtBottoleOrderNo_3);
-            this.tabBottolePage3.Controls.Add(this.txtBottoleItemName_3);
-            this.tabBottolePage3.Controls.Add(this.txtBottoleItemCode_3);
-            this.tabBottolePage3.Controls.Add(this.txtBottoleLotNo_3);
-            this.tabBottolePage3.Controls.Add(this.lblBottoleItemName_3);
-            this.tabBottolePage3.Controls.Add(this.lblBottleItemCode_3);
-            this.tabBottolePage3.Controls.Add(this.lblBottleLotNo_3);
-            this.tabBottolePage3.Controls.Add(this.lblTargetBottole_3);
-            this.tabBottolePage3.Controls.Add(this.timeCheck_3);
-            this.tabBottolePage3.Controls.Add(this.startBottoleTime_3);
-            this.tabBottolePage3.Controls.Add(this.lblBottole_3);
-            this.tabBottolePage3.Controls.Add(this.endBottoleTime_3);
-            this.tabBottolePage3.Controls.Add(this.btnClearBottle_3);
-            this.tabBottolePage3.Controls.Add(this.btnCsvOutputBottle_3);
-            this.tabBottolePage3.Controls.Add(this.btnTraceSearch_3);
-            this.tabBottolePage3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage3.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage3.Name = "tabBottolePage3";
-            this.tabBottolePage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage3.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage3.TabIndex = 14;
-            this.tabBottolePage3.Text = "(03)_未設定";
-            this.tabBottolePage3.UseVisualStyleBackColor = true;
+            this.tabBottlePage3.Controls.Add(this.panelStartBottle_3);
+            this.tabBottlePage3.Controls.Add(this.dgvStartBottle_3);
+            this.tabBottlePage3.Controls.Add(this.panelEndBottle_3);
+            this.tabBottlePage3.Controls.Add(this.dgvEndBottle_3);
+            this.tabBottlePage3.Controls.Add(this.rdoBackwardBottle_3);
+            this.tabBottlePage3.Controls.Add(this.rdoForwardBottle_3);
+            this.tabBottlePage3.Controls.Add(this.lblBottleOrderNo_3);
+            this.tabBottlePage3.Controls.Add(this.txtBottleOrderNo_3);
+            this.tabBottlePage3.Controls.Add(this.txtBottleItemName_3);
+            this.tabBottlePage3.Controls.Add(this.txtBottleItemCode_3);
+            this.tabBottlePage3.Controls.Add(this.txtBottleLotNo_3);
+            this.tabBottlePage3.Controls.Add(this.lblBottleItemName_3);
+            this.tabBottlePage3.Controls.Add(this.lblBottleItemCode_3);
+            this.tabBottlePage3.Controls.Add(this.lblBottleLotNo_3);
+            this.tabBottlePage3.Controls.Add(this.lblTargetBottle_3);
+            this.tabBottlePage3.Controls.Add(this.timeCheck_3);
+            this.tabBottlePage3.Controls.Add(this.startBottleTime_3);
+            this.tabBottlePage3.Controls.Add(this.lblBottle_3);
+            this.tabBottlePage3.Controls.Add(this.endBottleTime_3);
+            this.tabBottlePage3.Controls.Add(this.btnClearBottle_3);
+            this.tabBottlePage3.Controls.Add(this.btnCsvOutputBottle_3);
+            this.tabBottlePage3.Controls.Add(this.btnTraceSearch_3);
+            this.tabBottlePage3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage3.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage3.Name = "tabBottlePage3";
+            this.tabBottlePage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage3.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage3.TabIndex = 14;
+            this.tabBottlePage3.Text = "(03)_未設定";
+            this.tabBottlePage3.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_3
+            // panelStartBottle_3
             // 
-            this.panelStartBottole_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_3.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_3.Name = "panelStartBottole_3";
-            this.panelStartBottole_3.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_3.TabIndex = 28;
+            this.panelStartBottle_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_3.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_3.Name = "panelStartBottle_3";
+            this.panelStartBottle_3.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_3.TabIndex = 28;
             // 
             // dgvStartBottle_3
             // 
@@ -872,14 +872,14 @@ namespace LotTraceApp
             this.dgvStartBottle_3.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_3.TabIndex = 29;
             // 
-            // panelEndBottole_3
+            // panelEndBottle_3
             // 
-            this.panelEndBottole_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_3.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_3.Name = "panelEndBottole_3";
-            this.panelEndBottole_3.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_3.TabIndex = 30;
+            this.panelEndBottle_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_3.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_3.Name = "panelEndBottle_3";
+            this.panelEndBottle_3.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_3.TabIndex = 30;
             // 
             // dgvEndBottle_3
             // 
@@ -910,53 +910,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_3.TabStop = true;
             this.rdoForwardBottle_3.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_3
+            // lblBottleOrderNo_3
             // 
-            this.lblBottoleOrderNo_3.AutoSize = true;
-            this.lblBottoleOrderNo_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_3.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_3.Name = "lblBottoleOrderNo_3";
-            this.lblBottoleOrderNo_3.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_3.TabIndex = 1;
-            this.lblBottoleOrderNo_3.Text = "製造指図番号";
+            this.lblBottleOrderNo_3.AutoSize = true;
+            this.lblBottleOrderNo_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_3.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_3.Name = "lblBottleOrderNo_3";
+            this.lblBottleOrderNo_3.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_3.TabIndex = 1;
+            this.lblBottleOrderNo_3.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_3
+            // txtBottleOrderNo_3
             // 
-            this.txtBottoleOrderNo_3.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_3.Name = "txtBottoleOrderNo_3";
-            this.txtBottoleOrderNo_3.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_3.TabIndex = 2;
+            this.txtBottleOrderNo_3.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_3.Name = "txtBottleOrderNo_3";
+            this.txtBottleOrderNo_3.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_3.TabIndex = 2;
             // 
-            // txtBottoleItemName_3
+            // txtBottleItemName_3
             // 
-            this.txtBottoleItemName_3.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_3.Name = "txtBottoleItemName_3";
-            this.txtBottoleItemName_3.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_3.TabIndex = 4;
+            this.txtBottleItemName_3.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_3.Name = "txtBottleItemName_3";
+            this.txtBottleItemName_3.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_3.TabIndex = 4;
             // 
-            // txtBottoleItemCode_3
+            // txtBottleItemCode_3
             // 
-            this.txtBottoleItemCode_3.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_3.Name = "txtBottoleItemCode_3";
-            this.txtBottoleItemCode_3.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_3.TabIndex = 6;
+            this.txtBottleItemCode_3.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_3.Name = "txtBottleItemCode_3";
+            this.txtBottleItemCode_3.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_3.TabIndex = 6;
             // 
-            // txtBottoleLotNo_3
+            // txtBottleLotNo_3
             // 
-            this.txtBottoleLotNo_3.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_3.Name = "txtBottoleLotNo_3";
-            this.txtBottoleLotNo_3.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_3.TabIndex = 8;
+            this.txtBottleLotNo_3.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_3.Name = "txtBottleLotNo_3";
+            this.txtBottleLotNo_3.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_3.TabIndex = 8;
             // 
-            // lblBottoleItemName_3
+            // lblBottleItemName_3
             // 
-            this.lblBottoleItemName_3.AutoSize = true;
-            this.lblBottoleItemName_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_3.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_3.Name = "lblBottoleItemName_3";
-            this.lblBottoleItemName_3.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_3.TabIndex = 3;
-            this.lblBottoleItemName_3.Text = "品目名";
+            this.lblBottleItemName_3.AutoSize = true;
+            this.lblBottleItemName_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_3.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_3.Name = "lblBottleItemName_3";
+            this.lblBottleItemName_3.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_3.TabIndex = 3;
+            this.lblBottleItemName_3.Text = "品目名";
             // 
             // lblBottleItemCode_3
             // 
@@ -978,15 +978,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_3.TabIndex = 7;
             this.lblBottleLotNo_3.Text = "ロット番号";
             // 
-            // lblTargetBottole_3
+            // lblTargetBottle_3
             // 
-            this.lblTargetBottole_3.AutoSize = true;
-            this.lblTargetBottole_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_3.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_3.Name = "lblTargetBottole_3";
-            this.lblTargetBottole_3.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_3.TabIndex = 9;
-            this.lblTargetBottole_3.Text = "対象期間";
+            this.lblTargetBottle_3.AutoSize = true;
+            this.lblTargetBottle_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_3.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_3.Name = "lblTargetBottle_3";
+            this.lblTargetBottle_3.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_3.TabIndex = 9;
+            this.lblTargetBottle_3.Text = "対象期間";
             // 
             // timeCheck_3
             // 
@@ -995,35 +995,35 @@ namespace LotTraceApp
             this.timeCheck_3.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_3.TabIndex = 10;
             // 
-            // startBottoleTime_3
+            // startBottleTime_3
             // 
-            this.startBottoleTime_3.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_3.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_3.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_3.Name = "startBottoleTime_3";
-            this.startBottoleTime_3.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_3.TabIndex = 11;
+            this.startBottleTime_3.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_3.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_3.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_3.Name = "startBottleTime_3";
+            this.startBottleTime_3.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_3.TabIndex = 11;
             // 
-            // lblBottole_3
+            // lblBottle_3
             // 
-            this.lblBottole_3.AutoSize = true;
-            this.lblBottole_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_3.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_3.Name = "lblBottole_3";
-            this.lblBottole_3.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_3.TabIndex = 12;
-            this.lblBottole_3.Text = "～";
+            this.lblBottle_3.AutoSize = true;
+            this.lblBottle_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_3.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_3.Name = "lblBottle_3";
+            this.lblBottle_3.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_3.TabIndex = 12;
+            this.lblBottle_3.Text = "～";
             // 
-            // endBottoleTime_3
+            // endBottleTime_3
             // 
-            this.endBottoleTime_3.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_3.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_3.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_3.Name = "endBottoleTime_3";
-            this.endBottoleTime_3.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_3.TabIndex = 14;
+            this.endBottleTime_3.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_3.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_3.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_3.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_3.Name = "endBottleTime_3";
+            this.endBottleTime_3.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_3.TabIndex = 14;
             // 
             // btnClearBottle_3
             // 
@@ -1052,47 +1052,47 @@ namespace LotTraceApp
             this.btnTraceSearch_3.TabIndex = 22;
             this.btnTraceSearch_3.Text = "トレース検索";
             // 
-            // tabBottolePage4
+            // tabBottlePage4
             // 
-            this.tabBottolePage4.Controls.Add(this.panelStartBottole_4);
-            this.tabBottolePage4.Controls.Add(this.dgvStartBottle_4);
-            this.tabBottolePage4.Controls.Add(this.panelEndBottole_4);
-            this.tabBottolePage4.Controls.Add(this.dgvEndBottle_4);
-            this.tabBottolePage4.Controls.Add(this.rdoBackwardBottle_4);
-            this.tabBottolePage4.Controls.Add(this.rdoForwardBottle_4);
-            this.tabBottolePage4.Controls.Add(this.lblOrderNumber_4);
-            this.tabBottolePage4.Controls.Add(this.txtBottoleOrderNo_4);
-            this.tabBottolePage4.Controls.Add(this.textBox7);
-            this.tabBottolePage4.Controls.Add(this.txtBottoleItemCode_4);
-            this.tabBottolePage4.Controls.Add(this.txtBottoleLotNo_4);
-            this.tabBottolePage4.Controls.Add(this.lblBottoleItemName_4);
-            this.tabBottolePage4.Controls.Add(this.lblBottleItemCode_4);
-            this.tabBottolePage4.Controls.Add(this.lblBottleLotNo_4);
-            this.tabBottolePage4.Controls.Add(this.lblTargetBottole_4);
-            this.tabBottolePage4.Controls.Add(this.timeCheck_4);
-            this.tabBottolePage4.Controls.Add(this.startBottoleTime_4);
-            this.tabBottolePage4.Controls.Add(this.lblBottole_4);
-            this.tabBottolePage4.Controls.Add(this.endBottoleTime_4);
-            this.tabBottolePage4.Controls.Add(this.btnClearBottle_4);
-            this.tabBottolePage4.Controls.Add(this.btnCsvOutputBottle_4);
-            this.tabBottolePage4.Controls.Add(this.btnTraceSearch_4);
-            this.tabBottolePage4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage4.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage4.Name = "tabBottolePage4";
-            this.tabBottolePage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage4.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage4.TabIndex = 15;
-            this.tabBottolePage4.Text = "(04)_未設定";
-            this.tabBottolePage4.UseVisualStyleBackColor = true;
+            this.tabBottlePage4.Controls.Add(this.panelStartBottle_4);
+            this.tabBottlePage4.Controls.Add(this.dgvStartBottle_4);
+            this.tabBottlePage4.Controls.Add(this.panelEndBottle_4);
+            this.tabBottlePage4.Controls.Add(this.dgvEndBottle_4);
+            this.tabBottlePage4.Controls.Add(this.rdoBackwardBottle_4);
+            this.tabBottlePage4.Controls.Add(this.rdoForwardBottle_4);
+            this.tabBottlePage4.Controls.Add(this.lblOrderNumber_4);
+            this.tabBottlePage4.Controls.Add(this.txtBottleOrderNo_4);
+            this.tabBottlePage4.Controls.Add(this.textBox7);
+            this.tabBottlePage4.Controls.Add(this.txtBottleItemCode_4);
+            this.tabBottlePage4.Controls.Add(this.txtBottleLotNo_4);
+            this.tabBottlePage4.Controls.Add(this.lblBottleItemName_4);
+            this.tabBottlePage4.Controls.Add(this.lblBottleItemCode_4);
+            this.tabBottlePage4.Controls.Add(this.lblBottleLotNo_4);
+            this.tabBottlePage4.Controls.Add(this.lblTargetBottle_4);
+            this.tabBottlePage4.Controls.Add(this.timeCheck_4);
+            this.tabBottlePage4.Controls.Add(this.startBottleTime_4);
+            this.tabBottlePage4.Controls.Add(this.lblBottle_4);
+            this.tabBottlePage4.Controls.Add(this.endBottleTime_4);
+            this.tabBottlePage4.Controls.Add(this.btnClearBottle_4);
+            this.tabBottlePage4.Controls.Add(this.btnCsvOutputBottle_4);
+            this.tabBottlePage4.Controls.Add(this.btnTraceSearch_4);
+            this.tabBottlePage4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage4.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage4.Name = "tabBottlePage4";
+            this.tabBottlePage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage4.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage4.TabIndex = 15;
+            this.tabBottlePage4.Text = "(04)_未設定";
+            this.tabBottlePage4.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_4
+            // panelStartBottle_4
             // 
-            this.panelStartBottole_4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_4.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_4.Name = "panelStartBottole_4";
-            this.panelStartBottole_4.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_4.TabIndex = 28;
+            this.panelStartBottle_4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_4.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_4.Name = "panelStartBottle_4";
+            this.panelStartBottle_4.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_4.TabIndex = 28;
             // 
             // dgvStartBottle_4
             // 
@@ -1103,14 +1103,14 @@ namespace LotTraceApp
             this.dgvStartBottle_4.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_4.TabIndex = 29;
             // 
-            // panelEndBottole_4
+            // panelEndBottle_4
             // 
-            this.panelEndBottole_4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_4.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_4.Name = "panelEndBottole_4";
-            this.panelEndBottole_4.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_4.TabIndex = 30;
+            this.panelEndBottle_4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_4.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_4.Name = "panelEndBottle_4";
+            this.panelEndBottle_4.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_4.TabIndex = 30;
             // 
             // dgvEndBottle_4
             // 
@@ -1151,12 +1151,12 @@ namespace LotTraceApp
             this.lblOrderNumber_4.TabIndex = 1;
             this.lblOrderNumber_4.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_4
+            // txtBottleOrderNo_4
             // 
-            this.txtBottoleOrderNo_4.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_4.Name = "txtBottoleOrderNo_4";
-            this.txtBottoleOrderNo_4.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_4.TabIndex = 2;
+            this.txtBottleOrderNo_4.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_4.Name = "txtBottleOrderNo_4";
+            this.txtBottleOrderNo_4.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_4.TabIndex = 2;
             // 
             // textBox7
             // 
@@ -1165,29 +1165,29 @@ namespace LotTraceApp
             this.textBox7.Size = new System.Drawing.Size(250, 27);
             this.textBox7.TabIndex = 4;
             // 
-            // txtBottoleItemCode_4
+            // txtBottleItemCode_4
             // 
-            this.txtBottoleItemCode_4.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_4.Name = "txtBottoleItemCode_4";
-            this.txtBottoleItemCode_4.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_4.TabIndex = 6;
+            this.txtBottleItemCode_4.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_4.Name = "txtBottleItemCode_4";
+            this.txtBottleItemCode_4.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_4.TabIndex = 6;
             // 
-            // txtBottoleLotNo_4
+            // txtBottleLotNo_4
             // 
-            this.txtBottoleLotNo_4.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_4.Name = "txtBottoleLotNo_4";
-            this.txtBottoleLotNo_4.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_4.TabIndex = 8;
+            this.txtBottleLotNo_4.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_4.Name = "txtBottleLotNo_4";
+            this.txtBottleLotNo_4.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_4.TabIndex = 8;
             // 
-            // lblBottoleItemName_4
+            // lblBottleItemName_4
             // 
-            this.lblBottoleItemName_4.AutoSize = true;
-            this.lblBottoleItemName_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_4.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_4.Name = "lblBottoleItemName_4";
-            this.lblBottoleItemName_4.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_4.TabIndex = 3;
-            this.lblBottoleItemName_4.Text = "品目名";
+            this.lblBottleItemName_4.AutoSize = true;
+            this.lblBottleItemName_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_4.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_4.Name = "lblBottleItemName_4";
+            this.lblBottleItemName_4.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_4.TabIndex = 3;
+            this.lblBottleItemName_4.Text = "品目名";
             // 
             // lblBottleItemCode_4
             // 
@@ -1209,15 +1209,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_4.TabIndex = 7;
             this.lblBottleLotNo_4.Text = "ロット番号";
             // 
-            // lblTargetBottole_4
+            // lblTargetBottle_4
             // 
-            this.lblTargetBottole_4.AutoSize = true;
-            this.lblTargetBottole_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_4.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_4.Name = "lblTargetBottole_4";
-            this.lblTargetBottole_4.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_4.TabIndex = 9;
-            this.lblTargetBottole_4.Text = "対象期間";
+            this.lblTargetBottle_4.AutoSize = true;
+            this.lblTargetBottle_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_4.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_4.Name = "lblTargetBottle_4";
+            this.lblTargetBottle_4.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_4.TabIndex = 9;
+            this.lblTargetBottle_4.Text = "対象期間";
             // 
             // timeCheck_4
             // 
@@ -1226,35 +1226,35 @@ namespace LotTraceApp
             this.timeCheck_4.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_4.TabIndex = 10;
             // 
-            // startBottoleTime_4
+            // startBottleTime_4
             // 
-            this.startBottoleTime_4.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_4.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_4.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_4.Name = "startBottoleTime_4";
-            this.startBottoleTime_4.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_4.TabIndex = 11;
+            this.startBottleTime_4.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_4.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_4.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_4.Name = "startBottleTime_4";
+            this.startBottleTime_4.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_4.TabIndex = 11;
             // 
-            // lblBottole_4
+            // lblBottle_4
             // 
-            this.lblBottole_4.AutoSize = true;
-            this.lblBottole_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_4.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_4.Name = "lblBottole_4";
-            this.lblBottole_4.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_4.TabIndex = 12;
-            this.lblBottole_4.Text = "～";
+            this.lblBottle_4.AutoSize = true;
+            this.lblBottle_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_4.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_4.Name = "lblBottle_4";
+            this.lblBottle_4.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_4.TabIndex = 12;
+            this.lblBottle_4.Text = "～";
             // 
-            // endBottoleTime_4
+            // endBottleTime_4
             // 
-            this.endBottoleTime_4.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_4.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_4.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_4.Name = "endBottoleTime_4";
-            this.endBottoleTime_4.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_4.TabIndex = 14;
+            this.endBottleTime_4.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_4.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_4.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_4.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_4.Name = "endBottleTime_4";
+            this.endBottleTime_4.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_4.TabIndex = 14;
             // 
             // btnClearBottle_4
             // 
@@ -1283,47 +1283,47 @@ namespace LotTraceApp
             this.btnTraceSearch_4.TabIndex = 22;
             this.btnTraceSearch_4.Text = "トレース検索";
             // 
-            // tabBottolePage5
+            // tabBottlePage5
             // 
-            this.tabBottolePage5.Controls.Add(this.panelStartBottole_5);
-            this.tabBottolePage5.Controls.Add(this.dgvStartBottle_5);
-            this.tabBottolePage5.Controls.Add(this.panelEndBottole_5);
-            this.tabBottolePage5.Controls.Add(this.dgvEndBottle_5);
-            this.tabBottolePage5.Controls.Add(this.rdoBackwardBottle_5);
-            this.tabBottolePage5.Controls.Add(this.rdoForwardBottle_5);
-            this.tabBottolePage5.Controls.Add(this.lblBottoleOrderNo_5);
-            this.tabBottolePage5.Controls.Add(this.txtBottoleOrderNo_5);
-            this.tabBottolePage5.Controls.Add(this.txtBottoleItemName_5);
-            this.tabBottolePage5.Controls.Add(this.txtBottoleItemCode_5);
-            this.tabBottolePage5.Controls.Add(this.txtBottoleLotNo_5);
-            this.tabBottolePage5.Controls.Add(this.lblBottoleItemName_5);
-            this.tabBottolePage5.Controls.Add(this.lblBottleItemCode_5);
-            this.tabBottolePage5.Controls.Add(this.lblBottleLotNo_5);
-            this.tabBottolePage5.Controls.Add(this.lblTargetBottole_5);
-            this.tabBottolePage5.Controls.Add(this.timeCheck_5);
-            this.tabBottolePage5.Controls.Add(this.startBottoleTime_5);
-            this.tabBottolePage5.Controls.Add(this.lblBottole_5);
-            this.tabBottolePage5.Controls.Add(this.endBottoleTime_5);
-            this.tabBottolePage5.Controls.Add(this.btnClearBottle_5);
-            this.tabBottolePage5.Controls.Add(this.btnCsvOutputBottle_5);
-            this.tabBottolePage5.Controls.Add(this.btnTraceSearch_5);
-            this.tabBottolePage5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage5.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage5.Name = "tabBottolePage5";
-            this.tabBottolePage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage5.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage5.TabIndex = 16;
-            this.tabBottolePage5.Text = "(05)_未設定";
-            this.tabBottolePage5.UseVisualStyleBackColor = true;
+            this.tabBottlePage5.Controls.Add(this.panelStartBottle_5);
+            this.tabBottlePage5.Controls.Add(this.dgvStartBottle_5);
+            this.tabBottlePage5.Controls.Add(this.panelEndBottle_5);
+            this.tabBottlePage5.Controls.Add(this.dgvEndBottle_5);
+            this.tabBottlePage5.Controls.Add(this.rdoBackwardBottle_5);
+            this.tabBottlePage5.Controls.Add(this.rdoForwardBottle_5);
+            this.tabBottlePage5.Controls.Add(this.lblBottleOrderNo_5);
+            this.tabBottlePage5.Controls.Add(this.txtBottleOrderNo_5);
+            this.tabBottlePage5.Controls.Add(this.txtBottleItemName_5);
+            this.tabBottlePage5.Controls.Add(this.txtBottleItemCode_5);
+            this.tabBottlePage5.Controls.Add(this.txtBottleLotNo_5);
+            this.tabBottlePage5.Controls.Add(this.lblBottleItemName_5);
+            this.tabBottlePage5.Controls.Add(this.lblBottleItemCode_5);
+            this.tabBottlePage5.Controls.Add(this.lblBottleLotNo_5);
+            this.tabBottlePage5.Controls.Add(this.lblTargetBottle_5);
+            this.tabBottlePage5.Controls.Add(this.timeCheck_5);
+            this.tabBottlePage5.Controls.Add(this.startBottleTime_5);
+            this.tabBottlePage5.Controls.Add(this.lblBottle_5);
+            this.tabBottlePage5.Controls.Add(this.endBottleTime_5);
+            this.tabBottlePage5.Controls.Add(this.btnClearBottle_5);
+            this.tabBottlePage5.Controls.Add(this.btnCsvOutputBottle_5);
+            this.tabBottlePage5.Controls.Add(this.btnTraceSearch_5);
+            this.tabBottlePage5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage5.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage5.Name = "tabBottlePage5";
+            this.tabBottlePage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage5.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage5.TabIndex = 16;
+            this.tabBottlePage5.Text = "(05)_未設定";
+            this.tabBottlePage5.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_5
+            // panelStartBottle_5
             // 
-            this.panelStartBottole_5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_5.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_5.Name = "panelStartBottole_5";
-            this.panelStartBottole_5.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_5.TabIndex = 28;
+            this.panelStartBottle_5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_5.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_5.Name = "panelStartBottle_5";
+            this.panelStartBottle_5.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_5.TabIndex = 28;
             // 
             // dgvStartBottle_5
             // 
@@ -1334,14 +1334,14 @@ namespace LotTraceApp
             this.dgvStartBottle_5.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_5.TabIndex = 29;
             // 
-            // panelEndBottole_5
+            // panelEndBottle_5
             // 
-            this.panelEndBottole_5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_5.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_5.Name = "panelEndBottole_5";
-            this.panelEndBottole_5.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_5.TabIndex = 30;
+            this.panelEndBottle_5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_5.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_5.Name = "panelEndBottle_5";
+            this.panelEndBottle_5.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_5.TabIndex = 30;
             // 
             // dgvEndBottle_5
             // 
@@ -1372,53 +1372,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_5.TabStop = true;
             this.rdoForwardBottle_5.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_5
+            // lblBottleOrderNo_5
             // 
-            this.lblBottoleOrderNo_5.AutoSize = true;
-            this.lblBottoleOrderNo_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_5.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_5.Name = "lblBottoleOrderNo_5";
-            this.lblBottoleOrderNo_5.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_5.TabIndex = 1;
-            this.lblBottoleOrderNo_5.Text = "製造指図番号";
+            this.lblBottleOrderNo_5.AutoSize = true;
+            this.lblBottleOrderNo_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_5.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_5.Name = "lblBottleOrderNo_5";
+            this.lblBottleOrderNo_5.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_5.TabIndex = 1;
+            this.lblBottleOrderNo_5.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_5
+            // txtBottleOrderNo_5
             // 
-            this.txtBottoleOrderNo_5.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_5.Name = "txtBottoleOrderNo_5";
-            this.txtBottoleOrderNo_5.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_5.TabIndex = 2;
+            this.txtBottleOrderNo_5.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_5.Name = "txtBottleOrderNo_5";
+            this.txtBottleOrderNo_5.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_5.TabIndex = 2;
             // 
-            // txtBottoleItemName_5
+            // txtBottleItemName_5
             // 
-            this.txtBottoleItemName_5.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_5.Name = "txtBottoleItemName_5";
-            this.txtBottoleItemName_5.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_5.TabIndex = 4;
+            this.txtBottleItemName_5.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_5.Name = "txtBottleItemName_5";
+            this.txtBottleItemName_5.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_5.TabIndex = 4;
             // 
-            // txtBottoleItemCode_5
+            // txtBottleItemCode_5
             // 
-            this.txtBottoleItemCode_5.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_5.Name = "txtBottoleItemCode_5";
-            this.txtBottoleItemCode_5.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_5.TabIndex = 6;
+            this.txtBottleItemCode_5.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_5.Name = "txtBottleItemCode_5";
+            this.txtBottleItemCode_5.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_5.TabIndex = 6;
             // 
-            // txtBottoleLotNo_5
+            // txtBottleLotNo_5
             // 
-            this.txtBottoleLotNo_5.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_5.Name = "txtBottoleLotNo_5";
-            this.txtBottoleLotNo_5.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_5.TabIndex = 8;
+            this.txtBottleLotNo_5.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_5.Name = "txtBottleLotNo_5";
+            this.txtBottleLotNo_5.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_5.TabIndex = 8;
             // 
-            // lblBottoleItemName_5
+            // lblBottleItemName_5
             // 
-            this.lblBottoleItemName_5.AutoSize = true;
-            this.lblBottoleItemName_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_5.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_5.Name = "lblBottoleItemName_5";
-            this.lblBottoleItemName_5.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_5.TabIndex = 3;
-            this.lblBottoleItemName_5.Text = "品目名";
+            this.lblBottleItemName_5.AutoSize = true;
+            this.lblBottleItemName_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_5.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_5.Name = "lblBottleItemName_5";
+            this.lblBottleItemName_5.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_5.TabIndex = 3;
+            this.lblBottleItemName_5.Text = "品目名";
             // 
             // lblBottleItemCode_5
             // 
@@ -1440,15 +1440,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_5.TabIndex = 7;
             this.lblBottleLotNo_5.Text = "ロット番号";
             // 
-            // lblTargetBottole_5
+            // lblTargetBottle_5
             // 
-            this.lblTargetBottole_5.AutoSize = true;
-            this.lblTargetBottole_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_5.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_5.Name = "lblTargetBottole_5";
-            this.lblTargetBottole_5.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_5.TabIndex = 9;
-            this.lblTargetBottole_5.Text = "対象期間";
+            this.lblTargetBottle_5.AutoSize = true;
+            this.lblTargetBottle_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_5.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_5.Name = "lblTargetBottle_5";
+            this.lblTargetBottle_5.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_5.TabIndex = 9;
+            this.lblTargetBottle_5.Text = "対象期間";
             // 
             // timeCheck_5
             // 
@@ -1457,35 +1457,35 @@ namespace LotTraceApp
             this.timeCheck_5.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_5.TabIndex = 10;
             // 
-            // startBottoleTime_5
+            // startBottleTime_5
             // 
-            this.startBottoleTime_5.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_5.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_5.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_5.Name = "startBottoleTime_5";
-            this.startBottoleTime_5.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_5.TabIndex = 11;
+            this.startBottleTime_5.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_5.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_5.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_5.Name = "startBottleTime_5";
+            this.startBottleTime_5.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_5.TabIndex = 11;
             // 
-            // lblBottole_5
+            // lblBottle_5
             // 
-            this.lblBottole_5.AutoSize = true;
-            this.lblBottole_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_5.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_5.Name = "lblBottole_5";
-            this.lblBottole_5.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_5.TabIndex = 12;
-            this.lblBottole_5.Text = "～";
+            this.lblBottle_5.AutoSize = true;
+            this.lblBottle_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_5.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_5.Name = "lblBottle_5";
+            this.lblBottle_5.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_5.TabIndex = 12;
+            this.lblBottle_5.Text = "～";
             // 
-            // endBottoleTime_5
+            // endBottleTime_5
             // 
-            this.endBottoleTime_5.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_5.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_5.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_5.Name = "endBottoleTime_5";
-            this.endBottoleTime_5.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_5.TabIndex = 14;
+            this.endBottleTime_5.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_5.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_5.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_5.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_5.Name = "endBottleTime_5";
+            this.endBottleTime_5.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_5.TabIndex = 14;
             // 
             // btnClearBottle_5
             // 
@@ -1514,47 +1514,47 @@ namespace LotTraceApp
             this.btnTraceSearch_5.TabIndex = 22;
             this.btnTraceSearch_5.Text = "トレース検索";
             // 
-            // tabBottolePage6
+            // tabBottlePage6
             // 
-            this.tabBottolePage6.Controls.Add(this.panelStartBottole_6);
-            this.tabBottolePage6.Controls.Add(this.dgvStartBottle_6);
-            this.tabBottolePage6.Controls.Add(this.panelEndBottole_6);
-            this.tabBottolePage6.Controls.Add(this.dgvEndBottle_6);
-            this.tabBottolePage6.Controls.Add(this.rdoBackwardBottle_6);
-            this.tabBottolePage6.Controls.Add(this.rdoForwardBottle_6);
-            this.tabBottolePage6.Controls.Add(this.lblBottoleOrderNo_6);
-            this.tabBottolePage6.Controls.Add(this.txtBottoleOrderNo_6);
-            this.tabBottolePage6.Controls.Add(this.txtBottoleItemName_6);
-            this.tabBottolePage6.Controls.Add(this.txtBottoleItemCode_6);
-            this.tabBottolePage6.Controls.Add(this.txtBottoleLotNo_6);
-            this.tabBottolePage6.Controls.Add(this.lblBottoleItemName_6);
-            this.tabBottolePage6.Controls.Add(this.lblBottleItemCode_6);
-            this.tabBottolePage6.Controls.Add(this.lblBottleLotNo_6);
-            this.tabBottolePage6.Controls.Add(this.lblTargetBottole_6);
-            this.tabBottolePage6.Controls.Add(this.timeCheck_6);
-            this.tabBottolePage6.Controls.Add(this.startBottoleTime_6);
-            this.tabBottolePage6.Controls.Add(this.lblBottole_6);
-            this.tabBottolePage6.Controls.Add(this.endBottoleTime_6);
-            this.tabBottolePage6.Controls.Add(this.btnClearBottle_6);
-            this.tabBottolePage6.Controls.Add(this.btnCsvOutputBottle_6);
-            this.tabBottolePage6.Controls.Add(this.btnTraceSearch_6);
-            this.tabBottolePage6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage6.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage6.Name = "tabBottolePage6";
-            this.tabBottolePage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage6.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage6.TabIndex = 17;
-            this.tabBottolePage6.Text = "(06)_未設定";
-            this.tabBottolePage6.UseVisualStyleBackColor = true;
+            this.tabBottlePage6.Controls.Add(this.panelStartBottle_6);
+            this.tabBottlePage6.Controls.Add(this.dgvStartBottle_6);
+            this.tabBottlePage6.Controls.Add(this.panelEndBottle_6);
+            this.tabBottlePage6.Controls.Add(this.dgvEndBottle_6);
+            this.tabBottlePage6.Controls.Add(this.rdoBackwardBottle_6);
+            this.tabBottlePage6.Controls.Add(this.rdoForwardBottle_6);
+            this.tabBottlePage6.Controls.Add(this.lblBottleOrderNo_6);
+            this.tabBottlePage6.Controls.Add(this.txtBottleOrderNo_6);
+            this.tabBottlePage6.Controls.Add(this.txtBottleItemName_6);
+            this.tabBottlePage6.Controls.Add(this.txtBottleItemCode_6);
+            this.tabBottlePage6.Controls.Add(this.txtBottleLotNo_6);
+            this.tabBottlePage6.Controls.Add(this.lblBottleItemName_6);
+            this.tabBottlePage6.Controls.Add(this.lblBottleItemCode_6);
+            this.tabBottlePage6.Controls.Add(this.lblBottleLotNo_6);
+            this.tabBottlePage6.Controls.Add(this.lblTargetBottle_6);
+            this.tabBottlePage6.Controls.Add(this.timeCheck_6);
+            this.tabBottlePage6.Controls.Add(this.startBottleTime_6);
+            this.tabBottlePage6.Controls.Add(this.lblBottle_6);
+            this.tabBottlePage6.Controls.Add(this.endBottleTime_6);
+            this.tabBottlePage6.Controls.Add(this.btnClearBottle_6);
+            this.tabBottlePage6.Controls.Add(this.btnCsvOutputBottle_6);
+            this.tabBottlePage6.Controls.Add(this.btnTraceSearch_6);
+            this.tabBottlePage6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage6.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage6.Name = "tabBottlePage6";
+            this.tabBottlePage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage6.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage6.TabIndex = 17;
+            this.tabBottlePage6.Text = "(06)_未設定";
+            this.tabBottlePage6.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_6
+            // panelStartBottle_6
             // 
-            this.panelStartBottole_6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_6.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_6.Name = "panelStartBottole_6";
-            this.panelStartBottole_6.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_6.TabIndex = 28;
+            this.panelStartBottle_6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_6.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_6.Name = "panelStartBottle_6";
+            this.panelStartBottle_6.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_6.TabIndex = 28;
             // 
             // dgvStartBottle_6
             // 
@@ -1565,14 +1565,14 @@ namespace LotTraceApp
             this.dgvStartBottle_6.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_6.TabIndex = 29;
             // 
-            // panelEndBottole_6
+            // panelEndBottle_6
             // 
-            this.panelEndBottole_6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_6.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_6.Name = "panelEndBottole_6";
-            this.panelEndBottole_6.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_6.TabIndex = 30;
+            this.panelEndBottle_6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_6.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_6.Name = "panelEndBottle_6";
+            this.panelEndBottle_6.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_6.TabIndex = 30;
             // 
             // dgvEndBottle_6
             // 
@@ -1603,53 +1603,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_6.TabStop = true;
             this.rdoForwardBottle_6.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_6
+            // lblBottleOrderNo_6
             // 
-            this.lblBottoleOrderNo_6.AutoSize = true;
-            this.lblBottoleOrderNo_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_6.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_6.Name = "lblBottoleOrderNo_6";
-            this.lblBottoleOrderNo_6.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_6.TabIndex = 1;
-            this.lblBottoleOrderNo_6.Text = "製造指図番号";
+            this.lblBottleOrderNo_6.AutoSize = true;
+            this.lblBottleOrderNo_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_6.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_6.Name = "lblBottleOrderNo_6";
+            this.lblBottleOrderNo_6.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_6.TabIndex = 1;
+            this.lblBottleOrderNo_6.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_6
+            // txtBottleOrderNo_6
             // 
-            this.txtBottoleOrderNo_6.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_6.Name = "txtBottoleOrderNo_6";
-            this.txtBottoleOrderNo_6.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_6.TabIndex = 2;
+            this.txtBottleOrderNo_6.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_6.Name = "txtBottleOrderNo_6";
+            this.txtBottleOrderNo_6.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_6.TabIndex = 2;
             // 
-            // txtBottoleItemName_6
+            // txtBottleItemName_6
             // 
-            this.txtBottoleItemName_6.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_6.Name = "txtBottoleItemName_6";
-            this.txtBottoleItemName_6.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_6.TabIndex = 4;
+            this.txtBottleItemName_6.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_6.Name = "txtBottleItemName_6";
+            this.txtBottleItemName_6.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_6.TabIndex = 4;
             // 
-            // txtBottoleItemCode_6
+            // txtBottleItemCode_6
             // 
-            this.txtBottoleItemCode_6.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_6.Name = "txtBottoleItemCode_6";
-            this.txtBottoleItemCode_6.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_6.TabIndex = 6;
+            this.txtBottleItemCode_6.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_6.Name = "txtBottleItemCode_6";
+            this.txtBottleItemCode_6.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_6.TabIndex = 6;
             // 
-            // txtBottoleLotNo_6
+            // txtBottleLotNo_6
             // 
-            this.txtBottoleLotNo_6.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_6.Name = "txtBottoleLotNo_6";
-            this.txtBottoleLotNo_6.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_6.TabIndex = 8;
+            this.txtBottleLotNo_6.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_6.Name = "txtBottleLotNo_6";
+            this.txtBottleLotNo_6.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_6.TabIndex = 8;
             // 
-            // lblBottoleItemName_6
+            // lblBottleItemName_6
             // 
-            this.lblBottoleItemName_6.AutoSize = true;
-            this.lblBottoleItemName_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_6.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_6.Name = "lblBottoleItemName_6";
-            this.lblBottoleItemName_6.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_6.TabIndex = 3;
-            this.lblBottoleItemName_6.Text = "品目名";
+            this.lblBottleItemName_6.AutoSize = true;
+            this.lblBottleItemName_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_6.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_6.Name = "lblBottleItemName_6";
+            this.lblBottleItemName_6.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_6.TabIndex = 3;
+            this.lblBottleItemName_6.Text = "品目名";
             // 
             // lblBottleItemCode_6
             // 
@@ -1671,15 +1671,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_6.TabIndex = 7;
             this.lblBottleLotNo_6.Text = "ロット番号";
             // 
-            // lblTargetBottole_6
+            // lblTargetBottle_6
             // 
-            this.lblTargetBottole_6.AutoSize = true;
-            this.lblTargetBottole_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_6.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_6.Name = "lblTargetBottole_6";
-            this.lblTargetBottole_6.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_6.TabIndex = 9;
-            this.lblTargetBottole_6.Text = "対象期間";
+            this.lblTargetBottle_6.AutoSize = true;
+            this.lblTargetBottle_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_6.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_6.Name = "lblTargetBottle_6";
+            this.lblTargetBottle_6.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_6.TabIndex = 9;
+            this.lblTargetBottle_6.Text = "対象期間";
             // 
             // timeCheck_6
             // 
@@ -1688,35 +1688,35 @@ namespace LotTraceApp
             this.timeCheck_6.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_6.TabIndex = 10;
             // 
-            // startBottoleTime_6
+            // startBottleTime_6
             // 
-            this.startBottoleTime_6.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_6.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_6.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_6.Name = "startBottoleTime_6";
-            this.startBottoleTime_6.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_6.TabIndex = 11;
+            this.startBottleTime_6.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_6.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_6.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_6.Name = "startBottleTime_6";
+            this.startBottleTime_6.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_6.TabIndex = 11;
             // 
-            // lblBottole_6
+            // lblBottle_6
             // 
-            this.lblBottole_6.AutoSize = true;
-            this.lblBottole_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_6.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_6.Name = "lblBottole_6";
-            this.lblBottole_6.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_6.TabIndex = 12;
-            this.lblBottole_6.Text = "～";
+            this.lblBottle_6.AutoSize = true;
+            this.lblBottle_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_6.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_6.Name = "lblBottle_6";
+            this.lblBottle_6.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_6.TabIndex = 12;
+            this.lblBottle_6.Text = "～";
             // 
-            // endBottoleTime_6
+            // endBottleTime_6
             // 
-            this.endBottoleTime_6.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_6.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_6.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_6.Name = "endBottoleTime_6";
-            this.endBottoleTime_6.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_6.TabIndex = 14;
+            this.endBottleTime_6.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_6.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_6.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_6.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_6.Name = "endBottleTime_6";
+            this.endBottleTime_6.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_6.TabIndex = 14;
             // 
             // btnClearBottle_6
             // 
@@ -1745,47 +1745,47 @@ namespace LotTraceApp
             this.btnTraceSearch_6.TabIndex = 22;
             this.btnTraceSearch_6.Text = "トレース検索";
             // 
-            // tabBottolePage7
+            // tabBottlePage7
             // 
-            this.tabBottolePage7.Controls.Add(this.panelStartBottole_7);
-            this.tabBottolePage7.Controls.Add(this.dgvStartBottle_7);
-            this.tabBottolePage7.Controls.Add(this.panelEndBottole_7);
-            this.tabBottolePage7.Controls.Add(this.dgvEndBottle_7);
-            this.tabBottolePage7.Controls.Add(this.rdoBackwardBottle_7);
-            this.tabBottolePage7.Controls.Add(this.rdoForwardBottle_7);
-            this.tabBottolePage7.Controls.Add(this.lblBottoleOrderNo_7);
-            this.tabBottolePage7.Controls.Add(this.txtBottoleOrderNo_7);
-            this.tabBottolePage7.Controls.Add(this.txtBottoleItemName_7);
-            this.tabBottolePage7.Controls.Add(this.txtBottoleItemCode_7);
-            this.tabBottolePage7.Controls.Add(this.txtBottoleLotNo_7);
-            this.tabBottolePage7.Controls.Add(this.lblBottoleItemName_7);
-            this.tabBottolePage7.Controls.Add(this.lblBottleItemCode_7);
-            this.tabBottolePage7.Controls.Add(this.lblBottleLotNo_7);
-            this.tabBottolePage7.Controls.Add(this.lblTargetBottole_7);
-            this.tabBottolePage7.Controls.Add(this.timeCheck_7);
-            this.tabBottolePage7.Controls.Add(this.startBottoleTime_7);
-            this.tabBottolePage7.Controls.Add(this.lblBottole_7);
-            this.tabBottolePage7.Controls.Add(this.endBottoleTime_7);
-            this.tabBottolePage7.Controls.Add(this.btnClearBottle_7);
-            this.tabBottolePage7.Controls.Add(this.btnCsvOutputBottle_7);
-            this.tabBottolePage7.Controls.Add(this.btnTraceSearch_7);
-            this.tabBottolePage7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage7.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage7.Name = "tabBottolePage7";
-            this.tabBottolePage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage7.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage7.TabIndex = 18;
-            this.tabBottolePage7.Text = "(07)_未設定";
-            this.tabBottolePage7.UseVisualStyleBackColor = true;
+            this.tabBottlePage7.Controls.Add(this.panelStartBottle_7);
+            this.tabBottlePage7.Controls.Add(this.dgvStartBottle_7);
+            this.tabBottlePage7.Controls.Add(this.panelEndBottle_7);
+            this.tabBottlePage7.Controls.Add(this.dgvEndBottle_7);
+            this.tabBottlePage7.Controls.Add(this.rdoBackwardBottle_7);
+            this.tabBottlePage7.Controls.Add(this.rdoForwardBottle_7);
+            this.tabBottlePage7.Controls.Add(this.lblBottleOrderNo_7);
+            this.tabBottlePage7.Controls.Add(this.txtBottleOrderNo_7);
+            this.tabBottlePage7.Controls.Add(this.txtBottleItemName_7);
+            this.tabBottlePage7.Controls.Add(this.txtBottleItemCode_7);
+            this.tabBottlePage7.Controls.Add(this.txtBottleLotNo_7);
+            this.tabBottlePage7.Controls.Add(this.lblBottleItemName_7);
+            this.tabBottlePage7.Controls.Add(this.lblBottleItemCode_7);
+            this.tabBottlePage7.Controls.Add(this.lblBottleLotNo_7);
+            this.tabBottlePage7.Controls.Add(this.lblTargetBottle_7);
+            this.tabBottlePage7.Controls.Add(this.timeCheck_7);
+            this.tabBottlePage7.Controls.Add(this.startBottleTime_7);
+            this.tabBottlePage7.Controls.Add(this.lblBottle_7);
+            this.tabBottlePage7.Controls.Add(this.endBottleTime_7);
+            this.tabBottlePage7.Controls.Add(this.btnClearBottle_7);
+            this.tabBottlePage7.Controls.Add(this.btnCsvOutputBottle_7);
+            this.tabBottlePage7.Controls.Add(this.btnTraceSearch_7);
+            this.tabBottlePage7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage7.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage7.Name = "tabBottlePage7";
+            this.tabBottlePage7.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage7.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage7.TabIndex = 18;
+            this.tabBottlePage7.Text = "(07)_未設定";
+            this.tabBottlePage7.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_7
+            // panelStartBottle_7
             // 
-            this.panelStartBottole_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_7.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_7.Name = "panelStartBottole_7";
-            this.panelStartBottole_7.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_7.TabIndex = 28;
+            this.panelStartBottle_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_7.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_7.Name = "panelStartBottle_7";
+            this.panelStartBottle_7.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_7.TabIndex = 28;
             // 
             // dgvStartBottle_7
             // 
@@ -1796,14 +1796,14 @@ namespace LotTraceApp
             this.dgvStartBottle_7.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_7.TabIndex = 29;
             // 
-            // panelEndBottole_7
+            // panelEndBottle_7
             // 
-            this.panelEndBottole_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_7.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_7.Name = "panelEndBottole_7";
-            this.panelEndBottole_7.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_7.TabIndex = 30;
+            this.panelEndBottle_7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_7.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_7.Name = "panelEndBottle_7";
+            this.panelEndBottle_7.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_7.TabIndex = 30;
             // 
             // dgvEndBottle_7
             // 
@@ -1834,53 +1834,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_7.TabStop = true;
             this.rdoForwardBottle_7.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_7
+            // lblBottleOrderNo_7
             // 
-            this.lblBottoleOrderNo_7.AutoSize = true;
-            this.lblBottoleOrderNo_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_7.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_7.Name = "lblBottoleOrderNo_7";
-            this.lblBottoleOrderNo_7.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_7.TabIndex = 1;
-            this.lblBottoleOrderNo_7.Text = "製造指図番号";
+            this.lblBottleOrderNo_7.AutoSize = true;
+            this.lblBottleOrderNo_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_7.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_7.Name = "lblBottleOrderNo_7";
+            this.lblBottleOrderNo_7.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_7.TabIndex = 1;
+            this.lblBottleOrderNo_7.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_7
+            // txtBottleOrderNo_7
             // 
-            this.txtBottoleOrderNo_7.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_7.Name = "txtBottoleOrderNo_7";
-            this.txtBottoleOrderNo_7.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_7.TabIndex = 2;
+            this.txtBottleOrderNo_7.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_7.Name = "txtBottleOrderNo_7";
+            this.txtBottleOrderNo_7.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_7.TabIndex = 2;
             // 
-            // txtBottoleItemName_7
+            // txtBottleItemName_7
             // 
-            this.txtBottoleItemName_7.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_7.Name = "txtBottoleItemName_7";
-            this.txtBottoleItemName_7.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_7.TabIndex = 4;
+            this.txtBottleItemName_7.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_7.Name = "txtBottleItemName_7";
+            this.txtBottleItemName_7.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_7.TabIndex = 4;
             // 
-            // txtBottoleItemCode_7
+            // txtBottleItemCode_7
             // 
-            this.txtBottoleItemCode_7.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_7.Name = "txtBottoleItemCode_7";
-            this.txtBottoleItemCode_7.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_7.TabIndex = 6;
+            this.txtBottleItemCode_7.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_7.Name = "txtBottleItemCode_7";
+            this.txtBottleItemCode_7.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_7.TabIndex = 6;
             // 
-            // txtBottoleLotNo_7
+            // txtBottleLotNo_7
             // 
-            this.txtBottoleLotNo_7.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_7.Name = "txtBottoleLotNo_7";
-            this.txtBottoleLotNo_7.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_7.TabIndex = 8;
+            this.txtBottleLotNo_7.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_7.Name = "txtBottleLotNo_7";
+            this.txtBottleLotNo_7.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_7.TabIndex = 8;
             // 
-            // lblBottoleItemName_7
+            // lblBottleItemName_7
             // 
-            this.lblBottoleItemName_7.AutoSize = true;
-            this.lblBottoleItemName_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_7.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_7.Name = "lblBottoleItemName_7";
-            this.lblBottoleItemName_7.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_7.TabIndex = 3;
-            this.lblBottoleItemName_7.Text = "品目名";
+            this.lblBottleItemName_7.AutoSize = true;
+            this.lblBottleItemName_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_7.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_7.Name = "lblBottleItemName_7";
+            this.lblBottleItemName_7.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_7.TabIndex = 3;
+            this.lblBottleItemName_7.Text = "品目名";
             // 
             // lblBottleItemCode_7
             // 
@@ -1902,15 +1902,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_7.TabIndex = 7;
             this.lblBottleLotNo_7.Text = "ロット番号";
             // 
-            // lblTargetBottole_7
+            // lblTargetBottle_7
             // 
-            this.lblTargetBottole_7.AutoSize = true;
-            this.lblTargetBottole_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_7.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_7.Name = "lblTargetBottole_7";
-            this.lblTargetBottole_7.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_7.TabIndex = 9;
-            this.lblTargetBottole_7.Text = "対象期間";
+            this.lblTargetBottle_7.AutoSize = true;
+            this.lblTargetBottle_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_7.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_7.Name = "lblTargetBottle_7";
+            this.lblTargetBottle_7.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_7.TabIndex = 9;
+            this.lblTargetBottle_7.Text = "対象期間";
             // 
             // timeCheck_7
             // 
@@ -1919,35 +1919,35 @@ namespace LotTraceApp
             this.timeCheck_7.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_7.TabIndex = 10;
             // 
-            // startBottoleTime_7
+            // startBottleTime_7
             // 
-            this.startBottoleTime_7.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_7.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_7.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_7.Name = "startBottoleTime_7";
-            this.startBottoleTime_7.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_7.TabIndex = 11;
+            this.startBottleTime_7.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_7.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_7.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_7.Name = "startBottleTime_7";
+            this.startBottleTime_7.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_7.TabIndex = 11;
             // 
-            // lblBottole_7
+            // lblBottle_7
             // 
-            this.lblBottole_7.AutoSize = true;
-            this.lblBottole_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_7.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_7.Name = "lblBottole_7";
-            this.lblBottole_7.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_7.TabIndex = 12;
-            this.lblBottole_7.Text = "～";
+            this.lblBottle_7.AutoSize = true;
+            this.lblBottle_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_7.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_7.Name = "lblBottle_7";
+            this.lblBottle_7.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_7.TabIndex = 12;
+            this.lblBottle_7.Text = "～";
             // 
-            // endBottoleTime_7
+            // endBottleTime_7
             // 
-            this.endBottoleTime_7.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_7.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_7.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_7.Name = "endBottoleTime_7";
-            this.endBottoleTime_7.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_7.TabIndex = 14;
+            this.endBottleTime_7.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_7.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_7.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_7.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_7.Name = "endBottleTime_7";
+            this.endBottleTime_7.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_7.TabIndex = 14;
             // 
             // btnClearBottle_7
             // 
@@ -1976,47 +1976,47 @@ namespace LotTraceApp
             this.btnTraceSearch_7.TabIndex = 22;
             this.btnTraceSearch_7.Text = "トレース検索";
             // 
-            // tabBottolePage8
+            // tabBottlePage8
             // 
-            this.tabBottolePage8.Controls.Add(this.panelStartBottole_8);
-            this.tabBottolePage8.Controls.Add(this.dgvStartBottle_8);
-            this.tabBottolePage8.Controls.Add(this.panelEndBottole_8);
-            this.tabBottolePage8.Controls.Add(this.dgvEndBottle_8);
-            this.tabBottolePage8.Controls.Add(this.rdoBackwardBottle_8);
-            this.tabBottolePage8.Controls.Add(this.rdoForwardBottle_8);
-            this.tabBottolePage8.Controls.Add(this.lblBottoleOrderNo_8);
-            this.tabBottolePage8.Controls.Add(this.txtBottoleOrderNo_8);
-            this.tabBottolePage8.Controls.Add(this.txtBottoleItemName_8);
-            this.tabBottolePage8.Controls.Add(this.txtBottoleItemCode_8);
-            this.tabBottolePage8.Controls.Add(this.txtBottoleLotNo_8);
-            this.tabBottolePage8.Controls.Add(this.lblBottoleItemName_8);
-            this.tabBottolePage8.Controls.Add(this.lblBottleItemCode_8);
-            this.tabBottolePage8.Controls.Add(this.lblBottleLotNo_8);
-            this.tabBottolePage8.Controls.Add(this.lblTargetBottole_8);
-            this.tabBottolePage8.Controls.Add(this.timeCheck_8);
-            this.tabBottolePage8.Controls.Add(this.startBottoleTime_8);
-            this.tabBottolePage8.Controls.Add(this.lblBottole_8);
-            this.tabBottolePage8.Controls.Add(this.endBottoleTime_8);
-            this.tabBottolePage8.Controls.Add(this.btnClearBottle_8);
-            this.tabBottolePage8.Controls.Add(this.btnCsvOutputBottle_8);
-            this.tabBottolePage8.Controls.Add(this.btnTraceSearch_8);
-            this.tabBottolePage8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage8.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage8.Name = "tabBottolePage8";
-            this.tabBottolePage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage8.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage8.TabIndex = 19;
-            this.tabBottolePage8.Text = "(08)_未設定";
-            this.tabBottolePage8.UseVisualStyleBackColor = true;
+            this.tabBottlePage8.Controls.Add(this.panelStartBottle_8);
+            this.tabBottlePage8.Controls.Add(this.dgvStartBottle_8);
+            this.tabBottlePage8.Controls.Add(this.panelEndBottle_8);
+            this.tabBottlePage8.Controls.Add(this.dgvEndBottle_8);
+            this.tabBottlePage8.Controls.Add(this.rdoBackwardBottle_8);
+            this.tabBottlePage8.Controls.Add(this.rdoForwardBottle_8);
+            this.tabBottlePage8.Controls.Add(this.lblBottleOrderNo_8);
+            this.tabBottlePage8.Controls.Add(this.txtBottleOrderNo_8);
+            this.tabBottlePage8.Controls.Add(this.txtBottleItemName_8);
+            this.tabBottlePage8.Controls.Add(this.txtBottleItemCode_8);
+            this.tabBottlePage8.Controls.Add(this.txtBottleLotNo_8);
+            this.tabBottlePage8.Controls.Add(this.lblBottleItemName_8);
+            this.tabBottlePage8.Controls.Add(this.lblBottleItemCode_8);
+            this.tabBottlePage8.Controls.Add(this.lblBottleLotNo_8);
+            this.tabBottlePage8.Controls.Add(this.lblTargetBottle_8);
+            this.tabBottlePage8.Controls.Add(this.timeCheck_8);
+            this.tabBottlePage8.Controls.Add(this.startBottleTime_8);
+            this.tabBottlePage8.Controls.Add(this.lblBottle_8);
+            this.tabBottlePage8.Controls.Add(this.endBottleTime_8);
+            this.tabBottlePage8.Controls.Add(this.btnClearBottle_8);
+            this.tabBottlePage8.Controls.Add(this.btnCsvOutputBottle_8);
+            this.tabBottlePage8.Controls.Add(this.btnTraceSearch_8);
+            this.tabBottlePage8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage8.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage8.Name = "tabBottlePage8";
+            this.tabBottlePage8.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage8.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage8.TabIndex = 19;
+            this.tabBottlePage8.Text = "(08)_未設定";
+            this.tabBottlePage8.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_8
+            // panelStartBottle_8
             // 
-            this.panelStartBottole_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_8.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_8.Name = "panelStartBottole_8";
-            this.panelStartBottole_8.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_8.TabIndex = 28;
+            this.panelStartBottle_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_8.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_8.Name = "panelStartBottle_8";
+            this.panelStartBottle_8.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_8.TabIndex = 28;
             // 
             // dgvStartBottle_8
             // 
@@ -2027,14 +2027,14 @@ namespace LotTraceApp
             this.dgvStartBottle_8.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_8.TabIndex = 29;
             // 
-            // panelEndBottole_8
+            // panelEndBottle_8
             // 
-            this.panelEndBottole_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_8.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_8.Name = "panelEndBottole_8";
-            this.panelEndBottole_8.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_8.TabIndex = 30;
+            this.panelEndBottle_8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_8.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_8.Name = "panelEndBottle_8";
+            this.panelEndBottle_8.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_8.TabIndex = 30;
             // 
             // dgvEndBottle_8
             // 
@@ -2065,53 +2065,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_8.TabStop = true;
             this.rdoForwardBottle_8.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_8
+            // lblBottleOrderNo_8
             // 
-            this.lblBottoleOrderNo_8.AutoSize = true;
-            this.lblBottoleOrderNo_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_8.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_8.Name = "lblBottoleOrderNo_8";
-            this.lblBottoleOrderNo_8.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_8.TabIndex = 1;
-            this.lblBottoleOrderNo_8.Text = "製造指図番号";
+            this.lblBottleOrderNo_8.AutoSize = true;
+            this.lblBottleOrderNo_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_8.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_8.Name = "lblBottleOrderNo_8";
+            this.lblBottleOrderNo_8.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_8.TabIndex = 1;
+            this.lblBottleOrderNo_8.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_8
+            // txtBottleOrderNo_8
             // 
-            this.txtBottoleOrderNo_8.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_8.Name = "txtBottoleOrderNo_8";
-            this.txtBottoleOrderNo_8.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_8.TabIndex = 2;
+            this.txtBottleOrderNo_8.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_8.Name = "txtBottleOrderNo_8";
+            this.txtBottleOrderNo_8.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_8.TabIndex = 2;
             // 
-            // txtBottoleItemName_8
+            // txtBottleItemName_8
             // 
-            this.txtBottoleItemName_8.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_8.Name = "txtBottoleItemName_8";
-            this.txtBottoleItemName_8.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_8.TabIndex = 4;
+            this.txtBottleItemName_8.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_8.Name = "txtBottleItemName_8";
+            this.txtBottleItemName_8.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_8.TabIndex = 4;
             // 
-            // txtBottoleItemCode_8
+            // txtBottleItemCode_8
             // 
-            this.txtBottoleItemCode_8.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_8.Name = "txtBottoleItemCode_8";
-            this.txtBottoleItemCode_8.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_8.TabIndex = 6;
+            this.txtBottleItemCode_8.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_8.Name = "txtBottleItemCode_8";
+            this.txtBottleItemCode_8.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_8.TabIndex = 6;
             // 
-            // txtBottoleLotNo_8
+            // txtBottleLotNo_8
             // 
-            this.txtBottoleLotNo_8.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_8.Name = "txtBottoleLotNo_8";
-            this.txtBottoleLotNo_8.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_8.TabIndex = 8;
+            this.txtBottleLotNo_8.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_8.Name = "txtBottleLotNo_8";
+            this.txtBottleLotNo_8.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_8.TabIndex = 8;
             // 
-            // lblBottoleItemName_8
+            // lblBottleItemName_8
             // 
-            this.lblBottoleItemName_8.AutoSize = true;
-            this.lblBottoleItemName_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_8.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_8.Name = "lblBottoleItemName_8";
-            this.lblBottoleItemName_8.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_8.TabIndex = 3;
-            this.lblBottoleItemName_8.Text = "品目名";
+            this.lblBottleItemName_8.AutoSize = true;
+            this.lblBottleItemName_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_8.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_8.Name = "lblBottleItemName_8";
+            this.lblBottleItemName_8.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_8.TabIndex = 3;
+            this.lblBottleItemName_8.Text = "品目名";
             // 
             // lblBottleItemCode_8
             // 
@@ -2133,15 +2133,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_8.TabIndex = 7;
             this.lblBottleLotNo_8.Text = "ロット番号";
             // 
-            // lblTargetBottole_8
+            // lblTargetBottle_8
             // 
-            this.lblTargetBottole_8.AutoSize = true;
-            this.lblTargetBottole_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_8.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_8.Name = "lblTargetBottole_8";
-            this.lblTargetBottole_8.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_8.TabIndex = 9;
-            this.lblTargetBottole_8.Text = "対象期間";
+            this.lblTargetBottle_8.AutoSize = true;
+            this.lblTargetBottle_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_8.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_8.Name = "lblTargetBottle_8";
+            this.lblTargetBottle_8.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_8.TabIndex = 9;
+            this.lblTargetBottle_8.Text = "対象期間";
             // 
             // timeCheck_8
             // 
@@ -2150,35 +2150,35 @@ namespace LotTraceApp
             this.timeCheck_8.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_8.TabIndex = 10;
             // 
-            // startBottoleTime_8
+            // startBottleTime_8
             // 
-            this.startBottoleTime_8.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_8.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_8.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_8.Name = "startBottoleTime_8";
-            this.startBottoleTime_8.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_8.TabIndex = 11;
+            this.startBottleTime_8.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_8.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_8.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_8.Name = "startBottleTime_8";
+            this.startBottleTime_8.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_8.TabIndex = 11;
             // 
-            // lblBottole_8
+            // lblBottle_8
             // 
-            this.lblBottole_8.AutoSize = true;
-            this.lblBottole_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_8.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_8.Name = "lblBottole_8";
-            this.lblBottole_8.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_8.TabIndex = 12;
-            this.lblBottole_8.Text = "～";
+            this.lblBottle_8.AutoSize = true;
+            this.lblBottle_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_8.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_8.Name = "lblBottle_8";
+            this.lblBottle_8.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_8.TabIndex = 12;
+            this.lblBottle_8.Text = "～";
             // 
-            // endBottoleTime_8
+            // endBottleTime_8
             // 
-            this.endBottoleTime_8.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_8.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_8.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_8.Name = "endBottoleTime_8";
-            this.endBottoleTime_8.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_8.TabIndex = 14;
+            this.endBottleTime_8.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_8.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_8.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_8.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_8.Name = "endBottleTime_8";
+            this.endBottleTime_8.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_8.TabIndex = 14;
             // 
             // btnClearBottle_8
             // 
@@ -2207,47 +2207,47 @@ namespace LotTraceApp
             this.btnTraceSearch_8.TabIndex = 22;
             this.btnTraceSearch_8.Text = "トレース検索";
             // 
-            // tabBottolePage9
+            // tabBottlePage9
             // 
-            this.tabBottolePage9.Controls.Add(this.panelStartBottole_9);
-            this.tabBottolePage9.Controls.Add(this.dgvStartBottle_9);
-            this.tabBottolePage9.Controls.Add(this.panelEndBottole_9);
-            this.tabBottolePage9.Controls.Add(this.dgvEndBottle_9);
-            this.tabBottolePage9.Controls.Add(this.rdoBackwardBottle_9);
-            this.tabBottolePage9.Controls.Add(this.rdoForwardBottle_9);
-            this.tabBottolePage9.Controls.Add(this.lblBottoleOrderNo_9);
-            this.tabBottolePage9.Controls.Add(this.txtBottoleOrderNo_9);
-            this.tabBottolePage9.Controls.Add(this.txtBottoleItemName_9);
-            this.tabBottolePage9.Controls.Add(this.txtBottoleItemCode_9);
-            this.tabBottolePage9.Controls.Add(this.txtBottoleLotNo_9);
-            this.tabBottolePage9.Controls.Add(this.lblBottoleItemName_9);
-            this.tabBottolePage9.Controls.Add(this.lblBottleItemCode_9);
-            this.tabBottolePage9.Controls.Add(this.lblBottleLotNo_9);
-            this.tabBottolePage9.Controls.Add(this.lblTargetBottole_9);
-            this.tabBottolePage9.Controls.Add(this.timeCheck_9);
-            this.tabBottolePage9.Controls.Add(this.startBottoleTime_9);
-            this.tabBottolePage9.Controls.Add(this.lblBottole_9);
-            this.tabBottolePage9.Controls.Add(this.endBottoleTime_9);
-            this.tabBottolePage9.Controls.Add(this.btnClearBottle_9);
-            this.tabBottolePage9.Controls.Add(this.btnCsvOutputBottle_9);
-            this.tabBottolePage9.Controls.Add(this.btnTraceSearch_9);
-            this.tabBottolePage9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage9.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage9.Name = "tabBottolePage9";
-            this.tabBottolePage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage9.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage9.TabIndex = 20;
-            this.tabBottolePage9.Text = "(09)_未設定";
-            this.tabBottolePage9.UseVisualStyleBackColor = true;
+            this.tabBottlePage9.Controls.Add(this.panelStartBottle_9);
+            this.tabBottlePage9.Controls.Add(this.dgvStartBottle_9);
+            this.tabBottlePage9.Controls.Add(this.panelEndBottle_9);
+            this.tabBottlePage9.Controls.Add(this.dgvEndBottle_9);
+            this.tabBottlePage9.Controls.Add(this.rdoBackwardBottle_9);
+            this.tabBottlePage9.Controls.Add(this.rdoForwardBottle_9);
+            this.tabBottlePage9.Controls.Add(this.lblBottleOrderNo_9);
+            this.tabBottlePage9.Controls.Add(this.txtBottleOrderNo_9);
+            this.tabBottlePage9.Controls.Add(this.txtBottleItemName_9);
+            this.tabBottlePage9.Controls.Add(this.txtBottleItemCode_9);
+            this.tabBottlePage9.Controls.Add(this.txtBottleLotNo_9);
+            this.tabBottlePage9.Controls.Add(this.lblBottleItemName_9);
+            this.tabBottlePage9.Controls.Add(this.lblBottleItemCode_9);
+            this.tabBottlePage9.Controls.Add(this.lblBottleLotNo_9);
+            this.tabBottlePage9.Controls.Add(this.lblTargetBottle_9);
+            this.tabBottlePage9.Controls.Add(this.timeCheck_9);
+            this.tabBottlePage9.Controls.Add(this.startBottleTime_9);
+            this.tabBottlePage9.Controls.Add(this.lblBottle_9);
+            this.tabBottlePage9.Controls.Add(this.endBottleTime_9);
+            this.tabBottlePage9.Controls.Add(this.btnClearBottle_9);
+            this.tabBottlePage9.Controls.Add(this.btnCsvOutputBottle_9);
+            this.tabBottlePage9.Controls.Add(this.btnTraceSearch_9);
+            this.tabBottlePage9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage9.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage9.Name = "tabBottlePage9";
+            this.tabBottlePage9.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage9.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage9.TabIndex = 20;
+            this.tabBottlePage9.Text = "(09)_未設定";
+            this.tabBottlePage9.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_9
+            // panelStartBottle_9
             // 
-            this.panelStartBottole_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_9.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_9.Name = "panelStartBottole_9";
-            this.panelStartBottole_9.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_9.TabIndex = 28;
+            this.panelStartBottle_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_9.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_9.Name = "panelStartBottle_9";
+            this.panelStartBottle_9.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_9.TabIndex = 28;
             // 
             // dgvStartBottle_9
             // 
@@ -2258,14 +2258,14 @@ namespace LotTraceApp
             this.dgvStartBottle_9.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_9.TabIndex = 29;
             // 
-            // panelEndBottole_9
+            // panelEndBottle_9
             // 
-            this.panelEndBottole_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_9.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_9.Name = "panelEndBottole_9";
-            this.panelEndBottole_9.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_9.TabIndex = 30;
+            this.panelEndBottle_9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_9.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_9.Name = "panelEndBottle_9";
+            this.panelEndBottle_9.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_9.TabIndex = 30;
             // 
             // dgvEndBottle_9
             // 
@@ -2296,53 +2296,53 @@ namespace LotTraceApp
             this.rdoForwardBottle_9.TabStop = true;
             this.rdoForwardBottle_9.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_9
+            // lblBottleOrderNo_9
             // 
-            this.lblBottoleOrderNo_9.AutoSize = true;
-            this.lblBottoleOrderNo_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_9.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_9.Name = "lblBottoleOrderNo_9";
-            this.lblBottoleOrderNo_9.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_9.TabIndex = 1;
-            this.lblBottoleOrderNo_9.Text = "製造指図番号";
+            this.lblBottleOrderNo_9.AutoSize = true;
+            this.lblBottleOrderNo_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_9.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_9.Name = "lblBottleOrderNo_9";
+            this.lblBottleOrderNo_9.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_9.TabIndex = 1;
+            this.lblBottleOrderNo_9.Text = "製造指図番号";
             // 
-            // txtBottoleOrderNo_9
+            // txtBottleOrderNo_9
             // 
-            this.txtBottoleOrderNo_9.Location = new System.Drawing.Point(110, 15);
-            this.txtBottoleOrderNo_9.Name = "txtBottoleOrderNo_9";
-            this.txtBottoleOrderNo_9.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleOrderNo_9.TabIndex = 2;
+            this.txtBottleOrderNo_9.Location = new System.Drawing.Point(110, 15);
+            this.txtBottleOrderNo_9.Name = "txtBottleOrderNo_9";
+            this.txtBottleOrderNo_9.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleOrderNo_9.TabIndex = 2;
             // 
-            // txtBottoleItemName_9
+            // txtBottleItemName_9
             // 
-            this.txtBottoleItemName_9.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_9.Name = "txtBottoleItemName_9";
-            this.txtBottoleItemName_9.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_9.TabIndex = 4;
+            this.txtBottleItemName_9.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_9.Name = "txtBottleItemName_9";
+            this.txtBottleItemName_9.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_9.TabIndex = 4;
             // 
-            // txtBottoleItemCode_9
+            // txtBottleItemCode_9
             // 
-            this.txtBottoleItemCode_9.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_9.Name = "txtBottoleItemCode_9";
-            this.txtBottoleItemCode_9.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_9.TabIndex = 6;
+            this.txtBottleItemCode_9.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_9.Name = "txtBottleItemCode_9";
+            this.txtBottleItemCode_9.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_9.TabIndex = 6;
             // 
-            // txtBottoleLotNo_9
+            // txtBottleLotNo_9
             // 
-            this.txtBottoleLotNo_9.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_9.Name = "txtBottoleLotNo_9";
-            this.txtBottoleLotNo_9.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_9.TabIndex = 8;
+            this.txtBottleLotNo_9.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_9.Name = "txtBottleLotNo_9";
+            this.txtBottleLotNo_9.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_9.TabIndex = 8;
             // 
-            // lblBottoleItemName_9
+            // lblBottleItemName_9
             // 
-            this.lblBottoleItemName_9.AutoSize = true;
-            this.lblBottoleItemName_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_9.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_9.Name = "lblBottoleItemName_9";
-            this.lblBottoleItemName_9.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_9.TabIndex = 3;
-            this.lblBottoleItemName_9.Text = "品目名";
+            this.lblBottleItemName_9.AutoSize = true;
+            this.lblBottleItemName_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_9.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_9.Name = "lblBottleItemName_9";
+            this.lblBottleItemName_9.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_9.TabIndex = 3;
+            this.lblBottleItemName_9.Text = "品目名";
             // 
             // lblBottleItemCode_9
             // 
@@ -2364,15 +2364,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_9.TabIndex = 7;
             this.lblBottleLotNo_9.Text = "ロット番号";
             // 
-            // lblTargetBottole_9
+            // lblTargetBottle_9
             // 
-            this.lblTargetBottole_9.AutoSize = true;
-            this.lblTargetBottole_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_9.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_9.Name = "lblTargetBottole_9";
-            this.lblTargetBottole_9.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_9.TabIndex = 9;
-            this.lblTargetBottole_9.Text = "対象期間";
+            this.lblTargetBottle_9.AutoSize = true;
+            this.lblTargetBottle_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_9.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_9.Name = "lblTargetBottle_9";
+            this.lblTargetBottle_9.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_9.TabIndex = 9;
+            this.lblTargetBottle_9.Text = "対象期間";
             // 
             // timeCheck_9
             // 
@@ -2381,35 +2381,35 @@ namespace LotTraceApp
             this.timeCheck_9.Size = new System.Drawing.Size(15, 14);
             this.timeCheck_9.TabIndex = 10;
             // 
-            // startBottoleTime_9
+            // startBottleTime_9
             // 
-            this.startBottoleTime_9.CustomFormat = "yyyy/MM/dd";
-            this.startBottoleTime_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.startBottoleTime_9.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startBottoleTime_9.Location = new System.Drawing.Point(110, 155);
-            this.startBottoleTime_9.Name = "startBottoleTime_9";
-            this.startBottoleTime_9.Size = new System.Drawing.Size(110, 27);
-            this.startBottoleTime_9.TabIndex = 11;
+            this.startBottleTime_9.CustomFormat = "yyyy/MM/dd";
+            this.startBottleTime_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.startBottleTime_9.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startBottleTime_9.Location = new System.Drawing.Point(110, 155);
+            this.startBottleTime_9.Name = "startBottleTime_9";
+            this.startBottleTime_9.Size = new System.Drawing.Size(110, 27);
+            this.startBottleTime_9.TabIndex = 11;
             // 
-            // lblBottole_9
+            // lblBottle_9
             // 
-            this.lblBottole_9.AutoSize = true;
-            this.lblBottole_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottole_9.Location = new System.Drawing.Point(226, 162);
-            this.lblBottole_9.Name = "lblBottole_9";
-            this.lblBottole_9.Size = new System.Drawing.Size(19, 16);
-            this.lblBottole_9.TabIndex = 12;
-            this.lblBottole_9.Text = "～";
+            this.lblBottle_9.AutoSize = true;
+            this.lblBottle_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottle_9.Location = new System.Drawing.Point(226, 162);
+            this.lblBottle_9.Name = "lblBottle_9";
+            this.lblBottle_9.Size = new System.Drawing.Size(19, 16);
+            this.lblBottle_9.TabIndex = 12;
+            this.lblBottle_9.Text = "～";
             // 
-            // endBottoleTime_9
+            // endBottleTime_9
             // 
-            this.endBottoleTime_9.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_9.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_9.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_9.Name = "endBottoleTime_9";
-            this.endBottoleTime_9.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_9.TabIndex = 14;
+            this.endBottleTime_9.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_9.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_9.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_9.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_9.Name = "endBottleTime_9";
+            this.endBottleTime_9.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_9.TabIndex = 14;
             // 
             // btnClearBottle_9
             // 
@@ -2438,47 +2438,47 @@ namespace LotTraceApp
             this.btnTraceSearch_9.TabIndex = 22;
             this.btnTraceSearch_9.Text = "トレース検索";
             // 
-            // tabBottolePage10
+            // tabBottlePage10
             // 
-            this.tabBottolePage10.Controls.Add(this.panelStartBottole_10);
-            this.tabBottolePage10.Controls.Add(this.dgvStartBottle_10);
-            this.tabBottolePage10.Controls.Add(this.panelEndBottole_10);
-            this.tabBottolePage10.Controls.Add(this.dgvEndBottle_10);
-            this.tabBottolePage10.Controls.Add(this.radioButton5);
-            this.tabBottolePage10.Controls.Add(this.rdoForwardBottle_10);
-            this.tabBottolePage10.Controls.Add(this.lblBottoleOrderNo_10);
-            this.tabBottolePage10.Controls.Add(this.textBox10);
-            this.tabBottolePage10.Controls.Add(this.txtBottoleItemName_10);
-            this.tabBottolePage10.Controls.Add(this.txtBottoleItemCode_10);
-            this.tabBottolePage10.Controls.Add(this.txtBottoleLotNo_10);
-            this.tabBottolePage10.Controls.Add(this.lblBottoleItemName_10);
-            this.tabBottolePage10.Controls.Add(this.lblBottleItemCode_10);
-            this.tabBottolePage10.Controls.Add(this.lblBottleLotNo_10);
-            this.tabBottolePage10.Controls.Add(this.lblTargetBottole_10);
-            this.tabBottolePage10.Controls.Add(this.timeCheck_10);
-            this.tabBottolePage10.Controls.Add(this.dateTimePicker5);
-            this.tabBottolePage10.Controls.Add(this.label18);
-            this.tabBottolePage10.Controls.Add(this.endBottoleTime_10);
-            this.tabBottolePage10.Controls.Add(this.btnClearBottle_10);
-            this.tabBottolePage10.Controls.Add(this.btnCsvOutputBottle_10);
-            this.tabBottolePage10.Controls.Add(this.btnTraceSearch_10);
-            this.tabBottolePage10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tabBottolePage10.Location = new System.Drawing.Point(4, 34);
-            this.tabBottolePage10.Name = "tabBottolePage10";
-            this.tabBottolePage10.Padding = new System.Windows.Forms.Padding(3);
-            this.tabBottolePage10.Size = new System.Drawing.Size(1896, 902);
-            this.tabBottolePage10.TabIndex = 21;
-            this.tabBottolePage10.Text = "(10)_未設定";
-            this.tabBottolePage10.UseVisualStyleBackColor = true;
+            this.tabBottlePage10.Controls.Add(this.panelStartBottle_10);
+            this.tabBottlePage10.Controls.Add(this.dgvStartBottle_10);
+            this.tabBottlePage10.Controls.Add(this.panelEndBottle_10);
+            this.tabBottlePage10.Controls.Add(this.dgvEndBottle_10);
+            this.tabBottlePage10.Controls.Add(this.radioButton5);
+            this.tabBottlePage10.Controls.Add(this.rdoForwardBottle_10);
+            this.tabBottlePage10.Controls.Add(this.lblBottleOrderNo_10);
+            this.tabBottlePage10.Controls.Add(this.textBox10);
+            this.tabBottlePage10.Controls.Add(this.txtBottleItemName_10);
+            this.tabBottlePage10.Controls.Add(this.txtBottleItemCode_10);
+            this.tabBottlePage10.Controls.Add(this.txtBottleLotNo_10);
+            this.tabBottlePage10.Controls.Add(this.lblBottleItemName_10);
+            this.tabBottlePage10.Controls.Add(this.lblBottleItemCode_10);
+            this.tabBottlePage10.Controls.Add(this.lblBottleLotNo_10);
+            this.tabBottlePage10.Controls.Add(this.lblTargetBottle_10);
+            this.tabBottlePage10.Controls.Add(this.timeCheck_10);
+            this.tabBottlePage10.Controls.Add(this.dateTimePicker5);
+            this.tabBottlePage10.Controls.Add(this.label18);
+            this.tabBottlePage10.Controls.Add(this.endBottleTime_10);
+            this.tabBottlePage10.Controls.Add(this.btnClearBottle_10);
+            this.tabBottlePage10.Controls.Add(this.btnCsvOutputBottle_10);
+            this.tabBottlePage10.Controls.Add(this.btnTraceSearch_10);
+            this.tabBottlePage10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.tabBottlePage10.Location = new System.Drawing.Point(4, 34);
+            this.tabBottlePage10.Name = "tabBottlePage10";
+            this.tabBottlePage10.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBottlePage10.Size = new System.Drawing.Size(1896, 902);
+            this.tabBottlePage10.TabIndex = 21;
+            this.tabBottlePage10.Text = "(10)_未設定";
+            this.tabBottlePage10.UseVisualStyleBackColor = true;
             // 
-            // panelStartBottole_10
+            // panelStartBottle_10
             // 
-            this.panelStartBottole_10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
-            this.panelStartBottole_10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelStartBottole_10.Location = new System.Drawing.Point(10, 194);
-            this.panelStartBottole_10.Name = "panelStartBottole_10";
-            this.panelStartBottole_10.Size = new System.Drawing.Size(920, 28);
-            this.panelStartBottole_10.TabIndex = 28;
+            this.panelStartBottle_10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(250)))));
+            this.panelStartBottle_10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelStartBottle_10.Location = new System.Drawing.Point(10, 194);
+            this.panelStartBottle_10.Name = "panelStartBottle_10";
+            this.panelStartBottle_10.Size = new System.Drawing.Size(920, 28);
+            this.panelStartBottle_10.TabIndex = 28;
             // 
             // dgvStartBottle_10
             // 
@@ -2489,14 +2489,14 @@ namespace LotTraceApp
             this.dgvStartBottle_10.Size = new System.Drawing.Size(920, 650);
             this.dgvStartBottle_10.TabIndex = 29;
             // 
-            // panelEndBottole_10
+            // panelEndBottle_10
             // 
-            this.panelEndBottole_10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.panelEndBottole_10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelEndBottole_10.Location = new System.Drawing.Point(966, 194);
-            this.panelEndBottole_10.Name = "panelEndBottole_10";
-            this.panelEndBottole_10.Size = new System.Drawing.Size(920, 28);
-            this.panelEndBottole_10.TabIndex = 30;
+            this.panelEndBottle_10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.panelEndBottle_10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelEndBottle_10.Location = new System.Drawing.Point(966, 194);
+            this.panelEndBottle_10.Name = "panelEndBottle_10";
+            this.panelEndBottle_10.Size = new System.Drawing.Size(920, 28);
+            this.panelEndBottle_10.TabIndex = 30;
             // 
             // dgvEndBottle_10
             // 
@@ -2527,15 +2527,15 @@ namespace LotTraceApp
             this.rdoForwardBottle_10.TabStop = true;
             this.rdoForwardBottle_10.Text = "トレースフォワード(追跡)";
             // 
-            // lblBottoleOrderNo_10
+            // lblBottleOrderNo_10
             // 
-            this.lblBottoleOrderNo_10.AutoSize = true;
-            this.lblBottoleOrderNo_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleOrderNo_10.Location = new System.Drawing.Point(20, 20);
-            this.lblBottoleOrderNo_10.Name = "lblBottoleOrderNo_10";
-            this.lblBottoleOrderNo_10.Size = new System.Drawing.Size(79, 16);
-            this.lblBottoleOrderNo_10.TabIndex = 1;
-            this.lblBottoleOrderNo_10.Text = "製造指図番号";
+            this.lblBottleOrderNo_10.AutoSize = true;
+            this.lblBottleOrderNo_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleOrderNo_10.Location = new System.Drawing.Point(20, 20);
+            this.lblBottleOrderNo_10.Name = "lblBottleOrderNo_10";
+            this.lblBottleOrderNo_10.Size = new System.Drawing.Size(79, 16);
+            this.lblBottleOrderNo_10.TabIndex = 1;
+            this.lblBottleOrderNo_10.Text = "製造指図番号";
             // 
             // textBox10
             // 
@@ -2544,36 +2544,36 @@ namespace LotTraceApp
             this.textBox10.Size = new System.Drawing.Size(250, 27);
             this.textBox10.TabIndex = 2;
             // 
-            // txtBottoleItemName_10
+            // txtBottleItemName_10
             // 
-            this.txtBottoleItemName_10.Location = new System.Drawing.Point(110, 50);
-            this.txtBottoleItemName_10.Name = "txtBottoleItemName_10";
-            this.txtBottoleItemName_10.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemName_10.TabIndex = 4;
+            this.txtBottleItemName_10.Location = new System.Drawing.Point(110, 50);
+            this.txtBottleItemName_10.Name = "txtBottleItemName_10";
+            this.txtBottleItemName_10.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemName_10.TabIndex = 4;
             // 
-            // txtBottoleItemCode_10
+            // txtBottleItemCode_10
             // 
-            this.txtBottoleItemCode_10.Location = new System.Drawing.Point(110, 85);
-            this.txtBottoleItemCode_10.Name = "txtBottoleItemCode_10";
-            this.txtBottoleItemCode_10.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleItemCode_10.TabIndex = 6;
+            this.txtBottleItemCode_10.Location = new System.Drawing.Point(110, 85);
+            this.txtBottleItemCode_10.Name = "txtBottleItemCode_10";
+            this.txtBottleItemCode_10.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleItemCode_10.TabIndex = 6;
             // 
-            // txtBottoleLotNo_10
+            // txtBottleLotNo_10
             // 
-            this.txtBottoleLotNo_10.Location = new System.Drawing.Point(110, 120);
-            this.txtBottoleLotNo_10.Name = "txtBottoleLotNo_10";
-            this.txtBottoleLotNo_10.Size = new System.Drawing.Size(250, 27);
-            this.txtBottoleLotNo_10.TabIndex = 8;
+            this.txtBottleLotNo_10.Location = new System.Drawing.Point(110, 120);
+            this.txtBottleLotNo_10.Name = "txtBottleLotNo_10";
+            this.txtBottleLotNo_10.Size = new System.Drawing.Size(250, 27);
+            this.txtBottleLotNo_10.TabIndex = 8;
             // 
-            // lblBottoleItemName_10
+            // lblBottleItemName_10
             // 
-            this.lblBottoleItemName_10.AutoSize = true;
-            this.lblBottoleItemName_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblBottoleItemName_10.Location = new System.Drawing.Point(20, 55);
-            this.lblBottoleItemName_10.Name = "lblBottoleItemName_10";
-            this.lblBottoleItemName_10.Size = new System.Drawing.Size(43, 16);
-            this.lblBottoleItemName_10.TabIndex = 3;
-            this.lblBottoleItemName_10.Text = "品目名";
+            this.lblBottleItemName_10.AutoSize = true;
+            this.lblBottleItemName_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblBottleItemName_10.Location = new System.Drawing.Point(20, 55);
+            this.lblBottleItemName_10.Name = "lblBottleItemName_10";
+            this.lblBottleItemName_10.Size = new System.Drawing.Size(43, 16);
+            this.lblBottleItemName_10.TabIndex = 3;
+            this.lblBottleItemName_10.Text = "品目名";
             // 
             // lblBottleItemCode_10
             // 
@@ -2595,15 +2595,15 @@ namespace LotTraceApp
             this.lblBottleLotNo_10.TabIndex = 7;
             this.lblBottleLotNo_10.Text = "ロット番号";
             // 
-            // lblTargetBottole_10
+            // lblTargetBottle_10
             // 
-            this.lblTargetBottole_10.AutoSize = true;
-            this.lblTargetBottole_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTargetBottole_10.Location = new System.Drawing.Point(20, 160);
-            this.lblTargetBottole_10.Name = "lblTargetBottole_10";
-            this.lblTargetBottole_10.Size = new System.Drawing.Size(55, 16);
-            this.lblTargetBottole_10.TabIndex = 9;
-            this.lblTargetBottole_10.Text = "対象期間";
+            this.lblTargetBottle_10.AutoSize = true;
+            this.lblTargetBottle_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblTargetBottle_10.Location = new System.Drawing.Point(20, 160);
+            this.lblTargetBottle_10.Name = "lblTargetBottle_10";
+            this.lblTargetBottle_10.Size = new System.Drawing.Size(55, 16);
+            this.lblTargetBottle_10.TabIndex = 9;
+            this.lblTargetBottle_10.Text = "対象期間";
             // 
             // timeCheck_10
             // 
@@ -2632,15 +2632,15 @@ namespace LotTraceApp
             this.label18.TabIndex = 12;
             this.label18.Text = "～";
             // 
-            // endBottoleTime_10
+            // endBottleTime_10
             // 
-            this.endBottoleTime_10.CustomFormat = "yyyy/MM/dd";
-            this.endBottoleTime_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.endBottoleTime_10.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endBottoleTime_10.Location = new System.Drawing.Point(251, 155);
-            this.endBottoleTime_10.Name = "endBottoleTime_10";
-            this.endBottoleTime_10.Size = new System.Drawing.Size(110, 27);
-            this.endBottoleTime_10.TabIndex = 14;
+            this.endBottleTime_10.CustomFormat = "yyyy/MM/dd";
+            this.endBottleTime_10.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.endBottleTime_10.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endBottleTime_10.Location = new System.Drawing.Point(251, 155);
+            this.endBottleTime_10.Name = "endBottleTime_10";
+            this.endBottleTime_10.Size = new System.Drawing.Size(110, 27);
+            this.endBottleTime_10.TabIndex = 14;
             // 
             // btnClearBottle_10
             // 
@@ -2669,175 +2669,175 @@ namespace LotTraceApp
             this.btnTraceSearch_10.TabIndex = 22;
             this.btnTraceSearch_10.Text = "トレース検索";
             // 
-            // bottoleTitle
+            // BottleTitle
             // 
-            this.bottoleTitle.AutoSize = true;
-            this.bottoleTitle.Font = new System.Drawing.Font("游ゴシック", 20F);
-            this.bottoleTitle.Location = new System.Drawing.Point(785, 8);
-            this.bottoleTitle.Name = "bottoleTitle";
-            this.bottoleTitle.Size = new System.Drawing.Size(285, 35);
-            this.bottoleTitle.TabIndex = 50;
-            this.bottoleTitle.Text = "瓶設備ロットトレース";
+            this.BottleTitle.AutoSize = true;
+            this.BottleTitle.Font = new System.Drawing.Font("游ゴシック", 20F);
+            this.BottleTitle.Location = new System.Drawing.Point(785, 8);
+            this.BottleTitle.Name = "BottleTitle";
+            this.BottleTitle.Size = new System.Drawing.Size(285, 35);
+            this.BottleTitle.TabIndex = 50;
+            this.BottleTitle.Text = "瓶設備ロットトレース";
             // 
-            // rdoBottoleTabNameItemCode
+            // rdoBottleTabNameItemCode
             // 
-            this.rdoBottoleTabNameItemCode.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoBottoleTabNameItemCode.Location = new System.Drawing.Point(1389, 31);
-            this.rdoBottoleTabNameItemCode.Name = "rdoBottoleTabNameItemCode";
-            this.rdoBottoleTabNameItemCode.Size = new System.Drawing.Size(110, 24);
-            this.rdoBottoleTabNameItemCode.TabIndex = 53;
-            this.rdoBottoleTabNameItemCode.Text = "品目コード";
+            this.rdoBottleTabNameItemCode.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.rdoBottleTabNameItemCode.Location = new System.Drawing.Point(1389, 31);
+            this.rdoBottleTabNameItemCode.Name = "rdoBottleTabNameItemCode";
+            this.rdoBottleTabNameItemCode.Size = new System.Drawing.Size(110, 24);
+            this.rdoBottleTabNameItemCode.TabIndex = 53;
+            this.rdoBottleTabNameItemCode.Text = "品目コード";
             // 
-            // selectBottole
+            // selectBottle
             // 
-            this.selectBottole.AutoSize = true;
-            this.selectBottole.Font = new System.Drawing.Font("游ゴシック", 12F);
-            this.selectBottole.Location = new System.Drawing.Point(1265, 10);
-            this.selectBottole.Name = "selectBottole";
-            this.selectBottole.Size = new System.Drawing.Size(106, 21);
-            this.selectBottole.TabIndex = 52;
-            this.selectBottole.Text = "タブ名称選択";
+            this.selectBottle.AutoSize = true;
+            this.selectBottle.Font = new System.Drawing.Font("游ゴシック", 12F);
+            this.selectBottle.Location = new System.Drawing.Point(1265, 10);
+            this.selectBottle.Name = "selectBottle";
+            this.selectBottle.Size = new System.Drawing.Size(106, 21);
+            this.selectBottle.TabIndex = 52;
+            this.selectBottle.Text = "タブ名称選択";
             // 
-            // rdoBottoleTabNameOrder
+            // rdoBottleTabNameOrder
             // 
-            this.rdoBottoleTabNameOrder.Checked = true;
-            this.rdoBottoleTabNameOrder.Font = new System.Drawing.Font("游ゴシック", 10F);
-            this.rdoBottoleTabNameOrder.Location = new System.Drawing.Point(1389, 7);
-            this.rdoBottoleTabNameOrder.Name = "rdoBottoleTabNameOrder";
-            this.rdoBottoleTabNameOrder.Size = new System.Drawing.Size(110, 24);
-            this.rdoBottoleTabNameOrder.TabIndex = 51;
-            this.rdoBottoleTabNameOrder.TabStop = true;
-            this.rdoBottoleTabNameOrder.Text = "製造指図番号";
+            this.rdoBottleTabNameOrder.Checked = true;
+            this.rdoBottleTabNameOrder.Font = new System.Drawing.Font("游ゴシック", 10F);
+            this.rdoBottleTabNameOrder.Location = new System.Drawing.Point(1389, 7);
+            this.rdoBottleTabNameOrder.Name = "rdoBottleTabNameOrder";
+            this.rdoBottleTabNameOrder.Size = new System.Drawing.Size(110, 24);
+            this.rdoBottleTabNameOrder.TabIndex = 51;
+            this.rdoBottleTabNameOrder.TabStop = true;
+            this.rdoBottleTabNameOrder.Text = "製造指図番号";
             // 
-            // btnBottoleExcelOutput
+            // btnBottleExcelOutput
             // 
-            this.btnBottoleExcelOutput.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnBottoleExcelOutput.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnBottoleExcelOutput.Location = new System.Drawing.Point(1560, 15);
-            this.btnBottoleExcelOutput.Name = "btnBottoleExcelOutput";
-            this.btnBottoleExcelOutput.Size = new System.Drawing.Size(150, 50);
-            this.btnBottoleExcelOutput.TabIndex = 54;
-            this.btnBottoleExcelOutput.Text = "EXCEL出力";
+            this.btnBottleExcelOutput.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnBottleExcelOutput.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnBottleExcelOutput.Location = new System.Drawing.Point(1560, 15);
+            this.btnBottleExcelOutput.Name = "btnBottleExcelOutput";
+            this.btnBottleExcelOutput.Size = new System.Drawing.Size(150, 50);
+            this.btnBottleExcelOutput.TabIndex = 54;
+            this.btnBottleExcelOutput.Text = "EXCEL出力";
             // 
-            // btnBottoleDetectCrossPoints
+            // btnBottleDetectCrossPoints
             // 
-            this.btnBottoleDetectCrossPoints.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.btnBottoleDetectCrossPoints.Location = new System.Drawing.Point(1732, 15);
-            this.btnBottoleDetectCrossPoints.Name = "btnBottoleDetectCrossPoints";
-            this.btnBottoleDetectCrossPoints.Size = new System.Drawing.Size(150, 50);
-            this.btnBottoleDetectCrossPoints.TabIndex = 55;
-            this.btnBottoleDetectCrossPoints.Text = "交点検出";
+            this.btnBottleDetectCrossPoints.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnBottleDetectCrossPoints.Location = new System.Drawing.Point(1732, 15);
+            this.btnBottleDetectCrossPoints.Name = "btnBottleDetectCrossPoints";
+            this.btnBottleDetectCrossPoints.Size = new System.Drawing.Size(150, 50);
+            this.btnBottleDetectCrossPoints.TabIndex = 55;
+            this.btnBottleDetectCrossPoints.Text = "交点検出";
             // 
-            // checkBottole1
+            // checkBottle1
             // 
-            this.checkBottole1.AutoSize = true;
-            this.checkBottole1.Location = new System.Drawing.Point(12, 71);
-            this.checkBottole1.Name = "checkBottole1";
-            this.checkBottole1.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole1.TabIndex = 56;
-            this.checkBottole1.UseVisualStyleBackColor = true;
+            this.checkBottle1.AutoSize = true;
+            this.checkBottle1.Location = new System.Drawing.Point(12, 71);
+            this.checkBottle1.Name = "checkBottle1";
+            this.checkBottle1.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle1.TabIndex = 56;
+            this.checkBottle1.UseVisualStyleBackColor = true;
             // 
-            // checkBottole2
+            // checkBottle2
             // 
-            this.checkBottole2.AutoSize = true;
-            this.checkBottole2.Location = new System.Drawing.Point(184, 71);
-            this.checkBottole2.Name = "checkBottole2";
-            this.checkBottole2.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole2.TabIndex = 56;
-            this.checkBottole2.UseVisualStyleBackColor = true;
+            this.checkBottle2.AutoSize = true;
+            this.checkBottle2.Location = new System.Drawing.Point(184, 71);
+            this.checkBottle2.Name = "checkBottle2";
+            this.checkBottle2.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle2.TabIndex = 56;
+            this.checkBottle2.UseVisualStyleBackColor = true;
             // 
-            // checkBottole3
+            // checkBottle3
             // 
-            this.checkBottole3.AutoSize = true;
-            this.checkBottole3.Location = new System.Drawing.Point(358, 71);
-            this.checkBottole3.Name = "checkBottole3";
-            this.checkBottole3.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole3.TabIndex = 56;
-            this.checkBottole3.UseVisualStyleBackColor = true;
+            this.checkBottle3.AutoSize = true;
+            this.checkBottle3.Location = new System.Drawing.Point(358, 71);
+            this.checkBottle3.Name = "checkBottle3";
+            this.checkBottle3.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle3.TabIndex = 56;
+            this.checkBottle3.UseVisualStyleBackColor = true;
             // 
-            // checkBottole4
+            // checkBottle4
             // 
-            this.checkBottole4.AutoSize = true;
-            this.checkBottole4.Location = new System.Drawing.Point(527, 71);
-            this.checkBottole4.Name = "checkBottole4";
-            this.checkBottole4.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole4.TabIndex = 56;
-            this.checkBottole4.UseVisualStyleBackColor = true;
+            this.checkBottle4.AutoSize = true;
+            this.checkBottle4.Location = new System.Drawing.Point(527, 71);
+            this.checkBottle4.Name = "checkBottle4";
+            this.checkBottle4.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle4.TabIndex = 56;
+            this.checkBottle4.UseVisualStyleBackColor = true;
             // 
-            // checkBottole5
+            // checkBottle5
             // 
-            this.checkBottole5.AutoSize = true;
-            this.checkBottole5.Location = new System.Drawing.Point(699, 71);
-            this.checkBottole5.Name = "checkBottole5";
-            this.checkBottole5.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole5.TabIndex = 56;
-            this.checkBottole5.UseVisualStyleBackColor = true;
+            this.checkBottle5.AutoSize = true;
+            this.checkBottle5.Location = new System.Drawing.Point(699, 71);
+            this.checkBottle5.Name = "checkBottle5";
+            this.checkBottle5.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle5.TabIndex = 56;
+            this.checkBottle5.UseVisualStyleBackColor = true;
             // 
-            // checkBottole6
+            // checkBottle6
             // 
-            this.checkBottole6.AutoSize = true;
-            this.checkBottole6.Location = new System.Drawing.Point(871, 71);
-            this.checkBottole6.Name = "checkBottole6";
-            this.checkBottole6.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole6.TabIndex = 56;
-            this.checkBottole6.UseVisualStyleBackColor = true;
+            this.checkBottle6.AutoSize = true;
+            this.checkBottle6.Location = new System.Drawing.Point(871, 71);
+            this.checkBottle6.Name = "checkBottle6";
+            this.checkBottle6.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle6.TabIndex = 56;
+            this.checkBottle6.UseVisualStyleBackColor = true;
             // 
-            // checkBottole7
+            // checkBottle7
             // 
-            this.checkBottole7.AutoSize = true;
-            this.checkBottole7.Location = new System.Drawing.Point(1042, 71);
-            this.checkBottole7.Name = "checkBottole7";
-            this.checkBottole7.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole7.TabIndex = 56;
-            this.checkBottole7.UseVisualStyleBackColor = true;
+            this.checkBottle7.AutoSize = true;
+            this.checkBottle7.Location = new System.Drawing.Point(1042, 71);
+            this.checkBottle7.Name = "checkBottle7";
+            this.checkBottle7.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle7.TabIndex = 56;
+            this.checkBottle7.UseVisualStyleBackColor = true;
             // 
-            // checkBottole8
+            // checkBottle8
             // 
-            this.checkBottole8.AutoSize = true;
-            this.checkBottole8.Location = new System.Drawing.Point(1212, 71);
-            this.checkBottole8.Name = "checkBottole8";
-            this.checkBottole8.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole8.TabIndex = 56;
-            this.checkBottole8.UseVisualStyleBackColor = true;
+            this.checkBottle8.AutoSize = true;
+            this.checkBottle8.Location = new System.Drawing.Point(1212, 71);
+            this.checkBottle8.Name = "checkBottle8";
+            this.checkBottle8.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle8.TabIndex = 56;
+            this.checkBottle8.UseVisualStyleBackColor = true;
             // 
-            // checkBottole9
+            // checkBottle9
             // 
-            this.checkBottole9.AutoSize = true;
-            this.checkBottole9.Location = new System.Drawing.Point(1389, 71);
-            this.checkBottole9.Name = "checkBottole9";
-            this.checkBottole9.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole9.TabIndex = 56;
-            this.checkBottole9.UseVisualStyleBackColor = true;
+            this.checkBottle9.AutoSize = true;
+            this.checkBottle9.Location = new System.Drawing.Point(1389, 71);
+            this.checkBottle9.Name = "checkBottle9";
+            this.checkBottle9.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle9.TabIndex = 56;
+            this.checkBottle9.UseVisualStyleBackColor = true;
             // 
-            // checkBottole10
+            // checkBottle10
             // 
-            this.checkBottole10.AutoSize = true;
-            this.checkBottole10.Location = new System.Drawing.Point(1560, 71);
-            this.checkBottole10.Name = "checkBottole10";
-            this.checkBottole10.Size = new System.Drawing.Size(15, 14);
-            this.checkBottole10.TabIndex = 56;
-            this.checkBottole10.UseVisualStyleBackColor = true;
+            this.checkBottle10.AutoSize = true;
+            this.checkBottle10.Location = new System.Drawing.Point(1560, 71);
+            this.checkBottle10.Name = "checkBottle10";
+            this.checkBottle10.Size = new System.Drawing.Size(15, 14);
+            this.checkBottle10.TabIndex = 56;
+            this.checkBottle10.UseVisualStyleBackColor = true;
             // 
             // BottleTraceForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1920, 1024);
-            this.Controls.Add(this.checkBottole10);
-            this.Controls.Add(this.checkBottole9);
-            this.Controls.Add(this.checkBottole8);
-            this.Controls.Add(this.checkBottole7);
-            this.Controls.Add(this.checkBottole6);
-            this.Controls.Add(this.checkBottole5);
-            this.Controls.Add(this.checkBottole4);
-            this.Controls.Add(this.checkBottole3);
-            this.Controls.Add(this.checkBottole2);
-            this.Controls.Add(this.checkBottole1);
-            this.Controls.Add(this.btnBottoleExcelOutput);
-            this.Controls.Add(this.btnBottoleDetectCrossPoints);
-            this.Controls.Add(this.rdoBottoleTabNameItemCode);
-            this.Controls.Add(this.selectBottole);
-            this.Controls.Add(this.rdoBottoleTabNameOrder);
-            this.Controls.Add(this.bottoleTitle);
+            this.Controls.Add(this.checkBottle10);
+            this.Controls.Add(this.checkBottle9);
+            this.Controls.Add(this.checkBottle8);
+            this.Controls.Add(this.checkBottle7);
+            this.Controls.Add(this.checkBottle6);
+            this.Controls.Add(this.checkBottle5);
+            this.Controls.Add(this.checkBottle4);
+            this.Controls.Add(this.checkBottle3);
+            this.Controls.Add(this.checkBottle2);
+            this.Controls.Add(this.checkBottle1);
+            this.Controls.Add(this.btnBottleExcelOutput);
+            this.Controls.Add(this.btnBottleDetectCrossPoints);
+            this.Controls.Add(this.rdoBottleTabNameItemCode);
+            this.Controls.Add(this.selectBottle);
+            this.Controls.Add(this.rdoBottleTabNameOrder);
+            this.Controls.Add(this.BottleTitle);
             this.Controls.Add(this.swichBottleTab);
             this.Controls.Add(this.btnBackToLiquid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -2845,47 +2845,47 @@ namespace LotTraceApp
             this.Name = "BottleTraceForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "瓶設備ロットトレース";
-            this.bottoleIntersectionTab.ResumeLayout(false);
+            this.BottleIntersectionTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridIntersection)).EndInit();
-            this.tabBottolePage2.ResumeLayout(false);
-            this.tabBottolePage2.PerformLayout();
+            this.tabBottlePage2.ResumeLayout(false);
+            this.tabBottlePage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_2)).EndInit();
             this.swichBottleTab.ResumeLayout(false);
-            this.tabBottolePage1.ResumeLayout(false);
-            this.tabBottolePage1.PerformLayout();
+            this.tabBottlePage1.ResumeLayout(false);
+            this.tabBottlePage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle)).EndInit();
-            this.tabBottolePage3.ResumeLayout(false);
-            this.tabBottolePage3.PerformLayout();
+            this.tabBottlePage3.ResumeLayout(false);
+            this.tabBottlePage3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_3)).EndInit();
-            this.tabBottolePage4.ResumeLayout(false);
-            this.tabBottolePage4.PerformLayout();
+            this.tabBottlePage4.ResumeLayout(false);
+            this.tabBottlePage4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_4)).EndInit();
-            this.tabBottolePage5.ResumeLayout(false);
-            this.tabBottolePage5.PerformLayout();
+            this.tabBottlePage5.ResumeLayout(false);
+            this.tabBottlePage5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_5)).EndInit();
-            this.tabBottolePage6.ResumeLayout(false);
-            this.tabBottolePage6.PerformLayout();
+            this.tabBottlePage6.ResumeLayout(false);
+            this.tabBottlePage6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_6)).EndInit();
-            this.tabBottolePage7.ResumeLayout(false);
-            this.tabBottolePage7.PerformLayout();
+            this.tabBottlePage7.ResumeLayout(false);
+            this.tabBottlePage7.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_7)).EndInit();
-            this.tabBottolePage8.ResumeLayout(false);
-            this.tabBottolePage8.PerformLayout();
+            this.tabBottlePage8.ResumeLayout(false);
+            this.tabBottlePage8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_8)).EndInit();
-            this.tabBottolePage9.ResumeLayout(false);
-            this.tabBottolePage9.PerformLayout();
+            this.tabBottlePage9.ResumeLayout(false);
+            this.tabBottlePage9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_9)).EndInit();
-            this.tabBottolePage10.ResumeLayout(false);
-            this.tabBottolePage10.PerformLayout();
+            this.tabBottlePage10.ResumeLayout(false);
+            this.tabBottlePage10.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStartBottle_10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEndBottle_10)).EndInit();
             this.ResumeLayout(false);
@@ -2895,254 +2895,254 @@ namespace LotTraceApp
 
         #endregion
         private Button btnBackToLiquid;
-        private TabPage bottoleIntersectionTab;
+        private TabPage BottleIntersectionTab;
         private DataGridView dataGridIntersection;
-        private TabPage tabBottolePage2;
+        private TabPage tabBottlePage2;
         private DataGridView dgvStartBottle_2;
         private DataGridView dgvEndBottle_2;
         private RadioButton rdoBackwardBottle_2;
         private RadioButton rdoForwardBottle_2;
-        private Label lblBottoleOrderNo_2;
-        private Panel panelStartBottole_2;
-        private Panel panelEndBottole_2;
-        private TextBox txtBottoleOrderNo_2;
-        private TextBox txtBottoleItemName_2;
-        private TextBox txtBottoleItemCode_2;
-        private TextBox txtBottoleLotNo_2;
-        private Label lblBottoleItemName_2;
+        private Label lblBottleOrderNo_2;
+        private Panel panelStartBottle_2;
+        private Panel panelEndBottle_2;
+        private TextBox txtBottleOrderNo_2;
+        private TextBox txtBottleItemName_2;
+        private TextBox txtBottleItemCode_2;
+        private TextBox txtBottleLotNo_2;
+        private Label lblBottleItemName_2;
         private Label lblBottleItemCode_2;
         private Label lblBottleLotNo_2;
-        private Label lblTargetBottole_2;
+        private Label lblTargetBottle_2;
         private CheckBox timeCheck_2;
-        private DateTimePicker startBottoleTime_2;
-        private Label lblBottole_2;
-        private DateTimePicker endBottoleTime_2;
-        private Button btnClearBottole_2;
-        private Button btnCsvOutputBottole_2;
-        private Button btnBottoleTraceSearch_2;
+        private DateTimePicker startBottleTime_2;
+        private Label lblBottle_2;
+        private DateTimePicker endBottleTime_2;
+        private Button btnClearBottle_2;
+        private Button btnCsvOutputBottle_2;
+        private Button btnBottleTraceSearch_2;
         private TabControl swichBottleTab;
-        private TabPage tabBottolePage1;
-        private Panel panelStartBottole;
+        private TabPage tabBottlePage1;
+        private Panel panelStartBottle;
         private DataGridView dgvStartBottle;
-        private Panel panelEndBottole;
+        private Panel panelEndBottle;
         private DataGridView dgvEndBottle;
         private RadioButton rdoBackwardBottle;
         private RadioButton rdoForwardBottle;
-        private Label lblBottoleOrderNo;
-        private TextBox txtBottoleOrderNo;
-        private TextBox txtBottoleItemName;
-        private TextBox txtBottoleItemCode;
-        private TextBox txtBottoleLotNo;
-        private Label lblBottoleItemName;
+        private Label lblBottleOrderNo;
+        private TextBox txtBottleOrderNo;
+        private TextBox txtBottleItemName;
+        private TextBox txtBottleItemCode;
+        private TextBox txtBottleLotNo;
+        private Label lblBottleItemName;
         private Label lblBottleItemCode;
         private Label lblBottleLotNo;
-        private Label lblTargetBottole;
+        private Label lblTargetBottle;
         private CheckBox timeCheck;
-        private DateTimePicker startBottoleTime;
+        private DateTimePicker startBottleTime;
         private Label lblTilde;
-        private DateTimePicker endBottoleTime;
+        private DateTimePicker endBottleTime;
         private Button btnClearBottle;
         private Button btnCsvOutputBottle;
-        private Button btnBottoleTraceSearch;
-        private TabPage tabBottolePage3;
-        private Panel panelStartBottole_3;
+        private Button btnBottleTraceSearch;
+        private TabPage tabBottlePage3;
+        private Panel panelStartBottle_3;
         private DataGridView dgvStartBottle_3;
-        private Panel panelEndBottole_3;
+        private Panel panelEndBottle_3;
         private DataGridView dgvEndBottle_3;
         private RadioButton rdoBackwardBottle_3;
         private RadioButton rdoForwardBottle_3;
-        private Label lblBottoleOrderNo_3;
-        private TextBox txtBottoleOrderNo_3;
-        private TextBox txtBottoleItemName_3;
-        private TextBox txtBottoleItemCode_3;
-        private TextBox txtBottoleLotNo_3;
-        private Label lblBottoleItemName_3;
+        private Label lblBottleOrderNo_3;
+        private TextBox txtBottleOrderNo_3;
+        private TextBox txtBottleItemName_3;
+        private TextBox txtBottleItemCode_3;
+        private TextBox txtBottleLotNo_3;
+        private Label lblBottleItemName_3;
         private Label lblBottleItemCode_3;
         private Label lblBottleLotNo_3;
-        private Label lblTargetBottole_3;
+        private Label lblTargetBottle_3;
         private CheckBox timeCheck_3;
-        private DateTimePicker startBottoleTime_3;
-        private Label lblBottole_3;
-        private DateTimePicker endBottoleTime_3;
+        private DateTimePicker startBottleTime_3;
+        private Label lblBottle_3;
+        private DateTimePicker endBottleTime_3;
         private Button btnClearBottle_3;
         private Button btnCsvOutputBottle_3;
         private Button btnTraceSearch_3;
-        private TabPage tabBottolePage4;
-        private Panel panelStartBottole_4;
+        private TabPage tabBottlePage4;
+        private Panel panelStartBottle_4;
         private DataGridView dgvStartBottle_4;
-        private Panel panelEndBottole_4;
+        private Panel panelEndBottle_4;
         private DataGridView dgvEndBottle_4;
         private RadioButton rdoBackwardBottle_4;
         private RadioButton rdoForwardBottle_4;
         private Label lblOrderNumber_4;
-        private TextBox txtBottoleOrderNo_4;
+        private TextBox txtBottleOrderNo_4;
         private TextBox textBox7;
-        private TextBox txtBottoleItemCode_4;
-        private TextBox txtBottoleLotNo_4;
-        private Label lblBottoleItemName_4;
+        private TextBox txtBottleItemCode_4;
+        private TextBox txtBottleLotNo_4;
+        private Label lblBottleItemName_4;
         private Label lblBottleItemCode_4;
         private Label lblBottleLotNo_4;
-        private Label lblTargetBottole_4;
+        private Label lblTargetBottle_4;
         private CheckBox timeCheck_4;
-        private DateTimePicker startBottoleTime_4;
-        private Label lblBottole_4;
-        private DateTimePicker endBottoleTime_4;
+        private DateTimePicker startBottleTime_4;
+        private Label lblBottle_4;
+        private DateTimePicker endBottleTime_4;
         private Button btnClearBottle_4;
         private Button btnCsvOutputBottle_4;
         private Button btnTraceSearch_4;
-        private TabPage tabBottolePage5;
-        private Panel panelStartBottole_5;
+        private TabPage tabBottlePage5;
+        private Panel panelStartBottle_5;
         private DataGridView dgvStartBottle_5;
-        private Panel panelEndBottole_5;
+        private Panel panelEndBottle_5;
         private DataGridView dgvEndBottle_5;
         private RadioButton rdoBackwardBottle_5;
         private RadioButton rdoForwardBottle_5;
-        private Label lblBottoleOrderNo_5;
-        private TextBox txtBottoleOrderNo_5;
-        private TextBox txtBottoleItemName_5;
-        private TextBox txtBottoleItemCode_5;
-        private TextBox txtBottoleLotNo_5;
-        private Label lblBottoleItemName_5;
+        private Label lblBottleOrderNo_5;
+        private TextBox txtBottleOrderNo_5;
+        private TextBox txtBottleItemName_5;
+        private TextBox txtBottleItemCode_5;
+        private TextBox txtBottleLotNo_5;
+        private Label lblBottleItemName_5;
         private Label lblBottleItemCode_5;
         private Label lblBottleLotNo_5;
-        private Label lblTargetBottole_5;
+        private Label lblTargetBottle_5;
         private CheckBox timeCheck_5;
-        private DateTimePicker startBottoleTime_5;
-        private Label lblBottole_5;
-        private DateTimePicker endBottoleTime_5;
+        private DateTimePicker startBottleTime_5;
+        private Label lblBottle_5;
+        private DateTimePicker endBottleTime_5;
         private Button btnClearBottle_5;
         private Button btnCsvOutputBottle_5;
         private Button btnTraceSearch_5;
-        private TabPage tabBottolePage6;
-        private Panel panelStartBottole_6;
+        private TabPage tabBottlePage6;
+        private Panel panelStartBottle_6;
         private DataGridView dgvStartBottle_6;
-        private Panel panelEndBottole_6;
+        private Panel panelEndBottle_6;
         private DataGridView dgvEndBottle_6;
         private RadioButton rdoBackwardBottle_6;
         private RadioButton rdoForwardBottle_6;
-        private Label lblBottoleOrderNo_6;
-        private TextBox txtBottoleOrderNo_6;
-        private TextBox txtBottoleItemName_6;
-        private TextBox txtBottoleItemCode_6;
-        private TextBox txtBottoleLotNo_6;
-        private Label lblBottoleItemName_6;
+        private Label lblBottleOrderNo_6;
+        private TextBox txtBottleOrderNo_6;
+        private TextBox txtBottleItemName_6;
+        private TextBox txtBottleItemCode_6;
+        private TextBox txtBottleLotNo_6;
+        private Label lblBottleItemName_6;
         private Label lblBottleItemCode_6;
         private Label lblBottleLotNo_6;
-        private Label lblTargetBottole_6;
+        private Label lblTargetBottle_6;
         private CheckBox timeCheck_6;
-        private DateTimePicker startBottoleTime_6;
-        private Label lblBottole_6;
-        private DateTimePicker endBottoleTime_6;
+        private DateTimePicker startBottleTime_6;
+        private Label lblBottle_6;
+        private DateTimePicker endBottleTime_6;
         private Button btnClearBottle_6;
         private Button btnCsvOutputBottle_6;
         private Button btnTraceSearch_6;
-        private TabPage tabBottolePage7;
-        private Panel panelStartBottole_7;
+        private TabPage tabBottlePage7;
+        private Panel panelStartBottle_7;
         private DataGridView dgvStartBottle_7;
-        private Panel panelEndBottole_7;
+        private Panel panelEndBottle_7;
         private DataGridView dgvEndBottle_7;
         private RadioButton rdoBackwardBottle_7;
         private RadioButton rdoForwardBottle_7;
-        private Label lblBottoleOrderNo_7;
-        private TextBox txtBottoleOrderNo_7;
-        private TextBox txtBottoleItemName_7;
-        private TextBox txtBottoleItemCode_7;
-        private TextBox txtBottoleLotNo_7;
-        private Label lblBottoleItemName_7;
+        private Label lblBottleOrderNo_7;
+        private TextBox txtBottleOrderNo_7;
+        private TextBox txtBottleItemName_7;
+        private TextBox txtBottleItemCode_7;
+        private TextBox txtBottleLotNo_7;
+        private Label lblBottleItemName_7;
         private Label lblBottleItemCode_7;
         private Label lblBottleLotNo_7;
-        private Label lblTargetBottole_7;
+        private Label lblTargetBottle_7;
         private CheckBox timeCheck_7;
-        private DateTimePicker startBottoleTime_7;
-        private Label lblBottole_7;
-        private DateTimePicker endBottoleTime_7;
+        private DateTimePicker startBottleTime_7;
+        private Label lblBottle_7;
+        private DateTimePicker endBottleTime_7;
         private Button btnClearBottle_7;
         private Button btnCsvOutputBottle_7;
         private Button btnTraceSearch_7;
-        private TabPage tabBottolePage8;
-        private Panel panelStartBottole_8;
+        private TabPage tabBottlePage8;
+        private Panel panelStartBottle_8;
         private DataGridView dgvStartBottle_8;
-        private Panel panelEndBottole_8;
+        private Panel panelEndBottle_8;
         private DataGridView dgvEndBottle_8;
         private RadioButton rdoBackwardBottle_8;
         private RadioButton rdoForwardBottle_8;
-        private Label lblBottoleOrderNo_8;
-        private TextBox txtBottoleOrderNo_8;
-        private TextBox txtBottoleItemName_8;
-        private TextBox txtBottoleItemCode_8;
-        private TextBox txtBottoleLotNo_8;
-        private Label lblBottoleItemName_8;
+        private Label lblBottleOrderNo_8;
+        private TextBox txtBottleOrderNo_8;
+        private TextBox txtBottleItemName_8;
+        private TextBox txtBottleItemCode_8;
+        private TextBox txtBottleLotNo_8;
+        private Label lblBottleItemName_8;
         private Label lblBottleItemCode_8;
         private Label lblBottleLotNo_8;
-        private Label lblTargetBottole_8;
+        private Label lblTargetBottle_8;
         private CheckBox timeCheck_8;
-        private DateTimePicker startBottoleTime_8;
-        private Label lblBottole_8;
-        private DateTimePicker endBottoleTime_8;
+        private DateTimePicker startBottleTime_8;
+        private Label lblBottle_8;
+        private DateTimePicker endBottleTime_8;
         private Button btnClearBottle_8;
         private Button btnCsvOutputBottle_8;
         private Button btnTraceSearch_8;
-        private TabPage tabBottolePage9;
-        private Panel panelStartBottole_9;
+        private TabPage tabBottlePage9;
+        private Panel panelStartBottle_9;
         private DataGridView dgvStartBottle_9;
-        private Panel panelEndBottole_9;
+        private Panel panelEndBottle_9;
         private DataGridView dgvEndBottle_9;
         private RadioButton rdoBackwardBottle_9;
         private RadioButton rdoForwardBottle_9;
-        private Label lblBottoleOrderNo_9;
-        private TextBox txtBottoleOrderNo_9;
-        private TextBox txtBottoleItemName_9;
-        private TextBox txtBottoleItemCode_9;
-        private TextBox txtBottoleLotNo_9;
-        private Label lblBottoleItemName_9;
+        private Label lblBottleOrderNo_9;
+        private TextBox txtBottleOrderNo_9;
+        private TextBox txtBottleItemName_9;
+        private TextBox txtBottleItemCode_9;
+        private TextBox txtBottleLotNo_9;
+        private Label lblBottleItemName_9;
         private Label lblBottleItemCode_9;
         private Label lblBottleLotNo_9;
-        private Label lblTargetBottole_9;
+        private Label lblTargetBottle_9;
         private CheckBox timeCheck_9;
-        private DateTimePicker startBottoleTime_9;
-        private Label lblBottole_9;
-        private DateTimePicker endBottoleTime_9;
+        private DateTimePicker startBottleTime_9;
+        private Label lblBottle_9;
+        private DateTimePicker endBottleTime_9;
         private Button btnClearBottle_9;
         private Button btnCsvOutputBottle_9;
         private Button btnTraceSearch_9;
-        private TabPage tabBottolePage10;
-        private Panel panelStartBottole_10;
+        private TabPage tabBottlePage10;
+        private Panel panelStartBottle_10;
         private DataGridView dgvStartBottle_10;
-        private Panel panelEndBottole_10;
+        private Panel panelEndBottle_10;
         private DataGridView dgvEndBottle_10;
         private RadioButton radioButton5;
         private RadioButton rdoForwardBottle_10;
-        private Label lblBottoleOrderNo_10;
+        private Label lblBottleOrderNo_10;
         private TextBox textBox10;
-        private TextBox txtBottoleItemName_10;
-        private TextBox txtBottoleItemCode_10;
-        private TextBox txtBottoleLotNo_10;
-        private Label lblBottoleItemName_10;
+        private TextBox txtBottleItemName_10;
+        private TextBox txtBottleItemCode_10;
+        private TextBox txtBottleLotNo_10;
+        private Label lblBottleItemName_10;
         private Label lblBottleItemCode_10;
         private Label lblBottleLotNo_10;
-        private Label lblTargetBottole_10;
+        private Label lblTargetBottle_10;
         private CheckBox timeCheck_10;
         private DateTimePicker dateTimePicker5;
         private Label label18;
-        private DateTimePicker endBottoleTime_10;
+        private DateTimePicker endBottleTime_10;
         private Button btnClearBottle_10;
         private Button btnCsvOutputBottle_10;
         private Button btnTraceSearch_10;
-        private Label bottoleTitle;
-        private RadioButton rdoBottoleTabNameItemCode;
-        private Label selectBottole;
-        private RadioButton rdoBottoleTabNameOrder;
-        private Button btnBottoleExcelOutput;
-        private Button btnBottoleDetectCrossPoints;
-        private CheckBox checkBottole1;
-        private CheckBox checkBottole2;
-        private CheckBox checkBottole3;
-        private CheckBox checkBottole4;
-        private CheckBox checkBottole5;
-        private CheckBox checkBottole6;
-        private CheckBox checkBottole7;
-        private CheckBox checkBottole8;
-        private CheckBox checkBottole9;
-        private CheckBox checkBottole10;
+        private Label BottleTitle;
+        private RadioButton rdoBottleTabNameItemCode;
+        private Label selectBottle;
+        private RadioButton rdoBottleTabNameOrder;
+        private Button btnBottleExcelOutput;
+        private Button btnBottleDetectCrossPoints;
+        private CheckBox checkBottle1;
+        private CheckBox checkBottle2;
+        private CheckBox checkBottle3;
+        private CheckBox checkBottle4;
+        private CheckBox checkBottle5;
+        private CheckBox checkBottle6;
+        private CheckBox checkBottle7;
+        private CheckBox checkBottle8;
+        private CheckBox checkBottle9;
+        private CheckBox checkBottle10;
     }
 }
