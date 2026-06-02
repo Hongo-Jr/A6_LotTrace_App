@@ -103,9 +103,19 @@ namespace LotTraceApp.Models
             LineRanges = new List<BottleLineRanges>();
         }
     }
+
+    public class BottleTraceResult
+    {
+        public BottleDisplayTables DisplayTables { get; set; }
+        public List<BottleDisplayGroup> DisplayGroups { get; set; }
+
+        public BottleTraceResult()
+        {
+            DisplayGroups = new List<BottleDisplayGroup>();
+        }
+    }
    
   
-
     public class BottleLineRanges
     {
         public int BorderType { get; set; }

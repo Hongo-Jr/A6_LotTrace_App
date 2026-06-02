@@ -61,6 +61,21 @@ namespace LotTraceApp.Utils
             public ISet<string> CrossPointNodeKeys { get; set; }
         }
 
+        public sealed class DataTableExcelExportRequest
+        {
+            public string WorksheetName { get; set; }
+            public DataTable Table { get; set; }
+        }
+
+        public sealed class BottleTraceGridExcelExportRequest
+        {
+            public string WorksheetName { get; set; }
+            public DataGridView LeftGrid { get; set; }
+            public DataGridView RightGrid { get; set; }
+            public IEnumerable<BottleLineRanges> LineRanges { get; set; }
+            public ISet<string> CrossPointNodeKeys { get; set; }
+        }
+
         public static void ExportCurrentGridsToExcel(
     string filePath,
     DataGridView dgvLeft,
@@ -129,6 +144,93 @@ namespace LotTraceApp.Utils
                             request.DisplayResult,
                             request.DrawContext,
                             request.CrossPointNodeKeys);
+                        hasAnySheet = true;
+                    }
+                }
+
+                if (HasVisibleData(intersectionGrid))
+                {
+                    WriteDataGridSheet(
+                        wb,
+                        string.IsNullOrWhiteSpace(intersectionWorksheetName)
+                            ? "CrossPoints"
+                            : intersectionWorksheetName,
+                        intersectionGrid);
+                    hasAnySheet = true;
+                }
+
+                if (!hasAnySheet)
+                    throw new InvalidOperationException("出力対象のシートがありません。");
+
+                wb.SaveAs(filePath);
+            }
+        }
+
+        public static void ExportDataTableSheetsToExcel(
+            string filePath,
+            IEnumerable<DataTableExcelExportRequest> sheets,
+            DataGridView intersectionGrid,
+            string intersectionWorksheetName)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("filePath is null or empty.", nameof(filePath));
+
+            bool hasAnySheet = false;
+
+            using (var wb = new XLWorkbook())
+            {
+                if (sheets != null)
+                {
+                    foreach (var request in sheets)
+                    {
+                        if (request == null || request.Table == null || request.Table.Rows.Count == 0)
+                            continue;
+
+                        WriteDataTableSheet(wb, request.WorksheetName, request.Table);
+                        hasAnySheet = true;
+                    }
+                }
+
+                if (HasVisibleData(intersectionGrid))
+                {
+                    WriteDataGridSheet(
+                        wb,
+                        string.IsNullOrWhiteSpace(intersectionWorksheetName)
+                            ? "CrossPoints"
+                            : intersectionWorksheetName,
+                        intersectionGrid);
+                    hasAnySheet = true;
+                }
+
+                if (!hasAnySheet)
+                    throw new InvalidOperationException("出力対象のシートがありません。");
+
+                wb.SaveAs(filePath);
+            }
+        }
+
+        public static void ExportBottleTraceSheetsToExcel(
+            string filePath,
+            IEnumerable<BottleTraceGridExcelExportRequest> traceSheets,
+            DataGridView intersectionGrid,
+            string intersectionWorksheetName)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("filePath is null or empty.", nameof(filePath));
+
+            bool hasAnySheet = false;
+
+            using (var wb = new XLWorkbook())
+            {
+                if (traceSheets != null)
+                {
+                    foreach (var request in traceSheets)
+                    {
+                        if (request == null ||
+                            (!HasVisibleData(request.LeftGrid) && !HasVisibleData(request.RightGrid)))
+                            continue;
+
+                        WriteBottleTraceSheet(wb, request);
                         hasAnySheet = true;
                     }
                 }
@@ -238,6 +340,240 @@ namespace LotTraceApp.Utils
             ws.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
         }
 
+        private static void WriteDataTableSheet(
+            XLWorkbook wb,
+            string worksheetName,
+            DataTable table)
+        {
+            if (wb == null)
+                throw new ArgumentNullException(nameof(wb));
+            if (table == null)
+                throw new ArgumentNullException(nameof(table));
+
+            var ws = wb.Worksheets.Add(GetUniqueWorksheetName(wb, worksheetName));
+            ws.SheetView.FreezeRows(1);
+
+            for (int colIndex = 0; colIndex < table.Columns.Count; colIndex++)
+            {
+                var column = table.Columns[colIndex];
+                var cell = ws.Cell(1, colIndex + 1);
+                cell.Value = NullToEmpty(string.IsNullOrWhiteSpace(column.Caption)
+                    ? column.ColumnName
+                    : column.Caption);
+                ApplySimpleGridHeaderStyle(cell);
+            }
+
+            for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+            {
+                var row = table.Rows[rowIndex];
+                int excelRow = rowIndex + 2;
+
+                for (int colIndex = 0; colIndex < table.Columns.Count; colIndex++)
+                {
+                    var cell = ws.Cell(excelRow, colIndex + 1);
+                    object value = row[colIndex];
+                    cell.Value = value == null || value == DBNull.Value ? string.Empty : Convert.ToString(value);
+                    ApplySimpleTableCellStyle(cell);
+                }
+            }
+
+            ws.Columns().AdjustToContents(8.0, 60.0);
+            ws.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        }
+
+        private static void WriteBottleTraceSheet(
+            XLWorkbook wb,
+            BottleTraceGridExcelExportRequest request)
+        {
+            if (wb == null)
+                throw new ArgumentNullException(nameof(wb));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var leftColumns = GetVisibleColumns(request.LeftGrid);
+            var rightColumns = GetVisibleColumns(request.RightGrid);
+            var leftRows = GetVisibleRows(request.LeftGrid);
+            var rightRows = GetVisibleRows(request.RightGrid);
+            int totalColumns = leftColumns.Count + rightColumns.Count;
+            int maxRows = Math.Max(leftRows.Count, rightRows.Count);
+
+            if (totalColumns == 0)
+                throw new InvalidOperationException("出力対象の列がありません。");
+
+            var ws = wb.Worksheets.Add(GetUniqueWorksheetName(wb, request.WorksheetName));
+            ws.SheetView.FreezeRows(2);
+
+            WriteBottleGroupHeader(ws, 1, leftColumns.Count, "検索始点", StartHeaderBackColor, StartHeaderForeColor);
+            WriteBottleGroupHeader(ws, leftColumns.Count + 1, rightColumns.Count, "検索終点", EndHeaderBackColor, EndHeaderForeColor);
+
+            WriteBottleColumnHeaders(ws, request.LeftGrid, leftColumns, 1);
+            WriteBottleColumnHeaders(ws, request.RightGrid, rightColumns, leftColumns.Count + 1);
+
+            for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
+            {
+                int excelRow = FirstBodyExcelRow + rowIndex;
+                DataGridViewRow heightSource = rowIndex < leftRows.Count ? leftRows[rowIndex] :
+                    (rowIndex < rightRows.Count ? rightRows[rowIndex] : null);
+                if (heightSource != null)
+                    ws.Row(excelRow).Height = ConvertPixelToExcelRowHeight(heightSource.Height);
+
+                WriteBottleBodyRow(ws, leftRows, leftColumns, rowIndex, 1, request.CrossPointNodeKeys);
+                WriteBottleBodyRow(ws, rightRows, rightColumns, rowIndex, leftColumns.Count + 1, request.CrossPointNodeKeys);
+            }
+
+            ApplyBottleColumnWidths(ws, leftColumns, 1);
+            ApplyBottleColumnWidths(ws, rightColumns, leftColumns.Count + 1);
+            ApplyBottleTraceLines(ws, request.LineRanges, totalColumns, maxRows);
+
+            ws.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        }
+
+        private static void WriteBottleGroupHeader(
+            IXLWorksheet ws,
+            int startColumn,
+            int columnCount,
+            string text,
+            Color backColor,
+            Color foreColor)
+        {
+            if (ws == null || columnCount <= 0)
+                return;
+
+            var range = ws.Range(1, startColumn, 1, startColumn + columnCount - 1);
+            range.Merge();
+            range.Value = text;
+            range.Style.Fill.PatternType = XLFillPatternValues.Solid;
+            range.Style.Fill.BackgroundColor = XLColor.FromColor(backColor);
+            range.Style.Font.FontColor = XLColor.FromColor(foreColor);
+            range.Style.Font.Bold = true;
+            range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            range.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            ApplyDefaultThinBorder(range);
+        }
+
+        private static void WriteBottleColumnHeaders(
+            IXLWorksheet ws,
+            DataGridView grid,
+            List<DataGridViewColumn> columns,
+            int startColumn)
+        {
+            for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+            {
+                var cell = ws.Cell(ColumnHeaderExcelRow, startColumn + colIndex);
+                var column = columns[colIndex];
+                cell.Value = NullToEmpty(column.HeaderText);
+                bool isLeft = startColumn == 1;
+                ApplyColumnHeaderStyle(cell, grid, column, isLeft ? GridArea.Left : GridArea.Right);
+                cell.Style.Fill.PatternType = XLFillPatternValues.Solid;
+                cell.Style.Fill.BackgroundColor = XLColor.FromColor(isLeft ? StartHeaderBackColor : EndHeaderBackColor);
+            }
+        }
+
+        private static void WriteBottleBodyRow(
+            IXLWorksheet ws,
+            List<DataGridViewRow> rows,
+            List<DataGridViewColumn> columns,
+            int rowIndex,
+            int startColumn,
+            ISet<string> crossPointNodeKeys)
+        {
+            DataGridViewRow gridRow = rowIndex < rows.Count ? rows[rowIndex] : null;
+            int excelRow = FirstBodyExcelRow + rowIndex;
+
+            for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+            {
+                var column = columns[colIndex];
+                var xlCell = ws.Cell(excelRow, startColumn + colIndex);
+                DataGridViewCell gridCell = gridRow == null ? null : gridRow.Cells[column.Index];
+
+                WriteCellValue(xlCell, gridCell);
+                ApplySimpleGridCellStyle(xlCell, gridCell);
+                ApplyBottleRuntimeForeColor(xlCell, gridRow);
+                ApplyBottleRuntimeCrossPointBackColor(xlCell, gridRow, crossPointNodeKeys);
+            }
+        }
+
+        private static void ApplyBottleColumnWidths(
+            IXLWorksheet ws,
+            List<DataGridViewColumn> columns,
+            int startColumn)
+        {
+            for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+                ws.Column(startColumn + colIndex).Width = ConvertPixelToExcelColumnWidth(columns[colIndex].Width);
+        }
+
+        private static void ApplyBottleTraceLines(
+            IXLWorksheet ws,
+            IEnumerable<BottleLineRanges> lineRanges,
+            int totalColumns,
+            int maxRows)
+        {
+            if (ws == null || lineRanges == null || totalColumns <= 0)
+                return;
+
+            foreach (var line in lineRanges)
+            {
+                if (line == null || line.BorderIndex <= 0 || line.BorderIndex > maxRows)
+                    continue;
+
+                int excelRow = FirstBodyExcelRow + line.BorderIndex - 1;
+                var range = ws.Range(excelRow, 1, excelRow, totalColumns);
+                range.Style.Border.BottomBorder = XLBorderStyleValues.Medium;
+                range.Style.Border.BottomBorderColor = XLColor.FromColor(Color.FromArgb(120, 72, 32));
+            }
+        }
+
+        private static void ApplyBottleRuntimeForeColor(IXLCell xlCell, DataGridViewRow row)
+        {
+            if (xlCell == null || row == null)
+                return;
+
+            string nodeKey = GetRowValue(row, "NodeKey");
+            if (string.IsNullOrWhiteSpace(nodeKey))
+                return;
+
+            xlCell.Style.Font.FontColor = XLColor.FromColor(GetForeColorForNodeKeyGroup(nodeKey));
+        }
+
+        private static void ApplyBottleRuntimeCrossPointBackColor(
+            IXLCell xlCell,
+            DataGridViewRow row,
+            ISet<string> crossPointNodeKeys)
+        {
+            if (xlCell == null || row == null || crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
+                return;
+
+            string uiKey = BuildBottleCrossPointUiKeyFromRow(row);
+            if (string.IsNullOrWhiteSpace(uiKey) || !crossPointNodeKeys.Contains(uiKey))
+                return;
+
+            xlCell.Style.Fill.PatternType = XLFillPatternValues.Solid;
+            xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(GetCrossPointNodeBackColor(uiKey));
+        }
+
+        private static string BuildBottleCrossPointUiKeyFromRow(DataGridViewRow row)
+        {
+            if (row == null)
+                return null;
+
+            string masterKey = GetRowValue(row, "MasterKey");
+            string nodeKey = GetRowValue(row, "NodeKey");
+            string startDateLabel = GetRowValue(row, "StartDateLabel");
+            string inputSourceType = GetRowValue(row, "InputSourceType");
+
+            bool isManual =
+                string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(inputSourceType, "ManualInput", StringComparison.OrdinalIgnoreCase);
+
+            if (isManual)
+                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+
+            if (!string.IsNullOrWhiteSpace(masterKey))
+                return "MK|" + masterKey.Trim();
+
+            return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+        }
+
         private static bool HasVisibleData(DataGridView grid)
         {
             if (grid == null)
@@ -323,6 +659,21 @@ namespace LotTraceApp.Utils
                     continue;
 
                 list.Add(row);
+            }
+
+            return list;
+        }
+
+        private static List<DataGridViewColumn> GetVisibleColumns(DataGridView dgv)
+        {
+            var list = new List<DataGridViewColumn>();
+            if (dgv == null)
+                return list;
+
+            foreach (DataGridViewColumn column in dgv.Columns)
+            {
+                if (column != null && column.Visible)
+                    list.Add(column);
             }
 
             return list;
@@ -1243,6 +1594,16 @@ namespace LotTraceApp.Utils
             ApplyDefaultThinBorder(xlCell);
         }
 
+        private static void ApplySimpleTableCellStyle(IXLCell xlCell)
+        {
+            if (xlCell == null)
+                return;
+
+            xlCell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+            xlCell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            ApplyDefaultThinBorder(xlCell);
+        }
+
         private static void ApplyDefaultThinBorder(IXLCell xlCell)
         {
             xlCell.Style.Border.TopBorder = XLBorderStyleValues.Thin;
@@ -1254,6 +1615,22 @@ namespace LotTraceApp.Utils
             xlCell.Style.Border.BottomBorderColor = XLColor.FromColor(DefaultGridBorderColor);
             xlCell.Style.Border.LeftBorderColor = XLColor.FromColor(DefaultGridBorderColor);
             xlCell.Style.Border.RightBorderColor = XLColor.FromColor(DefaultGridBorderColor);
+        }
+
+        private static void ApplyDefaultThinBorder(IXLRange range)
+        {
+            if (range == null)
+                return;
+
+            range.Style.Border.TopBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.RightBorder = XLBorderStyleValues.Thin;
+
+            range.Style.Border.TopBorderColor = XLColor.FromColor(DefaultGridBorderColor);
+            range.Style.Border.BottomBorderColor = XLColor.FromColor(DefaultGridBorderColor);
+            range.Style.Border.LeftBorderColor = XLColor.FromColor(DefaultGridBorderColor);
+            range.Style.Border.RightBorderColor = XLColor.FromColor(DefaultGridBorderColor);
         }
 
         private static void WriteCellValue(IXLCell xlCell, DataGridViewCell dgvCell)

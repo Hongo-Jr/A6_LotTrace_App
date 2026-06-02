@@ -31,6 +31,12 @@ namespace LotTraceApp.Services
 
         public BottleDisplayTables B_TraceForward(TraceSearchParameters p)
         {
+            var result = B_TraceForwardResult(p);
+            return result == null ? null : result.DisplayTables;
+        }
+
+        public BottleTraceResult B_TraceForwardResult(TraceSearchParameters p)
+        {
             
             //検索条件からCandidates作成
             var candidate = _repo.B_FindForwardCandidate(p);
@@ -42,7 +48,11 @@ namespace LotTraceApp.Services
 
             var result = B_BuildDisplayTable(displayGroups);
 
-            return result;
+            return new BottleTraceResult
+            {
+                DisplayTables = result,
+                DisplayGroups = displayGroups
+            };
 
         }
 
@@ -52,6 +62,12 @@ namespace LotTraceApp.Services
         #region バック
 
         public BottleDisplayTables B_TraceBackward(TraceSearchParameters p)
+        {
+            var result = B_TraceBackwardResult(p);
+            return result == null ? null : result.DisplayTables;
+        }
+
+        public BottleTraceResult B_TraceBackwardResult(TraceSearchParameters p)
         {
 
             //検索条件からCandidates作成
@@ -64,7 +80,11 @@ namespace LotTraceApp.Services
 
             var result = B_BuildDisplayTable(displayGroups);
 
-            return result;
+            return new BottleTraceResult
+            {
+                DisplayTables = result,
+                DisplayGroups = displayGroups
+            };
 
         }
 
@@ -287,6 +307,9 @@ namespace LotTraceApp.Services
             tables.LiquidTable.Columns.Add("NodeKey", typeof(string));
             tables.LiquidTable.Columns.Add("DisplayKey", typeof(string));
             tables.LiquidTable.Columns.Add("ItemCode", typeof(string));
+            tables.LiquidTable.Columns.Add("MasterKey", typeof(string));
+            tables.LiquidTable.Columns.Add("StartDateLabel", typeof(string));
+            tables.LiquidTable.Columns.Add("InputSourceType", typeof(string));
 
 
             //瓶
@@ -301,6 +324,9 @@ namespace LotTraceApp.Services
             tables.BottleTable.Columns.Add("NodeKey", typeof(string));
             tables.BottleTable  .Columns.Add("DisplayKey", typeof(string));
             tables.BottleTable.Columns.Add("ItemCode", typeof(string));
+            tables.BottleTable.Columns.Add("MasterKey", typeof(string));
+            tables.BottleTable.Columns.Add("StartDateLabel", typeof(string));
+            tables.BottleTable.Columns.Add("InputSourceType", typeof(string));
 
 
 
@@ -340,8 +366,11 @@ namespace LotTraceApp.Services
             string NodeKey = liquid.SourceLiquidNode.NodeIdentityKey;
             string DisplayKey = liquid.DisplayNodeKey;
             string ItemCode = liquid.SourceLiquidNode.ItemCode;
+            string MasterKey = liquid.SourceLiquidNode.ControlMasterKey;
+            string StartDateLabel = liquid.SourceLiquidNode.StartDateLabel;
+            string InputSourceType = liquid.SourceLiquidNode.InputSourceType;
 
-            tables.LiquidTable.Rows.Add(OrderNumber, Lot, ItemName, StartDate, Weight, NodeKey, DisplayKey, ItemCode);
+            tables.LiquidTable.Rows.Add(OrderNumber, Lot, ItemName, StartDate, Weight, NodeKey, DisplayKey, ItemCode, MasterKey, StartDateLabel, InputSourceType);
 
         }
 
@@ -384,7 +413,7 @@ namespace LotTraceApp.Services
             string DisplayKey = bottle.DisplayNodeKey;
             string ItemCode = bottle.SourceBottleNode.ProductItemCode;
 
-            tables.BottleTable.Rows.Add( OrderNumber, Lot, ItemName, StartDate, OK_Num, NG_Num, Total_Num, NodeKey, DisplayKey, ItemCode);
+            tables.BottleTable.Rows.Add( OrderNumber, Lot, ItemName, StartDate, OK_Num, NG_Num, Total_Num, NodeKey, DisplayKey, ItemCode, null, null, null);
         }
 
         private void B_AdjustTableRow(BottleDisplayTables tables)
