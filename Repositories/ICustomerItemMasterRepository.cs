@@ -1,16 +1,18 @@
-﻿using System;
+﻿using LotTraceApp.Forms;
+using LotTraceApp.Settings;
+using LotTraceApp.Utils;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using LotTraceApp.Settings;
-using LotTraceApp.Utils;
 
 namespace LotTraceApp.Repositories
 {
     public interface ICustomerItemMasterRepository
     {
         Dictionary<string, string> GetItemNamesByCodes(IEnumerable<string> itemCodes);
+        List<string> GetItemCodeByName(string itemName);
     }
 
 
@@ -30,6 +32,58 @@ namespace LotTraceApp.Repositories
 
             _ini = ini;
         }
+
+        public List<string> GetItemCodeByName(string itemName)
+        {
+            List<string> result = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(itemName))
+            {
+                return result;
+            }
+
+            var settings = LoadCustomerItemMasterSettings(_ini);
+            if (!settings.IsEnabledAndValid())
+            {
+                return result;
+            }
+
+            ValidateSqlIdentifier(settings.SchemaName, "SchemaName");
+            ValidateSqlIdentifier(settings.TableName, "TableName");
+            ValidateSqlIdentifier(settings.ItemCodeColumnName, "ItemCodeColumnName");
+            ValidateSqlIdentifier(settings.ItemNameColumnName, "ItemNameColumnName");
+
+            string connectionString = BuildConnectionString(settings);
+            string sql = BuildSelectSql2(settings, 500);
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(sql, connection))
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandTimeout = settings.TimeoutSeconds;
+
+
+                command.Parameters.AddWithValue("@p", ConvertWildcardPattern(itemName));
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    var itemCodeOrdinal = reader.GetOrdinal(settings.ItemCodeColumnName);
+
+                    
+
+
+                    while (reader.Read())
+                    {
+                        result.Add(reader.IsDBNull(itemCodeOrdinal) ? string.Empty : reader.GetString(itemCodeOrdinal));
+                    }
+                }
+            }
+
+            return result;
+        }
+
 
         public Dictionary<string, string> GetItemNamesByCodes(IEnumerable<string> itemCodes)
         {
@@ -83,7 +137,7 @@ namespace LotTraceApp.Repositories
             ValidateSqlIdentifier(settings.ItemNameColumnName, "ItemNameColumnName");
 
             string connectionString = BuildConnectionString(settings);
-            string sql = BuildSelectSql(settings, codesToFetch.Count);
+            string sql = BuildSelectSql1(settings, codesToFetch.Count);
 
             var fetched = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -177,7 +231,7 @@ namespace LotTraceApp.Repositories
             return sb.ConnectionString;
         }
 
-        private string BuildSelectSql(CustomerItemMasterSettings settings, int codeCount)
+        private string BuildSelectSql1(CustomerItemMasterSettings settings, int codeCount)
         {
             var parameterNames = Enumerable.Range(0, codeCount)
                 .Select(i => "@p" + i)
@@ -190,6 +244,17 @@ namespace LotTraceApp.Repositories
                 Bracket(settings.SchemaName),
                 Bracket(settings.TableName),
                 string.Join(", ", parameterNames));
+        }
+
+        private string BuildSelectSql2(CustomerItemMasterSettings settings, int topCount)
+        {
+            return string.Format(
+                "SELECT TOP ({0}) {1}, {2} FROM {3}.{4} WHERE {2} LIKE @p ORDER BY {2}, {1}",
+                topCount,
+                Bracket(settings.ItemCodeColumnName),
+                Bracket(settings.ItemNameColumnName),
+                Bracket(settings.SchemaName),
+                Bracket(settings.TableName));
         }
 
         private void ValidateSqlIdentifier(string value, string parameterName)
@@ -216,7 +281,16 @@ namespace LotTraceApp.Repositories
 
         private string Bracket(string identifier)
         {
-            return "[" + identifier + "]";
+            return "[" + identifier.Replace("]", "]]") + "]";
+        }
+
+        private string ConvertWildcardPattern(string value)
+        {
+            return value
+                .Replace("[", "[[]")
+                .Replace("%", "[%]")
+                .Replace("_", "[_]")
+                .Replace("*", "%");
         }
     }
 }

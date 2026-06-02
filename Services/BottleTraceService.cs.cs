@@ -1,12 +1,13 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using LotTraceApp.Models;
+using LotTraceApp.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using LotTraceApp.Models;
-using LotTraceApp.Repositories;
+using System.Threading;
 
 
 namespace LotTraceApp.Services
@@ -27,17 +28,37 @@ namespace LotTraceApp.Services
             _customerItemMasterRepository = customerItemMasterRepository;
         }
 
+        private bool ResolveItemNameCondition(TraceSearchParameters p)
+        {
+            if (p == null)
+                return true;
+
+            if (string.IsNullOrWhiteSpace(p.ItemName))
+                return true;
+
+            p.ResolvedItemCodes =
+                _customerItemMasterRepository.GetItemCodeByName(p.ItemName);
+
+            p.ItemCode = null; // ItemName優先
+
+            return p.ResolvedItemCodes != null &&
+                   p.ResolvedItemCodes.Count > 0;
+        }
+
         #region フォワード
 
-        public BottleDisplayTables B_TraceForward(TraceSearchParameters p)
-        {
-            var result = B_TraceForwardResult(p);
-            return result == null ? null : result.DisplayTables;
-        }
 
         public BottleTraceResult B_TraceForwardResult(TraceSearchParameters p)
         {
+            if (p == null) throw new ArgumentNullException("p");
             
+
+            if (!ResolveItemNameCondition(p))
+            {
+                return new BottleTraceResult();
+            }
+
+
             //検索条件からCandidates作成
             var candidate = _repo.B_FindForwardCandidate(p);
 
@@ -61,14 +82,17 @@ namespace LotTraceApp.Services
 
         #region バック
 
-        public BottleDisplayTables B_TraceBackward(TraceSearchParameters p)
-        {
-            var result = B_TraceBackwardResult(p);
-            return result == null ? null : result.DisplayTables;
-        }
-
+        
         public BottleTraceResult B_TraceBackwardResult(TraceSearchParameters p)
         {
+
+            if (p == null) throw new ArgumentNullException("p");
+
+
+            if (!ResolveItemNameCondition(p))
+            {
+                return new BottleTraceResult();
+            }
 
             //検索条件からCandidates作成
             var candidate = _repo.B_FindBackwardCandidate(p);

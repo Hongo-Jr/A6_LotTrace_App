@@ -3287,10 +3287,10 @@ namespace LotTraceApp.Services
             CancellationToken cancellationToken)
         {
             var result = new List<BackwardParentSetCandidateGroup>();
-            var queue = new Queue<BackwardCandidateGroupTraversalItem>();
+            var queue = new Queue<BackwardParentSetCandidateGroup>();
             var seenGroupKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            Action<List<BackwardParentCandidate>, int, HashSet<string>> appendGroups = (candidates, level, expandedPathNodeKeys) =>
+            Action<List<BackwardParentCandidate>, int> appendGroups = (candidates, level) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -3304,91 +3304,30 @@ namespace LotTraceApp.Services
 
                     group.Level = level;
 
-                    if (ContainsExpandedBackwardParentNode(group, expandedPathNodeKeys))
-                        continue;
-
                     string groupKey = BuildBackwardCandidateGroupIdentityKey(group);
                     if (!seenGroupKeys.Add(groupKey))
                         continue;
 
                     result.Add(group);
-
-                    queue.Enqueue(new BackwardCandidateGroupTraversalItem
-                    {
-                        Group = group,
-                        ExpandedPathNodeKeys =
-                            BuildNextExpandedBackwardPathNodeKeys(expandedPathNodeKeys, group)
-                    });
+                    queue.Enqueue(group);
                 }
-        };
+            };
 
-            appendGroups(level0Candidates, 0, null);
+            appendGroups(level0Candidates, 0);
 
             while (queue.Count > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var item = queue.Dequeue();
-                var currentGroup = item == null ? null : item.Group;
-
+                var currentGroup = queue.Dequeue();
                 if (currentGroup == null || currentGroup.Level >= MaxDepth)
                     continue;
 
                 var nextCandidates = GetNextBackwardCandidates(currentGroup);
-
-                appendGroups(
-                    nextCandidates,
-                    currentGroup.Level + 1,
-                    item.ExpandedPathNodeKeys);
+                appendGroups(nextCandidates, currentGroup.Level + 1);
             }
 
             return result;
-        }
-
-        private bool ContainsExpandedBackwardParentNode(
-    BackwardParentSetCandidateGroup group,
-    HashSet<string> expandedPathNodeKeys)
-        {
-            if (group == null ||
-                group.ParentNodes == null ||
-                expandedPathNodeKeys == null ||
-                expandedPathNodeKeys.Count == 0)
-            {
-                return false;
-            }
-
-            return group.ParentNodes.Any(node =>
-                node != null &&
-                !string.IsNullOrWhiteSpace(node.NodeIdentityKey) &&
-                expandedPathNodeKeys.Contains(node.NodeIdentityKey));
-        }
-
-        private HashSet<string> BuildNextExpandedBackwardPathNodeKeys(
-            HashSet<string> source,
-            BackwardParentSetCandidateGroup group)
-        {
-            var next = source == null
-                ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                : new HashSet<string>(source, StringComparer.OrdinalIgnoreCase);
-
-            if (group == null || group.ParentNodes == null)
-                return next;
-
-            foreach (var node in group.ParentNodes)
-            {
-                if (node == null || string.IsNullOrWhiteSpace(node.NodeIdentityKey))
-                    continue;
-
-                next.Add(node.NodeIdentityKey);
-            }
-
-            return next;
-        }
-
-        private sealed class BackwardCandidateGroupTraversalItem
-        {
-            public BackwardParentSetCandidateGroup Group { get; set; }
-            public HashSet<string> ExpandedPathNodeKeys { get; set; }
         }
 
         private string BuildBackwardCandidateGroupIdentityKey(BackwardParentSetCandidateGroup group)
@@ -3494,113 +3433,66 @@ namespace LotTraceApp.Services
 
         }
 
-
+       
         private int PlaceBackwardNextTargetsRecursive(
-    List<BackwardDisplayNodeGroup> displayNodeGroups,
-    List<DisplayLaneNode> currentNodes,
-    int x,
-    int y,
-    List<DisplayLaneNode> placedeNodes,
-    string parentDisplayNodeKey)
+            List<BackwardDisplayNodeGroup> displayNodeGroups,
+            List<DisplayLaneNode> currentNodes,
+            int x,
+            int y,
+            List<DisplayLaneNode> placedeNodes,
+            string parentDisplayNodeKey)
         {
-            return PlaceBackwardNextTargetsRecursive(
-                displayNodeGroups,
-                currentNodes,
-                x,
-                y,
-                placedeNodes,
-                parentDisplayNodeKey,
-                new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-        }
-
-        private int PlaceBackwardNextTargetsRecursive(
-    List<BackwardDisplayNodeGroup> displayNodeGroups,
-    List<DisplayLaneNode> currentNodes,
-    int x,
-    int y,
-    List<DisplayLaneNode> placedeNodes,
-    string parentDisplayNodeKey,
-    HashSet<string> currentPathNodeKeys)
-        {
-            if (displayNodeGroups == null || currentNodes == null || placedeNodes == null)
-                return y;
-
-            if (x >= MaxDepth)
-                return y;
-
-            int currentY = y;
+            
+          
+            int currentY =y;
             int nextLevelY = y;
 
             var workcurrents = currentNodes.ToList();
             var Allready = new List<BackwardDisplayNodeGroup>();
+            
 
-            while (workcurrents.Count > 0)
+            while(workcurrents.Count > 0)
             {
                 var Current = workcurrents[0];
                 workcurrents.RemoveAt(0);
 
-                if (Current == null || Current.SourceNode == null)
-                    continue;
+                var nextGroups = TakeNextTargets(displayNodeGroups, x, Current);
+                bool SubTree_FLG = nextGroups.Any(g => !Allready.Contains(g));
 
-                string currentNodeKey = Current.SourceNode.NodeIdentityKey;
-
-                if (!string.IsNullOrWhiteSpace(currentNodeKey) &&
-                    currentPathNodeKeys.Contains(currentNodeKey))
+                if (SubTree_FLG)
                 {
-                    continue;
+                    currentY = Math.Max(currentY, nextLevelY);
                 }
 
-                bool addedToPath = false;
+                var placedCurrent = BackwardPlaceNode(Current, x, currentY, parentDisplayNodeKey);
+                placedeNodes.Add(placedCurrent);
+                currentY++;
 
-                if (!string.IsNullOrWhiteSpace(currentNodeKey))
+                foreach (var nextGroup in nextGroups)
                 {
-                    addedToPath = currentPathNodeKeys.Add(currentNodeKey);
-                }
-
-                try
-                {
-                    var nextGroups = TakeNextTargets(displayNodeGroups, x, Current);
-                    bool SubTree_FLG = nextGroups.Any(g => !Allready.Contains(g));
-
-                    if (SubTree_FLG)
+                    if (Allready.Contains(nextGroup))
                     {
-                        currentY = Math.Max(currentY, nextLevelY);
+                        continue;
                     }
 
-                    var placedCurrent = BackwardPlaceNode(Current, x, currentY, parentDisplayNodeKey);
-                    placedeNodes.Add(placedCurrent);
-                    currentY++;
+                    Allready.Add(nextGroup);
 
-                    foreach (var nextGroup in nextGroups)
-                    {
-                        if (Allready.Contains(nextGroup))
-                            continue;
+                    var nextCurrents = nextGroup.ParentNodes?.ToList() ?? new List<DisplayLaneNode>();
 
-                        Allready.Add(nextGroup);
-
-                        var nextCurrents = nextGroup.ParentNodes?.ToList()
-                            ?? new List<DisplayLaneNode>();
-
-                        nextLevelY = PlaceBackwardNextTargetsRecursive(
-                            displayNodeGroups,
-                            nextCurrents,
-                            x + 1,
-                            nextLevelY,
-                            placedeNodes,
-                            placedCurrent == null ? null : placedCurrent.DisplayNodeKey,
-                            currentPathNodeKeys);
-                    }
+                    nextLevelY = PlaceBackwardNextTargetsRecursive(
+                        displayNodeGroups,
+                        nextCurrents,
+                        x + 1,
+                        nextLevelY,
+                        placedeNodes,
+                        placedCurrent == null ? null : placedCurrent.DisplayNodeKey);
+                    
                 }
-                finally
-                {
-                    if (addedToPath)
-                        currentPathNodeKeys.Remove(currentNodeKey);
-                }
+                
             }
-
             return Math.Max(currentY, nextLevelY);
-        }
 
+        }
 
         private List<DisplayLaneNode> GetBackwardNextDisplayNodes(List<BackwardDisplayNodeGroup> displayNodeGroups,int nextLevel,DisplayLaneNode current)
         {

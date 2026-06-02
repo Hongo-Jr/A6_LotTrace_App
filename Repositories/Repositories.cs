@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DocumentFormat.OpenXml.Office.Word;
 using LotTraceApp.Models;
 
 
@@ -44,29 +43,39 @@ namespace LotTraceApp.Repositories
             var list = new List<ProductionResultNode>();
             var uniqueMasterKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            if (ShouldSkipMaterialTableAStartSearch(p))
-                return list;
+            
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
 
-                var sql = @"
-SELECT
-    ma.ForeignKey,   -- 0
-    ma.LotNumber,    -- 1
-    ma.ItemCode,     -- 2
-    ma.MasterKey     -- 3
-FROM dbo.MaterialTableA ma
-WHERE 1 = 1
-";
+                StringBuilder sql = new StringBuilder();
+                sql.AppendLine("SELECT ");
+                sql.AppendLine("ma.ForeignKey,   -- 0 ");
+                sql.AppendLine("ma.LotNumber,    -- 1 ");
+                sql.AppendLine("ma.ItemCode,     -- 2 ");
+                sql.AppendLine("ma.MasterKey     -- 3 ");
+                sql.AppendLine("FROM dbo.MaterialTableA ma");
+                sql.AppendLine("WHERE 1 = 1 ");
 
-                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, "ma", "ForeignKey", "@Order");
-                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, ref sql, "ma", "LotNumber", "@Lot");
-                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, ref sql, "ma", "ItemCode", "@ItemCode");
+                //                var sql = @"
+                //SELECT
+                //    ma.ForeignKey,   -- 0
+                //    ma.LotNumber,    -- 1
+                //    ma.ItemCode,     -- 2
+                //    ma.MasterKey     -- 3
+                //FROM dbo.MaterialTableA ma
+                //WHERE 1 = 1
+                //";
 
-                cmd.CommandText = sql;
+                AppendStartNodeSearchConditions(p, cmd, sql, "ma", false);
+
+                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+
+                cmd.CommandText = sql.ToString();
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -114,33 +123,49 @@ WHERE 1 = 1
                 // ============================================================
                 using (var cmd = conn.CreateCommand())
                 {
-                    var sql = @"
-SELECT
-    scp.ForeignKey,   -- 0
-    scp.LotNumber,    -- 1
-    scp.ItemCode,     -- 2
-    scp.StartDate,    -- 3
-    scp.Weight,       -- 4
-    scp.MasterKey     -- 5
-FROM dbo.SingleControlProcessTable scp
-WHERE 1 = 1
-  AND SUBSTRING(
-          scp.MasterKey,
-          CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
-          1
-      ) IN ('2','3')
-  AND SUBSTRING(
-        scp.MasterKey,
-        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-        1
-    ) IN ('4','7')
-";
+
+                    StringBuilder sql = new StringBuilder();
+
+                    sql.AppendLine(" SELECT");
+                    sql.AppendLine(" scp.ForeignKey,   -- 0");
+                    sql.AppendLine(" scp.LotNumber,    -- 1");
+                    sql.AppendLine(" scp.ItemCode,     -- 2");
+                    sql.AppendLine(" scp.StartDate,    -- 3");
+                    sql.AppendLine(" scp.Weight,       -- 4");
+                    sql.AppendLine(" scp.MasterKey     -- 5");
+                    sql.AppendLine(" FROM dbo.SingleControlProcessTable scp");
+                    sql.AppendLine(" WHERE 1 = 1");
+                    sql.AppendLine(" AND SUBSTRING( scp.MasterKey,");
+                    sql.AppendLine(" CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2, 1 ) IN ('2','3')");
+                    sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),1 ) IN ('4','7')");
+                    
+                    //var sql = @"
+                    //SELECT
+                    //    scp.ForeignKey,   -- 0
+                    //    scp.LotNumber,    -- 1
+                    //    scp.ItemCode,     -- 2
+                    //    scp.StartDate,    -- 3
+                    //    scp.Weight,       -- 4
+                    //    scp.MasterKey     -- 5
+                    //FROM dbo.SingleControlProcessTable scp
+                    //WHERE 1 = 1
+                    //  AND SUBSTRING(
+                    //          scp.MasterKey,
+                    //          CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
+                    //          1
+                    //      ) IN ('2','3')
+                    //  AND SUBSTRING(
+                    //        scp.MasterKey,
+                    //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
+                    //        1
+                    //    ) IN ('4','7')
+                    //";
 
 
                     // 既存Appendをそのまま使用
-                    AppendStartNodeSearchConditions(p, cmd, ref sql, "scp");
+                    AppendStartNodeSearchConditions(p, cmd, sql, "scp",true);
 
-                    cmd.CommandText = sql;
+                    cmd.CommandText = sql.ToString();
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -193,33 +218,49 @@ WHERE 1 = 1
                 {
                     using (var cmd = conn.CreateCommand())
                     {
-                        var sql = @"
-SELECT
-    scp.ForeignKey,   -- 0
-    scp.LotNumber,    -- 1
-    scp.ItemCode,     -- 2
-    scp.StartDate,    -- 3
-    scp.Weight,       -- 4
-    scp.MasterKey     -- 5
-FROM dbo.SingleControlProcessTable scp
-WHERE 1 = 1
-  AND scp.MasterKey LIKE '%[_]%'
-AND SUBSTRING(
-        scp.MasterKey,
-        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2,
-        1
-    ) = '2'
-AND SUBSTRING(
-        scp.MasterKey,
-        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-        1
-    ) IN ('4','7')
-";
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.AppendLine(" SELECT");
+                        sql.AppendLine(" scp.ForeignKey,   -- 0");
+                        sql.AppendLine(" scp.LotNumber,    -- 1");
+                        sql.AppendLine(" scp.ItemCode,     -- 2");
+                        sql.AppendLine(" scp.StartDate,    -- 3");
+                        sql.AppendLine(" scp.Weight,       -- 4");
+                        sql.AppendLine(" scp.MasterKey     -- 5");
+                        sql.AppendLine(" FROM dbo.SingleControlProcessTable scp");
+                        sql.AppendLine(" WHERE 1 = 1");
+                        sql.AppendLine(" AND scp.MasterKey LIKE '%[_]%'");
+                        sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2, 1) = '2' ");
+                        sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)), 1 ) IN ('4','7')");
+
+                        //                        var sql = @"
+                        //SELECT
+                        //    scp.ForeignKey,   -- 0
+                        //    scp.LotNumber,    -- 1
+                        //    scp.ItemCode,     -- 2
+                        //    scp.StartDate,    -- 3
+                        //    scp.Weight,       -- 4
+                        //    scp.MasterKey     -- 5
+                        //FROM dbo.SingleControlProcessTable scp
+                        //WHERE 1 = 1
+                        //  AND scp.MasterKey LIKE '%[_]%'
+                        //AND SUBSTRING(
+                        //        scp.MasterKey,
+                        //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2,
+                        //        1
+                        //    ) = '2'
+                        //AND SUBSTRING(
+                        //        scp.MasterKey,
+                        //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
+                        //        1
+                        //    ) IN ('4','7')
+                        //";
+
 
                         // 既存Appendをそのまま使用
-                        AppendStartNodeSearchConditions(p, cmd, ref sql, "scp");
+                        AppendStartNodeSearchConditions(p, cmd, sql, "scp",true);
 
-                        cmd.CommandText = sql;
+                        cmd.CommandText = sql.ToString();
 
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -270,62 +311,35 @@ AND SUBSTRING(
             return list;
         }
 
-        private void AppendStartNodeSearchConditions(
-    TraceSearchParameters p,
-    SqlCommand cmd,
-    ref string sql,
-    string alias)
+        private void AppendStartNodeSearchConditions(TraceSearchParameters p,SqlCommand cmd,StringBuilder sql,string alias,bool includeStartDate)
         {
-            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, alias, "ForeignKey", "@Order");
-            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, ref sql, alias, "LotNumber", "@Lot");
-            AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, ref sql, alias, "ItemCode", "@ItemCode");
+            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+
+            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
+
+            AppendItemCodeCondition( p, cmd, sql, alias, "ItemCode", "@ItemCode");
+
+            if (!includeStartDate || p == null)
+                return;
+
 
             if (p != null && p.From.HasValue)
             {
-                sql += " AND " + alias + ".StartDate >= @From";
-                cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+                sql.AppendLine("  AND " + alias + ".StartDate >= @From");
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
             }
 
             if (p != null && p.To.HasValue)
             {
-                sql += " AND " + alias + ".StartDate <= @To";
-                cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+                sql.AppendLine("  AND " + alias + ".StartDate <= @To");
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
         }
 
-        public void AppendSearchParameterCondition(
-            string rawValue,
-            SqlCommand cmd,
-            ref string sql,
-            string alias,
-            string columnName,
-            string parameterName)
-        {
-            if (string.IsNullOrWhiteSpace(rawValue))
-                return;
 
-            bool useLike = ContainsUserWildcard(rawValue);
-            sql += " AND " + alias + "." + columnName + (useLike ? " LIKE " : " = ") + parameterName;
-            if (useLike)
-                sql += " ESCAPE '\\'";
-
-            if (!cmd.Parameters.Contains(parameterName))
-            {
-                string value = useLike
-                    ? BuildSqlLikePatternFromUserWildcard(rawValue)
-                    : rawValue.Trim();
-
-                cmd.Parameters.AddWithValue(parameterName, value);
-            }
-        }
-
-        private void AppendSearchParameterCondition(
-            string rawValue,
-            SqlCommand cmd,
-            StringBuilder sql,
-            string alias,
-            string columnName,
-            string parameterName)
+        private void AppendSearchParameterCondition(string rawValue, SqlCommand cmd, StringBuilder sql, string alias, string columnName,string parameterName)
         {
             if (string.IsNullOrWhiteSpace(rawValue))
                 return;
@@ -341,6 +355,60 @@ AND SUBSTRING(
 
                 cmd.Parameters.AddWithValue(parameterName, value);
             }
+        }
+
+        private void AppendItemCodeCondition( TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, string columnName, string parameterName)
+        {
+            if (p == null)
+                return;
+
+            if (p.ResolvedItemCodes != null && p.ResolvedItemCodes.Count > 0)
+            {
+                AppendInCondition( p.ResolvedItemCodes, cmd, sql, alias, columnName, parameterName);
+                return;
+            }
+
+            AppendSearchParameterCondition( p.ItemCode, cmd, sql, alias, columnName, parameterName);
+        }
+
+        private void AppendInCondition(
+    List<string> values,
+    SqlCommand cmd,
+    StringBuilder sql,
+    string alias,
+    string columnName,
+    string parameterName)
+        {
+            if (values == null || values.Count == 0)
+                return;
+
+            var parameterNames = new List<string>();
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                string value = values[i];
+
+                if (string.IsNullOrWhiteSpace(value))
+                    continue;
+
+                string currentParameterName = parameterName + i.ToString();
+
+                parameterNames.Add(currentParameterName);
+
+                if (!cmd.Parameters.Contains(currentParameterName))
+                {
+                    cmd.Parameters.AddWithValue(
+                        currentParameterName,
+                        value.Trim());
+                }
+            }
+
+            if (parameterNames.Count == 0)
+                return;
+
+            sql.AppendLine(
+                "  AND " + alias + "." + columnName +
+                " IN (" + string.Join(", ", parameterNames) + ")");
         }
 
         private void AddSearchParameterValue(
@@ -398,80 +466,40 @@ AND SUBSTRING(
             return pattern.ToString();
         }
 
-        private bool ShouldSkipMaterialTableAStartSearch(TraceSearchParameters p)
-        {
-            return HasMaterialTableAUnresolvableStartCondition(p); //&&
-                //!HasMaterialTableAResolvableStartCondition(p)//;
-        }
-
-        private bool HasMaterialTableAResolvableStartCondition(TraceSearchParameters p)
-        {
-            if (p == null)
-                return false;
-
-            return !string.IsNullOrWhiteSpace(p.ProductionOrderNumber) ||
-                !string.IsNullOrWhiteSpace(p.LotNumber) ||
-                !string.IsNullOrWhiteSpace(p.ItemCode);
-        }
-
-        private bool HasMaterialTableAUnresolvableStartCondition(TraceSearchParameters p)
-        {
-            if (p == null)
-                return false;
-
-            return !string.IsNullOrWhiteSpace(p.ItemName) ||
-                p.From.HasValue ||
-                p.To.HasValue;
-        }
+        
 
         private void AppendSingleControlProcessStartDateConditions(
-            TraceSearchParameters p,
-            SqlCommand cmd,
-            ref string sql,
-            string alias)
+    TraceSearchParameters p,
+    SqlCommand cmd,
+    StringBuilder sql,
+    string alias)
         {
             if (p == null)
                 return;
 
             if (p.From.HasValue)
             {
-                sql += Environment.NewLine + "  AND " + alias + ".StartDate >= @From" + Environment.NewLine;
+                sql.AppendLine("  AND " + alias + ".StartDate >= @From");
                 if (!cmd.Parameters.Contains("@From"))
                     cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
             }
 
             if (p.To.HasValue)
             {
-                sql += Environment.NewLine + "  AND " + alias + ".StartDate <= @To" + Environment.NewLine;
+                sql.AppendLine("  AND " + alias + ".StartDate <= @To");
                 if (!cmd.Parameters.Contains("@To"))
                     cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
         }
 
-        private void AppendForwardDToBChildSearchConditions(
-            TraceSearchParameters p,
-            SqlCommand cmd,
-            ref string sql,
-            string alias)
+        private void AppendForwardDToBChildSearchConditions(TraceSearchParameters p,SqlCommand cmd, StringBuilder sql, string alias)
         {
-            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, ref sql, alias, "ForeignKey", "@Order");
-            AppendSingleControlProcessStartDateConditions(p, cmd, ref sql, alias);
+            AppendSearchParameterCondition( p == null ? null : p.ProductionOrderNumber, cmd, sql, alias,"ForeignKey", "@Order");
+
+            AppendSingleControlProcessStartDateConditions( p, cmd, sql, alias);
         }
 
-        private void AppendStartNodeSearchConditionsForMaterialTableA(
-    TraceSearchParameters p,
-    SqlCommand cmd,
-    StringBuilder sql,
-    string alias)
-        {
-            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
-            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
-            AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, alias, "ItemCode", "@ItemCode");
-
-            // From / To は必要ならここ（MaterialTableAに列がある場合のみ）
-
-            // From / To はここでは載せない
-        }
+        
 
 
         #endregion
@@ -487,8 +515,7 @@ AND SUBSTRING(
             var list = new List<ProductionResultNode>();
             var uniqueNodeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            if (ShouldSkipMaterialTableAStartSearch(p))
-                return list;
+            
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -585,9 +612,11 @@ AND SUBSTRING(
                 sql.AppendLine("  AND ma.ManualInputLoadingAmount" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND ma.ManualInputLoadingAmount" + idx + " <> 0");
 
-                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+                AppendStartNodeSearchConditions(p,cmd,sql,"ma",false);
+
+                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
 
                 first = false;
             }
@@ -942,8 +971,8 @@ AND SUBSTRING(
         {
             var result = new List<ChildCandidate>();
 
-            if (ShouldSkipMaterialTableAStartSearch(p))
-                return FindForwardStartDToBCandidatesFromBHit(p);
+            //if (ShouldSkipMaterialTableAStartSearch(p))
+            //    return FindForwardStartDToBCandidatesFromBHit(p);
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -1014,10 +1043,10 @@ AND SUBSTRING(
         }
 
         private string BuildForwardStartDToBFromBHitSql(
-            TraceSearchParameters p,
-            SqlCommand cmd)
+    TraceSearchParameters p,
+    SqlCommand cmd)
         {
-            var sql = new StringBuilder();
+            StringBuilder sql = new StringBuilder();
             bool first = true;
 
             for (int i = 1; i <= 5; i++)
@@ -1029,47 +1058,55 @@ AND SUBSTRING(
                     sql.AppendLine("UNION ALL");
                 }
 
-                string part = @"
-SELECT
-    scp.ForeignKey,                                  -- 0 Child: ProductionOrderNumber
-    scp.LotNumber,                                   -- 1 Child: LotNumber
-    scp.ItemCode,                                    -- 2 Child: ItemCode
-    scp.StartDate,                                   -- 3 Child: StartDate
-    scp.Weight,                                      -- 4 Child: Weight
-    scp.MasterKey,                                   -- 5 Child: ControlMasterKey
-    ma.DrumcanLotNumber" + idx + @" AS DrumLotNumber,    -- 6 Parent: LotNumber
-    ma.DrumcanItemCode" + idx + @" AS DrumItemCode,      -- 7 Parent: ItemCode
-    ma.DrumcanLoadingAmount" + idx + @" AS DrumWeight,   -- 8 Parent: Weight
-    '" + idx + @"' AS SlotNo                              -- 9 Parent: InputSlotNo
-FROM dbo.SingleControlProcessTable scp
-INNER JOIN dbo.MaterialTableA ma
-        ON ma.LotNumber = scp.LotNumber
-WHERE 1 = 1
-  AND ma.DrumcanLoadingAmount" + idx + @" IS NOT NULL
-  AND ma.DrumcanLoadingAmount" + idx + @" <> 0
-  AND ma.DrumcanLotNumber" + idx + @" IS NOT NULL
-  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + @")) <> ''
-  AND scp.MasterKey LIKE '%[_]%'
-  AND SUBSTRING(
-        scp.MasterKey,
-        CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
-        1
-      ) IN ('2','3')
-  AND SUBSTRING(
-        scp.MasterKey,
-        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-        1
-    ) IN ('4','7')
-";
-
-                AppendForwardDToBChildSearchConditions(p, cmd, ref part, "scp");
-                sql.Append(part);
+                AppendForwardStartDToBFromBHitPartSql(sql, p, cmd, idx);
 
                 first = false;
             }
 
             return sql.ToString();
         }
+
+        private void AppendForwardStartDToBFromBHitPartSql(
+    StringBuilder sql,
+    TraceSearchParameters p,
+    SqlCommand cmd,
+    string idx)
+        {
+            sql.AppendLine("SELECT");
+            sql.AppendLine("    scp.ForeignKey,                                  -- 0 Child: ProductionOrderNumber");
+            sql.AppendLine("    scp.LotNumber,                                   -- 1 Child: LotNumber");
+            sql.AppendLine("    scp.ItemCode,                                    -- 2 Child: ItemCode");
+            sql.AppendLine("    scp.StartDate,                                   -- 3 Child: StartDate");
+            sql.AppendLine("    scp.Weight,                                      -- 4 Child: Weight");
+            sql.AppendLine("    scp.MasterKey,                                   -- 5 Child: ControlMasterKey");
+            sql.AppendLine("    ma.DrumcanLotNumber" + idx + " AS DrumLotNumber,    -- 6 Parent: LotNumber");
+            sql.AppendLine("    ma.DrumcanItemCode" + idx + " AS DrumItemCode,      -- 7 Parent: ItemCode");
+            sql.AppendLine("    ma.DrumcanLoadingAmount" + idx + " AS DrumWeight,   -- 8 Parent: Weight");
+            sql.AppendLine("    '" + idx + "' AS SlotNo                              -- 9 Parent: InputSlotNo");
+            sql.AppendLine("FROM dbo.SingleControlProcessTable scp");
+            sql.AppendLine("INNER JOIN dbo.MaterialTableA ma");
+            sql.AppendLine("        ON ma.LotNumber = scp.LotNumber");
+            sql.AppendLine("WHERE 1 = 1");
+            sql.AppendLine("  AND ma.DrumcanLoadingAmount" + idx + " IS NOT NULL");
+            sql.AppendLine("  AND ma.DrumcanLoadingAmount" + idx + " <> 0");
+            sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " IS NOT NULL");
+            sql.AppendLine("  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + ")) <> ''");
+            sql.AppendLine("  AND scp.MasterKey LIKE '%[_]%'");
+            sql.AppendLine("  AND SUBSTRING(");
+            sql.AppendLine("        scp.MasterKey,");
+            sql.AppendLine("        CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,");
+            sql.AppendLine("        1");
+            sql.AppendLine("      ) IN ('2','3')");
+            sql.AppendLine("  AND SUBSTRING(");
+            sql.AppendLine("        scp.MasterKey,");
+            sql.AppendLine("        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),");
+            sql.AppendLine("        1");
+            sql.AppendLine("    ) IN ('4','7')");
+
+            AppendForwardDToBChildSearchConditions(p, cmd, sql, "scp");
+        }
+
+
 
         private List<ChildCandidate> AdjustForwardStartDCandidatesForB(
     List<ChildCandidate> source,
@@ -1176,39 +1213,43 @@ WHERE 1 = 1
         }
 
         private string BuildForwardStartD25MaterialTableBSql(
-            TraceSearchParameters p,
-            SqlCommand cmd)
+    TraceSearchParameters p,
+    SqlCommand cmd)
         {
-            var sql = @"
-SELECT
-    scp.ForeignKey,   -- 0
-    scp.LotNumber,    -- 1
-    scp.ItemCode,     -- 2
-    scp.StartDate,    -- 3
-    scp.Weight,       -- 4
-    scp.MasterKey     -- 5
-FROM dbo.SingleControlProcessTable scp
-WHERE scp.LotNumber = @ChildLot
-  AND scp.MasterKey LIKE '%[_]%'
-  AND SUBSTRING(
-        scp.MasterKey,
-        CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
-        1
-      ) IN ('2','3')
-  AND SUBSTRING(
-        scp.MasterKey,
-        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-        1
-    ) IN ('4','7')
-";
+            StringBuilder sql = new StringBuilder();
 
-            AppendForwardDToBChildSearchConditions(p, cmd, ref sql, "scp");
-            sql += @"
-ORDER BY
-    scp.StartDate,
-    scp.MasterKey
-";
-            return sql;
+            sql.AppendLine("SELECT");
+            sql.AppendLine("    scp.ForeignKey,   -- 0");
+            sql.AppendLine("    scp.LotNumber,    -- 1");
+            sql.AppendLine("    scp.ItemCode,     -- 2");
+            sql.AppendLine("    scp.StartDate,    -- 3");
+            sql.AppendLine("    scp.Weight,       -- 4");
+            sql.AppendLine("    scp.MasterKey     -- 5");
+            sql.AppendLine("FROM dbo.SingleControlProcessTable scp");
+            sql.AppendLine("WHERE scp.LotNumber = @ChildLot");
+            sql.AppendLine("  AND scp.MasterKey LIKE '%[_]%'");
+            sql.AppendLine("  AND SUBSTRING(");
+            sql.AppendLine("        scp.MasterKey,");
+            sql.AppendLine("        CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,");
+            sql.AppendLine("        1");
+            sql.AppendLine("      ) IN ('2','3')");
+            sql.AppendLine("  AND SUBSTRING(");
+            sql.AppendLine("        scp.MasterKey,");
+            sql.AppendLine("        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),");
+            sql.AppendLine("        1");
+            sql.AppendLine("    ) IN ('4','7')");
+
+            AppendForwardDToBChildSearchConditions(
+                p,
+                cmd,
+                sql,
+                "scp");
+
+            sql.AppendLine("ORDER BY");
+            sql.AppendLine("    scp.StartDate,");
+            sql.AppendLine("    scp.MasterKey");
+
+            return sql.ToString();
         }
 
         private string BuildForwardStartD1FromDrumSql(
@@ -1277,7 +1318,7 @@ ORDER BY
                 sql.AppendLine("FROM dbo.MaterialTableA ma");
                 sql.AppendLine("WHERE 1 = 1");
 
-                AppendStartNodeSearchConditionsForMaterialTableA(p, cmd, sql, "ma");
+                AppendStartNodeSearchConditions(p, cmd, sql, "ma",false);
 
                 sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + ")) <> ''");
@@ -1831,12 +1872,14 @@ ORDER BY
         /// </summary>
         private string BuildForwardStep1MaterialTableBSql()
         {
-            return @"
-SELECT
-    mb.LotNumber AS ChildLotNumber   -- 0
-FROM dbo.MaterialTableB mb
-WHERE mb.SourceTankLotNumber01 = @ParentLot
-";
+            StringBuilder sql = new StringBuilder();
+
+            sql.AppendLine(" SELECT");
+            sql.AppendLine(" mb.LotNumber AS ChildLotNumber   -- 0");
+            sql.AppendLine(" FROM dbo.MaterialTableB mb");
+            sql.AppendLine(" WHERE mb.SourceTankLotNumber01 = @ParentLot");
+
+            return sql.ToString();
         }
 
         /// <summary>
@@ -1893,20 +1936,36 @@ WHERE mb.SourceTankLotNumber01 = @ParentLot
         /// </summary>
         private string BuildForwardStep2MaterialTableBSql()
         {
-            return @"
-SELECT
-    scp.ForeignKey,   -- 0
-    scp.LotNumber,    -- 1
-    scp.ItemCode,     -- 2
-    scp.StartDate,    -- 3
-    scp.Weight,       -- 4
-    scp.MasterKey     -- 5
-FROM dbo.MaterialTableB mb
-INNER JOIN dbo.SingleControlProcessTable scp
-        ON scp.MasterKey = mb.MasterKey
-WHERE mb.SourceTankLotNumber01 = @ParentLot
-  AND scp.LotNumber = @ChildLot
-";
+            StringBuilder sql = new StringBuilder();
+
+            sql.AppendLine(" SELECT");
+            sql.AppendLine(" scp.ForeignKey,   -- 0");
+            sql.AppendLine(" scp.LotNumber,    -- 1");
+            sql.AppendLine(" scp.ItemCode,     -- 2");
+            sql.AppendLine(" scp.StartDate,    -- 3");
+            sql.AppendLine(" scp.Weight,       -- 4");
+            sql.AppendLine(" scp.MasterKey     -- 5");
+            sql.AppendLine(" FROM dbo.MaterialTableB mb");
+            sql.AppendLine(" INNER JOIN dbo.SingleControlProcessTable scp ON scp.MasterKey = mb.MasterKey");
+            sql.AppendLine(" WHERE mb.SourceTankLotNumber01 = @ParentLot");
+            sql.AppendLine(" AND scp.LotNumber = @ChildLot");
+
+            //            return @"
+            //SELECT
+            //    scp.ForeignKey,   -- 0
+            //    scp.LotNumber,    -- 1
+            //    scp.ItemCode,     -- 2
+            //    scp.StartDate,    -- 3
+            //    scp.Weight,       -- 4
+            //    scp.MasterKey     -- 5
+            //FROM dbo.MaterialTableB mb
+            //INNER JOIN dbo.SingleControlProcessTable scp
+            //        ON scp.MasterKey = mb.MasterKey
+            //WHERE mb.SourceTankLotNumber01 = @ParentLot
+            //  AND scp.LotNumber = @ChildLot
+            //";
+
+            return sql.ToString();
         }
 
         private void AppendForwardStartDCandidatesDeduped(
@@ -3184,8 +3243,7 @@ WHERE scp.LotNumber = @ParentLotNumber
             if (p == null)
                 return result;
 
-            if (ShouldSkipMaterialTableAStartSearch(p))
-                return result;
+            
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -3338,9 +3396,11 @@ WHERE scp.LotNumber = @ParentLotNumber
                 sql.AppendLine("  AND ma.DrumcanLotNumber" + idx + " IS NOT NULL");
                 sql.AppendLine("  AND LTRIM(RTRIM(ma.DrumcanLotNumber" + idx + ")) <> ''");
 
-                AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+                AppendStartNodeSearchConditions(p, cmd, sql, "ma", false);
+
+                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
 
                 first = false;
             }

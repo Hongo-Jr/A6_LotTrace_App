@@ -49,6 +49,9 @@ namespace LotTraceApp.Models
         public string ProductionOrderNumber { get; set; }
         public string ItemName { get; set; }
         public string ItemCode { get; set; }
+
+        public List<string> ResolvedItemCodes { get; set; }
+
         public string LotNumber { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
