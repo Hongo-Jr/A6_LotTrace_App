@@ -59,21 +59,11 @@ namespace LotTraceApp.Repositories
                 sql.AppendLine("FROM dbo.MaterialTableA ma");
                 sql.AppendLine("WHERE 1 = 1 ");
 
-                //                var sql = @"
-                //SELECT
-                //    ma.ForeignKey,   -- 0
-                //    ma.LotNumber,    -- 1
-                //    ma.ItemCode,     -- 2
-                //    ma.MasterKey     -- 3
-                //FROM dbo.MaterialTableA ma
-                //WHERE 1 = 1
-                //";
+                
 
                 AppendStartNodeSearchConditions(p, cmd, sql, "ma", false);
 
-                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+                
 
                 cmd.CommandText = sql.ToString();
 
@@ -139,27 +129,7 @@ namespace LotTraceApp.Repositories
                     sql.AppendLine(" CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2, 1 ) IN ('2','3')");
                     sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),1 ) IN ('4','7')");
                     
-                    //var sql = @"
-                    //SELECT
-                    //    scp.ForeignKey,   -- 0
-                    //    scp.LotNumber,    -- 1
-                    //    scp.ItemCode,     -- 2
-                    //    scp.StartDate,    -- 3
-                    //    scp.Weight,       -- 4
-                    //    scp.MasterKey     -- 5
-                    //FROM dbo.SingleControlProcessTable scp
-                    //WHERE 1 = 1
-                    //  AND SUBSTRING(
-                    //          scp.MasterKey,
-                    //          CHARINDEX('_', scp.MasterKey, CHARINDEX('_', scp.MasterKey) + 1) + 2,
-                    //          1
-                    //      ) IN ('2','3')
-                    //  AND SUBSTRING(
-                    //        scp.MasterKey,
-                    //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-                    //        1
-                    //    ) IN ('4','7')
-                    //";
+                   
 
 
                     // 既存Appendをそのまま使用
@@ -233,28 +203,7 @@ namespace LotTraceApp.Repositories
                         sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2, 1) = '2' ");
                         sql.AppendLine(" AND SUBSTRING( scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)), 1 ) IN ('4','7')");
 
-                        //                        var sql = @"
-                        //SELECT
-                        //    scp.ForeignKey,   -- 0
-                        //    scp.LotNumber,    -- 1
-                        //    scp.ItemCode,     -- 2
-                        //    scp.StartDate,    -- 3
-                        //    scp.Weight,       -- 4
-                        //    scp.MasterKey     -- 5
-                        //FROM dbo.SingleControlProcessTable scp
-                        //WHERE 1 = 1
-                        //  AND scp.MasterKey LIKE '%[_]%'
-                        //AND SUBSTRING(
-                        //        scp.MasterKey,
-                        //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)) - 2,
-                        //        1
-                        //    ) = '2'
-                        //AND SUBSTRING(
-                        //        scp.MasterKey,
-                        //        LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),
-                        //        1
-                        //    ) IN ('4','7')
-                        //";
+                        
 
 
                         // 既存Appendをそのまま使用
@@ -614,9 +563,7 @@ namespace LotTraceApp.Repositories
 
                 AppendStartNodeSearchConditions(p,cmd,sql,"ma",false);
 
-                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+             
 
                 first = false;
             }
@@ -971,8 +918,7 @@ namespace LotTraceApp.Repositories
         {
             var result = new List<ChildCandidate>();
 
-            //if (ShouldSkipMaterialTableAStartSearch(p))
-            //    return FindForwardStartDToBCandidatesFromBHit(p);
+          
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -1950,20 +1896,7 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" WHERE mb.SourceTankLotNumber01 = @ParentLot");
             sql.AppendLine(" AND scp.LotNumber = @ChildLot");
 
-            //            return @"
-            //SELECT
-            //    scp.ForeignKey,   -- 0
-            //    scp.LotNumber,    -- 1
-            //    scp.ItemCode,     -- 2
-            //    scp.StartDate,    -- 3
-            //    scp.Weight,       -- 4
-            //    scp.MasterKey     -- 5
-            //FROM dbo.MaterialTableB mb
-            //INNER JOIN dbo.SingleControlProcessTable scp
-            //        ON scp.MasterKey = mb.MasterKey
-            //WHERE mb.SourceTankLotNumber01 = @ParentLot
-            //  AND scp.LotNumber = @ChildLot
-            //";
+           
 
             return sql.ToString();
         }
@@ -3398,10 +3331,7 @@ WHERE scp.LotNumber = @ParentLotNumber
 
                 AppendStartNodeSearchConditions(p, cmd, sql, "ma", false);
 
-                //AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                //AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                //AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
-
+                
                 first = false;
             }
 
@@ -3513,41 +3443,9 @@ WHERE scp.LotNumber = @ParentLotNumber
                 inputSlotNo);
         }
 
-        private void ApplyBackwardStartNodeContext(ProductionResultNode node)
-        {
-            if (node == null)
-                return;
+      
 
-            node.Depth = 0;
-            node.NodeType = "Start";
-            node.ParentKey = null;
-
-            // バック始点は現時点では B起点運用
-            node.RouteSystem = "B";
-
-            // B系統は現行モデル上、入力情報を固定で持たせる
-            node.InputSlotNo = 1;
-            node.InputSourceType = null;
-
-            if (!node.IsTraceTerminal)
-                node.IsTraceTerminal = string.IsNullOrWhiteSpace(node.LotNumber);
-        }
-
-        private string BuildBackwardStartMergeKey(ProductionResultNode node)
-        {
-            if (node == null)
-                return null;
-
-            // サービス側 MergeKey 方針に寄せるため、
-            // B始点は MasterKey 優先、無ければ LotNumber を使用
-            if (!string.IsNullOrWhiteSpace(node.ControlMasterKey))
-                return "BSTART|" + node.ControlMasterKey.Trim().ToUpperInvariant();
-
-            if (!string.IsNullOrWhiteSpace(node.LotNumber))
-                return "BSTARTLOT|" + node.LotNumber.Trim().ToUpperInvariant();
-
-            return null;
-        }
+       
 
         private string BuildDeterministicSpecialNodeMasterKey(
     string specialNodeType,
