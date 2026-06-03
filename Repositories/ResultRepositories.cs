@@ -735,5 +735,6 @@ SELECT CASE WHEN EXISTS (
                 return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
             }
         }
+
     }
 }
