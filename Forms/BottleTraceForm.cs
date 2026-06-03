@@ -20,6 +20,7 @@ namespace LotTraceApp
     public partial class BottleTraceForm : Form
     {
         private readonly BottleTraceService _service;
+        private readonly ResultService _resultService;
         // タブ番号 → 検索条件。MainForm と同じく、タブごとの状態を保持する。
         private readonly Dictionary<int, TraceSearchParameters> _tabSearchParameters =
             new Dictionary<int, TraceSearchParameters>();
@@ -204,9 +205,10 @@ namespace LotTraceApp
 
         #region コンストラクタ・初期化
 
-        public BottleTraceForm(BottleTraceService service)
+        public BottleTraceForm(BottleTraceService service, ResultService resultService)
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
+            _resultService = resultService;
             InitializeComponent();
             ConfigureBottleTraceTabOwnerDraw();
 
@@ -272,6 +274,7 @@ namespace LotTraceApp
 
             btnBottleDetectCrossPoints.Click -= btnBottleDetectCrossPoints_Click;
             btnBottleDetectCrossPoints.Click += btnBottleDetectCrossPoints_Click;
+            
         }
 
         private void InitializeBottleIntersectionTab()
@@ -513,6 +516,11 @@ namespace LotTraceApp
 
             grid.MouseLeave -= Grid_ItemNameToolTipHideOnMouseLeave;
             grid.MouseLeave += Grid_ItemNameToolTipHideOnMouseLeave;
+
+            
+                grid.CellMouseClick -= dataGrid_CellMouseClick;
+                grid.CellMouseClick += dataGrid_CellMouseClick;
+            
         }
 
         private void UnregisterTraceGridBorderPaint(DataGridView grid)
@@ -1025,7 +1033,7 @@ namespace LotTraceApp
             tab.GridStart.Columns["NodeKey"].Visible = false;
             tab.GridStart.Columns["DisplayKey"].Visible = false;
             tab.GridStart.Columns["ItemCode"].Visible = false;
-
+            tab.GridStart.Columns["MasterKey"].Visible = false;
             //瓶
 
             tab.GridEnd.DataSource = tables.BottleTable;
@@ -1063,6 +1071,8 @@ namespace LotTraceApp
             tab.GridEnd.Columns["NodeKey"].Visible = false;
             tab.GridEnd.Columns["DisplayKey"].Visible = false;
             tab.GridEnd.Columns["ItemCode"].Visible = false;
+            tab.GridEnd.Columns["MasterKey"].Visible = false;
+
 
             HideBottleInternalColumns(tab.GridStart);
             HideBottleInternalColumns(tab.GridEnd);
@@ -3494,6 +3504,62 @@ namespace LotTraceApp
                 | AnchorStyles.Bottom
                 | AnchorStyles.Left;
         }
+
+        #endregion
+
+        #region 履歴詳細
+
+        private void dataGrid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            var grid = sender as DataGridView;
+
+            if (grid.Columns.Contains("Weight"))
+            {
+                dataGridLiquid_CellMouseClick(grid,e);
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void dataGridLiquid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // ヘッダ等は無視
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            // ★右クリック以外は開かない
+            if (e.Button != MouseButtons.Right) return;
+
+            // 右クリックした行を選択
+
+            var tab = GetCurrentTabContext();
+
+            tab.GridStart.ClearSelection();
+            tab.GridStart.CurrentCell = tab.GridStart.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            tab.GridStart.Rows[e.RowIndex].Selected = true;
+
+            var drv = tab.GridStart.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            if (drv == null) return;
+
+            DataRow r = drv.Row;
+            string Get(string col) =>
+                r.Table.Columns.Contains(col) && r[col] != DBNull.Value ? Convert.ToString(r[col]) : "";
+
+            string productionOrderNumber = Get("OrderNumber");
+            string itemCode = Get("ItemCode");
+            string itemName = Get("ItemName");
+            string lotNumber = Get("Lot");
+            string preferredProcessId = Get("MasterKey");
+
+            using (var f = new LotTraceApp.Forms.Result(
+                _resultService, productionOrderNumber, itemCode, itemName, lotNumber, preferredProcessId))
+            {
+                f.ShowDialog(this);
+            }
+        }
+
+
 
         #endregion
     }

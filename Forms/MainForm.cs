@@ -3783,7 +3783,7 @@ namespace LotTraceApp
         {
             if (_bottleTraceForm == null || _bottleTraceForm.IsDisposed)
             {
-                _bottleTraceForm = new BottleTraceForm(_bottleService);
+                _bottleTraceForm = new BottleTraceForm(_bottleService,_resultService);
                 _bottleTraceForm.FormClosing -= BottleTraceForm_FormClosing;
                 _bottleTraceForm.FormClosing += BottleTraceForm_FormClosing;
             }

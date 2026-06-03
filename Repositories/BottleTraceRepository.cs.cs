@@ -244,10 +244,40 @@ namespace LotTraceApp.Repositories
         private void B_AppendStartNodeSearchConditions(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, bool includeStartDate)
         {
             B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
-
+           
+            
             B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
 
             B_AppendItemCodeCondition(p, cmd, sql, alias, "ItemCode", "@ItemCode");
+
+            if (!includeStartDate || p == null)
+                return;
+
+
+            if (p != null && p.From.HasValue)
+            {
+                sql.AppendLine("  AND " + alias + ".StartDate >= @From");
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+            }
+
+            if (p != null && p.To.HasValue)
+            {
+                sql.AppendLine("  AND " + alias + ".StartDate <= @To");
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+            }
+        }
+
+
+        private void B_BottleAppendStartNodeSearchConditions(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, bool includeStartDate)
+        {
+            B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "OrderNumber", "@Order");
+
+
+            B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "ProductLotNumber", "@Lot");
+
+            B_AppendItemCodeCondition(p, cmd, sql, alias, "ProductItemCode", "@ItemCode");
 
             if (!includeStartDate || p == null)
                 return;
@@ -561,7 +591,7 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");
 
-            B_AppendStartNodeSearchConditions(p, cmd, sql, "fb", true);
+            B_BottleAppendStartNodeSearchConditions(p, cmd, sql, "fb", true);
             //B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fb");
 
             return sql.ToString();
@@ -612,34 +642,13 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");
 
-            B_AppendStartNodeSearchConditions(p, cmd, sql, "fd", true);
+            B_BottleAppendStartNodeSearchConditions(p, cmd, sql, "fd", true);
             //B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fd");
 
             return sql.ToString();
         }
 
-        private void B_AppendStartNodeSearchConditions_BottleTable(
-    TraceSearchParameters p,
-    SqlCommand cmd,
-    StringBuilder sql,
-    string alias)
-        {
-            B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "OrderNumber", "@Order");
-            B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "ProductLotNumber", "@Lot");
-            B_AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, alias, "ProductItemCode", "@ItemCode");
-
-            if (p != null && p.From.HasValue)
-            {
-                sql.AppendLine(" AND fo.StartDate >= @From");
-                cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
-            }
-
-            if (p != null && p.To.HasValue)
-            {
-                sql.AppendLine(" AND fo.StartDate <= @To");
-                cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
-            }
-        }
+        
 
         private List<BottleCandidate> B_GetBackwardBottleCandidate(List<Bottle_ProductionResultNode> nodes)
         {
