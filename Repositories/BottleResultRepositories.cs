@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LotTraceApp.Repositories
 {
-    internal class BottleResultRepositories
+    public class BottleResultRepositories
     {
         private readonly string _connectionString;
 
