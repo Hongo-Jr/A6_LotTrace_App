@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LotTraceApp.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,8 +13,12 @@ namespace LotTraceApp.Forms
 {
     public partial class BottleResult : Form
     {
-        public BottleResult()
+        private readonly BottleResultService _service;
+
+        public BottleResult(BottleResultService service,string orderNumber, string lotNo)
         {
+            _service = service ?? throw new ArgumentNullException(nameof(service));
+
             InitializeComponent();
         }
     }
