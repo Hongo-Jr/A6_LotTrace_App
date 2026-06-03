@@ -3142,7 +3142,6 @@ namespace LotTraceApp
         }
 
         #endregion
-        private System.Windows.Forms.Panel panelMiddleHeaderInner;
         private BindingSource bindingSource1;
         private TabPage tabPage1;
         private Label lblProductionOrderNumber;

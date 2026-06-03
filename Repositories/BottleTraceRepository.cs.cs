@@ -152,10 +152,11 @@ namespace LotTraceApp.Repositories
                 sql.AppendLine("  AND ma.ManualInputLoadingAmount" + idx + " <> 0");
                 sql.AppendLine("AND SUBSTRING(ma.MasterKey,LEN(ma.MasterKey) - CHARINDEX('_', ma.MasterKey),1) IN('G', 'G')");
 
+                B_AppendStartNodeSearchConditions(p, cmd, sql, "ma", false);
 
-                B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
-                B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
-                B_AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
+                //B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, "ma", "ForeignKey", "@Order");
+                //B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, "ma", "LotNumber", "@Lot");
+                //B_AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, "ma", "ItemCode", "@ItemCode");
 
                 first = false;
             }
@@ -232,36 +233,40 @@ namespace LotTraceApp.Repositories
             sql.AppendLine("AND SUBSTRING(scp.MasterKey, LEN(scp.MasterKey) - CHARINDEX('_', REVERSE(scp.MasterKey)),1) IN ('4','7')");
 
 
-            B_AppendStartNodeSearchConditions(p, cmd, sql, "scp");
+            B_AppendStartNodeSearchConditions(p, cmd, sql, "scp",true);
+
 
             return sql.ToString();
         }
 
-        private void B_AppendStartNodeSearchConditions(
-    TraceSearchParameters p,
-    SqlCommand cmd,
-    StringBuilder sql,
-    string alias)
+        
+
+        private void B_AppendStartNodeSearchConditions(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, bool includeStartDate)
         {
             B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+
             B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
-            B_AppendSearchParameterCondition(p == null ? null : p.ItemCode, cmd, sql, alias, "ItemCode", "@ItemCode");
+
+            B_AppendItemCodeCondition(p, cmd, sql, alias, "ItemCode", "@ItemCode");
+
+            if (!includeStartDate || p == null)
+                return;
+
 
             if (p != null && p.From.HasValue)
             {
-
-                sql.AppendLine(" AND " + alias + ".StartDate >= @From");
-                cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+                sql.AppendLine("  AND " + alias + ".StartDate >= @From");
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
             }
 
             if (p != null && p.To.HasValue)
             {
-                sql.AppendLine(" AND " + alias + ".StartDate <= @To");
-                cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+                sql.AppendLine("  AND " + alias + ".StartDate <= @To");
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
         }
-
-
 
         public void B_AppendSearchParameterCondition(
             string rawValue,
@@ -289,7 +294,53 @@ namespace LotTraceApp.Repositories
             }
         }
 
-        
+        private void B_AppendInCondition( List<string> values, SqlCommand cmd, StringBuilder sql, string alias, string columnName, string parameterName)
+        {
+            if (values == null || values.Count == 0)
+                return;
+
+            var parameterNames = new List<string>();
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                string value = values[i];
+
+                if (string.IsNullOrWhiteSpace(value))
+                    continue;
+
+                string currentParameterName = parameterName + i.ToString();
+
+                parameterNames.Add(currentParameterName);
+
+                if (!cmd.Parameters.Contains(currentParameterName))
+                {
+                    cmd.Parameters.AddWithValue(
+                        currentParameterName,
+                        value.Trim());
+                }
+            }
+
+            if (parameterNames.Count == 0)
+                return;
+
+            sql.AppendLine(
+                "  AND " + alias + "." + columnName +
+                " IN (" + string.Join(", ", parameterNames) + ")");
+        }
+
+        private void B_AppendItemCodeCondition(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, string columnName, string parameterName)
+        {
+            if (p == null)
+                return;
+
+            if (p.ResolvedItemCodes != null && p.ResolvedItemCodes.Count > 0)
+            {
+                B_AppendInCondition(p.ResolvedItemCodes, cmd, sql, alias, columnName, parameterName);
+                return;
+            }
+
+            B_AppendSearchParameterCondition(p.ItemCode, cmd, sql, alias, columnName, parameterName);
+        }
 
         private List<BottleCandidate> B_GetForwardBottleCandidate(List<ProductionResultNode> nodes)
         {
@@ -510,8 +561,8 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");
 
-
-            B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fb");
+            B_AppendStartNodeSearchConditions(p, cmd, sql, "fb", true);
+            //B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fb");
 
             return sql.ToString();
         }
@@ -561,8 +612,8 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");
 
-
-            B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fd");
+            B_AppendStartNodeSearchConditions(p, cmd, sql, "fd", true);
+            //B_AppendStartNodeSearchConditions_BottleTable(p, cmd, sql, "fd");
 
             return sql.ToString();
         }

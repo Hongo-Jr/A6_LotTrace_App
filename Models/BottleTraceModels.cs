@@ -102,6 +102,15 @@ namespace LotTraceApp.Models
             BottleTable = bottle; 
             LineRanges = new List<BottleLineRanges>();
         }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return (LiquidTable?.Rows?.Count ?? 0) == 0
+                    && (BottleTable?.Rows?.Count ?? 0) == 0;
+            }
+        }
     }
 
     public class BottleTraceResult
@@ -111,7 +120,16 @@ namespace LotTraceApp.Models
 
         public BottleTraceResult()
         {
+            
             DisplayGroups = new List<BottleDisplayGroup>();
+        }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return DisplayTables == null || DisplayTables.IsEmpty;
+            }
         }
     }
    

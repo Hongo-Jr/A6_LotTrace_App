@@ -1369,6 +1369,8 @@ namespace LotTraceApp
             if (dataGridIntersection != null)
             {
                 InitializeIntersectionTabCommands();
+                IntersectionTab.Resize -= IntersectionTab_Resize;
+                IntersectionTab.Resize += IntersectionTab_Resize;
                 ApplyIntersectionTabLayout();
                 dataGridIntersection.ScrollBars = ScrollBars.Both;
                 dataGridIntersection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
@@ -1417,6 +1419,12 @@ namespace LotTraceApp
             };
         }
 
+        private void IntersectionTab_Resize(object sender, EventArgs e)
+        {
+            ApplyIntersectionTabLayout();
+            ApplyCrossPointGridColumnWidths();
+        }
+
         private void ApplyIntersectionTabLayout()
         {
             if (IntersectionTab == null || dataGridIntersection == null)
@@ -1451,8 +1459,7 @@ namespace LotTraceApp
                 IntersectionTab.ClientSize.Height - gridTop - margin);
             dataGridIntersection.Anchor = AnchorStyles.Top
                 | AnchorStyles.Bottom
-                | AnchorStyles.Left
-                | AnchorStyles.Right;
+                | AnchorStyles.Left;
         }
 
        
@@ -1593,7 +1600,52 @@ namespace LotTraceApp
                 ApplyCrossPointGridCellStyle(col);
             }
 
-            ApplyIntersectionTabLayout();
+            FitIntersectionGridWidthToColumns();
+        }
+
+        private int GetIntersectionGridMaxWidth()
+        {
+            if (IntersectionTab == null)
+                return dataGridIntersection == null ? 0 : dataGridIntersection.Width;
+
+            const int margin = 16;
+            int width = IntersectionTab.ClientSize.Width - margin * 2;
+            return width < 10 ? 10 : width;
+        }
+
+        private int GetVisibleIntersectionColumnsWidth()
+        {
+            if (dataGridIntersection == null)
+                return 0;
+
+            int width = 0;
+            foreach (DataGridViewColumn col in dataGridIntersection.Columns)
+            {
+                if (col != null && col.Visible)
+                    width += col.Width;
+            }
+
+            return width;
+        }
+
+        private void FitIntersectionGridWidthToColumns()
+        {
+            if (dataGridIntersection == null)
+                return;
+
+            int columnsWidth = GetVisibleIntersectionColumnsWidth();
+            if (columnsWidth <= 0)
+                return;
+
+            int targetWidth = columnsWidth + SystemInformation.VerticalScrollBarWidth + 4;
+            int maxWidth = GetIntersectionGridMaxWidth();
+            if (targetWidth > maxWidth)
+                targetWidth = maxWidth;
+            if (targetWidth < 10)
+                targetWidth = 10;
+
+            dataGridIntersection.Width = targetWidth;
+            dataGridIntersection.Invalidate();
         }
 
         private void ApplyCrossPointGridCellStyle(DataGridViewColumn col)
@@ -2802,6 +2854,17 @@ namespace LotTraceApp
                         p,
                         showProgress ? progress : null,
                         cancellation == null ? CancellationToken.None : cancellation.Token));
+
+                if (workResult == null || workResult.Result.IsEmpty)
+                {
+                    MessageBox.Show(
+                        "検索結果は0件です。",
+                        "検索結果なし",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    return false;
+                }
 
                 if (showProgress)
                     progress.Report(new TraceProgressState("グリッドへ反映しています...", 90));

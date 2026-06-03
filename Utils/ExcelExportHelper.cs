@@ -424,6 +424,7 @@ namespace LotTraceApp.Utils
             ApplyBottleColumnWidths(ws, leftColumns, 1);
             ApplyBottleColumnWidths(ws, rightColumns, leftColumns.Count + 1);
             ApplyBottleTraceLines(ws, request.LineRanges, totalColumns, maxRows);
+            ApplyBottleGridVerticalBoundary(ws, leftColumns.Count, rightColumns.Count, maxRows);
 
             ws.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
         }
@@ -520,6 +521,31 @@ namespace LotTraceApp.Utils
                 var range = ws.Range(excelRow, 1, excelRow, totalColumns);
                 range.Style.Border.BottomBorder = XLBorderStyleValues.Medium;
                 range.Style.Border.BottomBorderColor = XLColor.FromColor(Color.FromArgb(120, 72, 32));
+            }
+        }
+
+        private static void ApplyBottleGridVerticalBoundary(
+            IXLWorksheet ws,
+            int leftColumnCount,
+            int rightColumnCount,
+            int visibleBodyRowCount)
+        {
+            if (ws == null || leftColumnCount <= 0 || rightColumnCount <= 0)
+                return;
+
+            int leftEndCol = leftColumnCount;
+            int rightStartCol = leftColumnCount + 1;
+            int lastExcelRow = Math.Max(ColumnHeaderExcelRow, FirstBodyExcelRow + visibleBodyRowCount - 1);
+
+            for (int row = GroupHeaderExcelRow; row <= lastExcelRow; row++)
+            {
+                var leftCell = ws.Cell(row, leftEndCol);
+                leftCell.Style.Border.RightBorder = XLBorderStyleValues.Medium;
+                leftCell.Style.Border.RightBorderColor = XLColor.FromColor(LevelBoundaryColor);
+
+                var rightCell = ws.Cell(row, rightStartCol);
+                rightCell.Style.Border.LeftBorder = XLBorderStyleValues.Medium;
+                rightCell.Style.Border.LeftBorderColor = XLColor.FromColor(LevelBoundaryColor);
             }
         }
 

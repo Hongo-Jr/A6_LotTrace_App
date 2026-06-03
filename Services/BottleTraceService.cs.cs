@@ -48,26 +48,40 @@ namespace LotTraceApp.Services
         #region フォワード
 
 
-        public BottleTraceResult B_TraceForwardResult(TraceSearchParameters p)
+        public BottleTraceResult B_TraceForwardResult(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (p == null) throw new ArgumentNullException("p");
-            
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "品目名条件を解決しています...", 12);
 
             if (!ResolveItemNameCondition(p))
             {
                 return new BottleTraceResult();
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "液設備から瓶設備への候補を取得しています...", 25);
 
             //検索条件からCandidates作成
             var candidate = _repo.B_FindForwardCandidate(p);
 
-            //Candidateをグループ化したDisplayNodeにする。
-            var displayGroups = B_BuildDisplaylane(candidate);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "表示レーンを構築しています...", 62);
 
+            //Candidateをグループ化したDisplayNodeにする。
+            var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "液設備情報を補完しています...", 70);
             ResolveLiquidNodeComplements(displayGroups);
 
-            var result = B_BuildDisplayTable(displayGroups);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "グリッド用データを作成しています...", 78);
+            var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
 
             return new BottleTraceResult
             {
@@ -83,26 +97,41 @@ namespace LotTraceApp.Services
         #region バック
 
         
-        public BottleTraceResult B_TraceBackwardResult(TraceSearchParameters p)
+        public BottleTraceResult B_TraceBackwardResult(
+            TraceSearchParameters p,
+            IProgress<TraceProgressState> progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
 
             if (p == null) throw new ArgumentNullException("p");
 
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "品目名条件を解決しています...", 12);
 
             if (!ResolveItemNameCondition(p))
             {
                 return new BottleTraceResult();
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "瓶設備から液設備への候補を取得しています...", 25);
+
             //検索条件からCandidates作成
             var candidate = _repo.B_FindBackwardCandidate(p);
 
-            //Candidateをグループ化したDisplayNodeにする。
-            var displayGroups = B_BuildDisplaylane(candidate);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "表示レーンを構築しています...", 62);
 
+            //Candidateをグループ化したDisplayNodeにする。
+            var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "液設備情報を補完しています...", 70);
             ResolveLiquidNodeComplements(displayGroups);
 
-            var result = B_BuildDisplayTable(displayGroups);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "グリッド用データを作成しています...", 78);
+            var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
 
             return new BottleTraceResult
             {
@@ -120,16 +149,31 @@ namespace LotTraceApp.Services
         #region 汎用
 
 
-        private List<BottleDisplayGroup> B_BuildDisplaylane(List<BottleCandidate> candidates)
+        private static void ReportProgress(IProgress<TraceProgressState> progress, string message, int? percent = null)
+        {
+            if (progress != null)
+                progress.Report(new TraceProgressState(message, percent));
+        }
+
+        private List<BottleDisplayGroup> B_BuildDisplaylane(
+            List<BottleCandidate> candidates,
+            IProgress<TraceProgressState> progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = new List<BottleDisplayGroup>();
             int StartY = 0;
+            int total = candidates == null ? 0 : candidates.Count;
+            int index = 0;
 
-            foreach (var candidate in candidates)
+            foreach (var candidate in candidates ?? new List<BottleCandidate>())
             {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (total > 0 && index % 20 == 0)
+                    ReportProgress(progress, "表示レーンを構築しています...", 62 + Math.Min(6, index * 6 / total));
+
                 var DisplayGroup = new BottleDisplayGroup();
-                DisplayGroup.LiquidNodes.AddRange(BuildDisplayNodes(candidate.LiquidNodes, StartY));
-                DisplayGroup.BottleNodes.AddRange(BuildDisplayNodes(candidate.BottleNodes, StartY));
+                DisplayGroup.LiquidNodes.AddRange(BuildDisplayNodes(candidate.LiquidNodes, StartY, cancellationToken));
+                DisplayGroup.BottleNodes.AddRange(BuildDisplayNodes(candidate.BottleNodes, StartY, cancellationToken));
                 DisplayGroup.StartY = StartY;
 
                 int liquidY = DisplayGroup.LiquidNodes.Count;
@@ -141,6 +185,7 @@ namespace LotTraceApp.Services
                 StartY += nextY;
 
                 result.Add(DisplayGroup);
+                index++;
 
             }
 
@@ -246,12 +291,16 @@ namespace LotTraceApp.Services
             }
         }
 
-        private List<BottleDisplayLaneNode > BuildDisplayNodes(List<ProductionResultNode> liquidNodes, int BaseY)
+        private List<BottleDisplayLaneNode > BuildDisplayNodes(
+            List<ProductionResultNode> liquidNodes,
+            int BaseY,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = new List<BottleDisplayLaneNode>();
             int currentY = BaseY;
-            foreach (var node in liquidNodes)
+            foreach (var node in liquidNodes ?? new List<ProductionResultNode>())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var DisplayNode = new BottleDisplayLaneNode();
 
                 DisplayNode.NodeType = 0;
@@ -267,12 +316,16 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private List<BottleDisplayLaneNode> BuildDisplayNodes(List<Bottle_ProductionResultNode> liquidNodes, int BaseY)
+        private List<BottleDisplayLaneNode> BuildDisplayNodes(
+            List<Bottle_ProductionResultNode> liquidNodes,
+            int BaseY,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = new List<BottleDisplayLaneNode>();
             int currentY = BaseY;
-            foreach (var node in liquidNodes)
+            foreach (var node in liquidNodes ?? new List<Bottle_ProductionResultNode>())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var DisplayNode = new BottleDisplayLaneNode();
 
                 DisplayNode.NodeType = 1;
@@ -288,7 +341,10 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private BottleDisplayTables B_BuildDisplayTable(List<BottleDisplayGroup> groups)
+        private BottleDisplayTables B_BuildDisplayTable(
+            List<BottleDisplayGroup> groups,
+            IProgress<TraceProgressState> progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var liquid = new DataTable();
             var bottle = new DataTable();
@@ -298,19 +354,27 @@ namespace LotTraceApp.Services
 
             int liquidBaseY = 0;
             int bottleBaseY = 0;
+            int total = groups == null ? 0 : groups.Count;
+            int index = 0;
 
-            foreach (var group in groups)
+            foreach (var group in groups ?? new List<BottleDisplayGroup>())
             {
-                liquidBaseY = B_SetLiquidTable(tables,group.LiquidNodes,liquidBaseY);
-                bottleBaseY = B_SetBottleTable(tables, group.BottleNodes,bottleBaseY);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (total > 0 && index % 20 == 0)
+                    ReportProgress(progress, "グリッド用データを作成しています...", 78 + Math.Min(10, index * 10 / total));
+
+                liquidBaseY = B_SetLiquidTable(tables, group.LiquidNodes, liquidBaseY, cancellationToken);
+                bottleBaseY = B_SetBottleTable(tables, group.BottleNodes, bottleBaseY, cancellationToken);
 
                 var groupLine = new BottleLineRanges();
                 groupLine.BorderType = 0;
                 groupLine.BorderIndex = group.EndY;
                 tables.LineRanges.Add(groupLine);
+                index++;
                 
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             B_AdjustTableRow(tables);
 
 
@@ -356,14 +420,21 @@ namespace LotTraceApp.Services
 
         }
 
-        private int B_SetLiquidTable(BottleDisplayTables tables,List<BottleDisplayLaneNode> liquids,int BaseY)
+        private int B_SetLiquidTable(
+            BottleDisplayTables tables,
+            List<BottleDisplayLaneNode> liquids,
+            int BaseY,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             int currentY = BaseY;
 
             foreach(var node in liquids.OrderBy(x => x.YLane))
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 while (currentY < node.YLane)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     tables.LiquidTable.Rows.Add(tables.LiquidTable.NewRow());
                     currentY++;
                 }
@@ -399,7 +470,11 @@ namespace LotTraceApp.Services
         }
 
 
-        private int B_SetBottleTable(BottleDisplayTables tables, List<BottleDisplayLaneNode> bottles,int BaseY)
+        private int B_SetBottleTable(
+            BottleDisplayTables tables,
+            List<BottleDisplayLaneNode> bottles,
+            int BaseY,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
 
             int currentY = BaseY;
@@ -407,8 +482,11 @@ namespace LotTraceApp.Services
 
             foreach (var node in bottles.OrderBy(x=>x.YLane))
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 while (currentY < node.YLane)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     tables.BottleTable.Rows.Add(tables.BottleTable.NewRow());
                     currentY++;
                 }

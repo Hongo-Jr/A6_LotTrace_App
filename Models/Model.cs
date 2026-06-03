@@ -782,6 +782,15 @@ namespace LotTraceApp.Models
             TraceLineRanges = new List<TraceLineRange>();
         }
 
+        public bool IsEmpty
+            
+        {
+            get
+            {
+                return StartNodes.Count == 0 && MiddleNodes.Count == 0 && EndNodes.Count == 0;
+            }
+        }
+
     }
 
 
