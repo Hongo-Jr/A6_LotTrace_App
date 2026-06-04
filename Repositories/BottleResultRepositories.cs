@@ -30,7 +30,7 @@ namespace LotTraceApp.Repositories
 
         public DataTable GetBottleOrder(string order, string lot)
         {
-            var result = new DataTable();
+            var result = SettWideTabel();
 
             if (string.IsNullOrWhiteSpace(order) || string.IsNullOrWhiteSpace(lot))
             {
@@ -62,17 +62,17 @@ namespace LotTraceApp.Repositories
                             reader.IsDBNull(6) ? null : reader.GetString(6),
                             reader.IsDBNull(7) ? null : reader.GetString(7),
                             reader.IsDBNull(8) ? null : reader.GetString(8),
-                            reader.IsDBNull(9) ? null : reader.GetString(9),
-                            reader.IsDBNull(10) ? null : reader.GetString(10),
-                            reader.IsDBNull(11) ? null : reader.GetString(11),
-                            reader.IsDBNull(12) ? null : reader.GetString(12),
-                            reader.IsDBNull(13) ? null : reader.GetString(13),
-                            reader.IsDBNull(14) ? null : reader.GetString(14),
-                            reader.IsDBNull(15) ? null : reader.GetString(15),
-                            reader.IsDBNull(16) ? null : reader.GetString(16),
-                            reader.IsDBNull(17) ? null : reader.GetString(17),
-                            reader.IsDBNull(18) ? null : reader.GetString(18),
-                            reader.IsDBNull(19) ? null : reader.GetString(19),
+                            reader.IsDBNull(9) ? null : reader.GetInt32(9).ToString(),
+                            reader.IsDBNull(10) ? null : reader.GetInt32(10).ToString(),
+                            reader.IsDBNull(11) ? null : reader.GetInt32(11).ToString(),
+                            reader.IsDBNull(12) ? null : reader.GetInt32(12).ToString(),
+                            reader.IsDBNull(13) ? null : reader.GetInt32(13).ToString(),
+                            reader.IsDBNull(14) ? null : reader.GetInt32(14).ToString(),
+                            reader.IsDBNull(15) ? null : reader.GetInt32(15).ToString(),
+                            reader.IsDBNull(16) ? null : reader.GetInt32(16).ToString(),
+                            reader.IsDBNull(17) ? null : reader.GetInt32(17).ToString(),
+                            reader.IsDBNull(18) ? null : reader.GetInt32(18).ToString(),
+                            reader.IsDBNull(19) ? null : reader.GetInt32(19).ToString(),
                             reader.IsDBNull(20) ? null : reader.GetString(20),
                             reader.IsDBNull(21) ? null : reader.GetString(21),
                             reader.IsDBNull(22) ? null : reader.GetString(22),
@@ -85,9 +85,80 @@ namespace LotTraceApp.Repositories
                             reader.IsDBNull(29) ? null : reader.GetString(29)
                         );
                     }
-                        return result;
+
+                    //result.Load(reader);
+                    return result;
                 }
             }
+        }
+
+        private DataTable SettWideTabel()
+        {
+            var result = new DataTable();
+
+            result.Columns.Add("OrderNumber", typeof(string));
+            result.Columns["OrderNumber"].Caption = "指図番号";
+            result.Columns.Add("ProcessType", typeof(string));
+            result.Columns["ProcessType"].Caption = "工程種別";
+            result.Columns.Add("ProductItemName", typeof(string));
+            result.Columns["ProductItemName"].Caption = "製品品目名";
+            result.Columns.Add("ProductItemCode", typeof(string));
+            result.Columns["ProductItemCode"].Caption = "製品品目コード";
+            result.Columns.Add("MiddleProductItemCode", typeof(string));
+            result.Columns["MiddleProductItemCode"].Caption = "中間品品目コード";
+            result.Columns.Add("ProductLotNumber", typeof(string));
+            result.Columns["ProductLotNumber"].Caption = "製品ロットNo.";
+            result.Columns.Add("OutWashBottelLotNumber", typeof(string));
+            result.Columns["OutWashBottelLotNumber"].Caption = "出庫洗瓶ロットNo.";
+            result.Columns.Add("MiddleProductLotNumber", typeof(string));
+            result.Columns["MiddleProductLotNumber"].Caption = "中間品ロットNo.";
+            result.Columns.Add("AuxiliaryLabelID", typeof(string));
+            result.Columns["AuxiliaryLabelID"].Caption = "補助ラベルID";
+            result.Columns.Add("NumberOfBottleIndicated", typeof(int));
+            result.Columns["NumberOfBottleIndicated"].Caption = "指示瓶本数";
+            result.Columns.Add("NumberOfDrumcanSpecified", typeof(int));
+            result.Columns["NumberOfDrumcanSpecified"].Caption = "指示ドラム缶本数";
+            result.Columns.Add("InjectionMode", typeof(string));
+            result.Columns["InjectionMode"].Caption = "投入モード";
+            result.Columns.Add("SamplingDesignation1", typeof(string));
+            result.Columns["SamplingDesignation1"].Caption = "サンプリング指定1";
+            result.Columns.Add("SamplingDesignation2", typeof(string));
+            result.Columns["SamplingDesignation2"].Caption = "サンプリング指定2";
+            result.Columns.Add("SamplingDesignation3", typeof(string));
+            result.Columns["SamplingDesignation3"].Caption = "サンプリング指定3";
+            result.Columns.Add("SamplingDesignation4", typeof(string));
+            result.Columns["SamplingDesignation4"].Caption = "サンプリング指定4";
+            result.Columns.Add("SamplingDesignation5", typeof(string));
+            result.Columns["SamplingDesignation5"].Caption = "サンプリング指定5";
+            result.Columns.Add("FillingSettingMode", typeof(string));
+            result.Columns["FillingSettingMode"].Caption = "充填設定モード";
+            result.Columns.Add("NozzleNumber", typeof(int));
+            result.Columns["NozzleNumber"].Caption = "ノズル番号";
+            result.Columns.Add("OverEntry", typeof(string));
+            result.Columns["OverEntry"].Caption = "追越入庫";
+            result.Columns.Add("SamplingGroup1", typeof(string));
+            result.Columns["SamplingGroup1"].Caption = "サンプリンググループ１";
+            result.Columns.Add("SamplingGroup2", typeof(string));
+            result.Columns["SamplingGroup2"].Caption = "サンプリンググループ２";
+            result.Columns.Add("SamplingGroup3", typeof(string));
+            result.Columns["SamplingGroup3"].Caption = "サンプリンググループ３";
+            result.Columns.Add("SamplingGroup4", typeof(string));
+            result.Columns["SamplingGroup4"].Caption = "サンプリンググループ４";
+            result.Columns.Add("SamplingGroup5", typeof(string));
+            result.Columns["SamplingGroup5"].Caption = "サンプリンググループ５";
+            result.Columns.Add("SamplingGroup6", typeof(string));
+            result.Columns["SamplingGroup6"].Caption = "サンプリンググループ６";
+            result.Columns.Add("SamplingGroup7", typeof(string));
+            result.Columns["SamplingGroup7"].Caption = "サンプリンググループ７";
+            result.Columns.Add("SamplingGroup8", typeof(string));
+            result.Columns["SamplingGroup8"].Caption = "サンプリンググループ８";
+            result.Columns.Add("SamplingGroup9", typeof(string));
+            result.Columns["SamplingGroup9"].Caption = "サンプリンググループ９";
+            result.Columns.Add("SamplingGroup10", typeof(string));
+            result.Columns["SamplingGroup10"].Caption = "サンプリンググループ１０";
+
+
+            return result;
         }
 
         public string BuildBottleOrderSQL(string order, string lot)

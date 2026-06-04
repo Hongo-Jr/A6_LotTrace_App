@@ -14,6 +14,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LotTraceApp.Forms;
+
 
 namespace LotTraceApp
 {
@@ -196,6 +198,7 @@ namespace LotTraceApp
         private readonly Dictionary<DataGridView, int> _selectedRowIndexByGrid =
             new Dictionary<DataGridView, int>();
         private bool _syncingBottleGridSelection;
+        private readonly BottleResultService _bottleResultService;
 
 
         private Button _btnIntersectionCsv;
@@ -213,10 +216,15 @@ namespace LotTraceApp
 
         #region コンストラクタ・初期化
 
-        public BottleTraceForm(BottleTraceService service, ResultService resultService)
+        public BottleTraceForm(BottleTraceService service, ResultService resultService, BottleResultService bottleResultService)
         {
+            if (bottleResultService == null) throw new ArgumentNullException("bottleResultService");
+
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _resultService = resultService;
+            _bottleResultService = bottleResultService;
+
+
             InitializeComponent();
             ConfigureBottleTraceTabOwnerDraw();
 
@@ -233,6 +241,7 @@ namespace LotTraceApp
 
             swichBottleTab.SelectedIndexChanged -= SwichBottleTab_SelectedIndexChanged;
             swichBottleTab.SelectedIndexChanged += SwichBottleTab_SelectedIndexChanged;
+
         }
 
         private void InitializeBottleTraceTabContexts()
@@ -282,7 +291,10 @@ namespace LotTraceApp
 
             btnBottleDetectCrossPoints.Click -= btnBottleDetectCrossPoints_Click;
             btnBottleDetectCrossPoints.Click += btnBottleDetectCrossPoints_Click;
-            
+
+
+            dgvEndBottle.CellMouseClick -= dgvEndBottle_CellMouseClick;
+            dgvEndBottle.CellMouseClick += dgvEndBottle_CellMouseClick;
         }
 
         private void InitializeBottleIntersectionTab()
@@ -3889,5 +3901,31 @@ namespace LotTraceApp
 
 
         #endregion
+
+
+        private void dgvEndBottle_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+            if (e.RowIndex < 0) return; // ヘッダ除外
+
+            // 右クリック行を選択状態にする（任意）
+            dgvEndBottle.ClearSelection();
+            dgvEndBottle.Rows[e.RowIndex].Selected = true;
+            if (e.ColumnIndex >= 0)
+                dgvEndBottle.CurrentCell = dgvEndBottle.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+            var row = dgvEndBottle.Rows[e.RowIndex];
+
+          
+            var orderNumber = Convert.ToString(row.Cells["OrderNumber"].Value);
+            var lotNo = Convert.ToString(row.Cells["Lot"].Value);
+
+            if (string.IsNullOrWhiteSpace(orderNumber) || string.IsNullOrWhiteSpace(lotNo))
+                return;
+
+            var f = new BottleResult(_bottleResultService,orderNumber,lotNo);
+            f.Show(this); 
+        }
+
     }
 }

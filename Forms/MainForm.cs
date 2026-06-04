@@ -24,6 +24,7 @@ namespace LotTraceApp
         private readonly LotTraceService _liquidService;
         private readonly BottleTraceService _bottleService;
         private readonly ResultService _resultService;
+        private readonly BottleResultService _bottelResultService;
         private CommandLineOptions _commandLineStartupOptions;
         private BottleTraceForm _bottleTraceForm;
         private bool _disposingBottleTraceForm;
@@ -573,12 +574,15 @@ namespace LotTraceApp
 
         #region 初期化・イベント登録
 
-        public MainForm(LotTraceService liquidService, BottleTraceService bottleService, ResultService resultService)
+        public MainForm(LotTraceService liquidService, BottleTraceService bottleService, ResultService resultService, BottleResultService bottleResultService)
         {
             if (liquidService == null) throw new ArgumentNullException("liquidService");
             if (bottleService == null) throw new ArgumentNullException("bottleService");
             if (resultService == null) throw new ArgumentNullException("resulteService");
+            if (bottleResultService == null) throw new ArgumentNullException("bottleResultService");
 
+
+            _bottelResultService = bottleResultService;
             _liquidService = liquidService;
             _bottleService = bottleService;
             _resultService = resultService;
@@ -3801,7 +3805,7 @@ namespace LotTraceApp
         {
             if (_bottleTraceForm == null || _bottleTraceForm.IsDisposed)
             {
-                _bottleTraceForm = new BottleTraceForm(_bottleService,_resultService);
+                _bottleTraceForm = new BottleTraceForm(_bottleService,_resultService, _bottelResultService);
                 _bottleTraceForm.FormClosing -= BottleTraceForm_FormClosing;
                 _bottleTraceForm.FormClosing += BottleTraceForm_FormClosing;
             }
