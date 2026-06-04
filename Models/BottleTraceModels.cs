@@ -141,9 +141,10 @@ namespace LotTraceApp.Models
 
     #region 瓶詳細
 
-    public class BottleResultPage<T>
+    public class BottleResultPage
     {
-        public List<T> Rows { get; set; } = new List<T>();
+        public List<FillingBottleRow> BottleRows { get; set; } = new List<FillingBottleRow>();
+        public List<FillingDrumcanRow> DrumRows {  get; set; } = new List<FillingDrumcanRow>();
 
         public int TotalCount { get; set; }
         public int PageNo { get; set; }

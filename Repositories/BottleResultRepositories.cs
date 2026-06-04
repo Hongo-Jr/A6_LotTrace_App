@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using LotTraceApp.Models;
 using System.Threading.Tasks;
 
 namespace LotTraceApp.Repositories
@@ -137,12 +138,41 @@ namespace LotTraceApp.Repositories
                 sql.AppendLine("  AND [ProductLotNumber] = @lot");
 
 
-
-
             result = sql.ToString();
 
             return result;
         }
+
+        public BottleResultPage GetFilingResultPages(string order, string lot)
+        {
+            var result = new BottleResultPage();
+
+          
+            result.BottleRows.AddRange(GetFilingBottleRows());
+            result.DrumRows.AddRange(GetFilingDrumRows());
+
+            return result;
+
+        }
+
+        public List<FillingBottleRow> GetFilingBottleRows()
+        {
+            var result = new List<FillingBottleRow>();
+
+
+
+            return result; 
+        }
+
+        public List<FillingDrumcanRow> GetFilingDrumRows()
+        {
+            var result = new List<FillingDrumcanRow>();
+
+
+
+            return result;
+        }
+
 
     }
 }
