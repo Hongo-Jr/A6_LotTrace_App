@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace LotTraceApp.Models
 {
+    
     /// <summary>
     /// 瓶の実績Node
     /// </summary>
