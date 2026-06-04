@@ -562,9 +562,14 @@ namespace LotTraceApp
         private readonly ToolTip _itemNameToolTip = new ToolTip();
         private readonly Font _itemNameToolTipFont = new Font("Segoe UI", 12F, FontStyle.Regular);
 
+        private readonly Color _gridHoverCellBackColor = Color.FromArgb(225, 235, 250);
+        private readonly Color _gridSelectedRowBorderColor = Color.FromArgb(150, 56, 112, 190);
+
         private DataGridView _hoverGrid = null;
         private int _hoverRowIndex = -1;
         private int _hoverColumnIndex = -1;
+        private readonly Dictionary<DataGridView, int> _selectedRowIndexByGrid =
+            new Dictionary<DataGridView, int>();
 
         #region 初期化・イベント登録
 
@@ -915,6 +920,8 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
+            grid.Paint -= Grid_SelectedRowOutlinePaint;
+            grid.Paint += Grid_SelectedRowOutlinePaint;
             grid.Paint -= paintHandler;
             grid.Paint += paintHandler;
 
@@ -935,9 +942,17 @@ namespace LotTraceApp
 
             grid.MouseLeave -= Grid_ItemNameToolTipHideOnMouseLeave;
             grid.MouseLeave += Grid_ItemNameToolTipHideOnMouseLeave;
+            grid.MouseLeave -= Grid_MouseLeave_Hover;
+            grid.MouseLeave += Grid_MouseLeave_Hover;
 
             grid.CellFormatting -= OnCrossPointNodeBackColorFormatting;
             grid.CellFormatting += OnCrossPointNodeBackColorFormatting;
+            grid.CellFormatting -= Grid_CellFormatting_SelectionAndHover;
+            grid.CellFormatting += Grid_CellFormatting_SelectionAndHover;
+            grid.CellMouseMove -= Grid_CellMouseMove_Hover;
+            grid.CellMouseMove += Grid_CellMouseMove_Hover;
+            grid.SelectionChanged -= Grid_SelectionVisualChanged;
+            grid.SelectionChanged += Grid_SelectionVisualChanged;
         }
 
         private void RegisterNodeKeyGroupForeColorFormatting()
@@ -966,6 +981,9 @@ namespace LotTraceApp
             grid.CellFormatting += OnNodeKeyGroupForeColorFormattingFromCache;
             if (isEndGrid)
                 grid.CellFormatting += DataGridEnd_CellFormatting;
+
+            grid.CellFormatting -= Grid_CellFormatting_SelectionAndHover;
+            grid.CellFormatting += Grid_CellFormatting_SelectionAndHover;
         }
 
         private void UnregisterNodeKeyGroupForeColorFormatting()
@@ -3977,7 +3995,7 @@ namespace LotTraceApp
 
         #region ホバー表示
 
-        private void Grid_CellFormatting_Hover(object sender, DataGridViewCellFormattingEventArgs e)
+        private void Grid_CellFormatting_SelectionAndHover(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null) return;
@@ -3985,17 +4003,19 @@ namespace LotTraceApp
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
                 return;
 
-            // 選択優先
-            if (grid.Rows[e.RowIndex].Selected)
-                return;
+            e.CellStyle.SelectionBackColor = ResolveGridSelectionBackColor(e.CellStyle.BackColor);
+            e.CellStyle.SelectionForeColor = e.CellStyle.ForeColor;
 
-            if (e.RowIndex == _hoverRowIndex && e.ColumnIndex == _hoverColumnIndex)
+            bool isHoverCell = ReferenceEquals(_hoverGrid, grid) &&
+                e.RowIndex == _hoverRowIndex &&
+                e.ColumnIndex == _hoverColumnIndex;
+
+            if (isHoverCell)
             {
-                e.CellStyle.BackColor = Color.FromArgb(225, 235, 250);
+                e.CellStyle.BackColor = _gridHoverCellBackColor;
+                e.CellStyle.SelectionBackColor = _gridHoverCellBackColor;
             }
         }
-
-
 
         private void Grid_CellMouseMove_Hover(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -4093,6 +4113,106 @@ namespace LotTraceApp
             {
                 grid.Invalidate();
             }
+        }
+
+        private Color ResolveGridSelectionBackColor(Color backColor)
+        {
+            return backColor.IsEmpty ? SystemColors.Window : backColor;
+        }
+
+        private void Grid_SelectionVisualChanged(object sender, EventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null)
+                return;
+
+            int previousRowIndex;
+            if (!_selectedRowIndexByGrid.TryGetValue(grid, out previousRowIndex))
+                previousRowIndex = -1;
+
+            int currentRowIndex = GetSelectedRowIndex(grid);
+            _selectedRowIndexByGrid[grid] = currentRowIndex;
+
+            InvalidateDisplayedRow(grid, previousRowIndex);
+            InvalidateDisplayedRow(grid, currentRowIndex);
+        }
+
+        private int GetSelectedRowIndex(DataGridView grid)
+        {
+            if (grid == null || grid.SelectedRows.Count == 0)
+                return -1;
+
+            return grid.SelectedRows[0].Index;
+        }
+
+        private void InvalidateDisplayedRow(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+                return;
+
+            Rectangle rect = GetDisplayedRowBounds(grid, rowIndex);
+            if (!rect.IsEmpty)
+            {
+                rect.Inflate(2, 2);
+                grid.Invalidate(rect);
+            }
+        }
+
+        private void Grid_SelectedRowOutlinePaint(object sender, PaintEventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null || e == null)
+                return;
+
+            using (var pen = new Pen(_gridSelectedRowBorderColor, 2))
+            {
+                foreach (DataGridViewRow row in grid.SelectedRows)
+                {
+                    if (row == null || row.IsNewRow || !row.Visible || !row.Selected)
+                        continue;
+
+                    Rectangle rect = GetDisplayedRowBounds(grid, row.Index);
+                    if (rect.IsEmpty)
+                        continue;
+
+                    int left = rect.Left;
+                    int right = rect.Right - 1;
+                    int top = rect.Top;
+                    int bottom = rect.Bottom - 1;
+
+                    e.Graphics.DrawLine(pen, left, top, right, top);
+                    e.Graphics.DrawLine(pen, left, bottom, right, bottom);
+                }
+            }
+        }
+
+        private Rectangle GetDisplayedRowBounds(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+                return Rectangle.Empty;
+
+            Rectangle rowRect = grid.GetRowDisplayRectangle(rowIndex, true);
+            if (rowRect.Height <= 0)
+                return Rectangle.Empty;
+
+            Rectangle bounds = Rectangle.Empty;
+            foreach (DataGridViewColumn column in grid.Columns)
+            {
+                if (column == null || !column.Visible)
+                    continue;
+
+                Rectangle cellRect = grid.GetCellDisplayRectangle(column.Index, rowIndex, true);
+                if (cellRect.Width <= 0 || cellRect.Height <= 0)
+                    continue;
+
+                bounds = bounds.IsEmpty ? cellRect : Rectangle.Union(bounds, cellRect);
+            }
+
+            if (bounds.IsEmpty)
+                return Rectangle.Empty;
+
+            bounds.Intersect(grid.DisplayRectangle);
+            return bounds;
         }
 
         #endregion
