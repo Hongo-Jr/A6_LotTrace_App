@@ -142,6 +142,15 @@ namespace LotTraceApp.Models
 
     #region 瓶詳細
 
+    public class BottleNodeInfo
+    {
+        public string OrderNumber {  get; set; }
+        public string ProductLotNo {  get; set; }
+        public string ProductItemCode { get; set; }
+        public string ProductItemName { get; set; }
+        public string MasterKey {  get; set; }
+    }
+
     public class BottleResultPage
     {
         public List<FillingBottleRow> BottleRows { get; set; } = new List<FillingBottleRow>();

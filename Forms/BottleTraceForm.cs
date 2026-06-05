@@ -293,8 +293,7 @@ namespace LotTraceApp
             btnBottleDetectCrossPoints.Click += btnBottleDetectCrossPoints_Click;
 
 
-            dgvEndBottle.CellMouseClick -= dgvEndBottle_CellMouseClick;
-            dgvEndBottle.CellMouseClick += dgvEndBottle_CellMouseClick;
+          
         }
 
         private void InitializeBottleIntersectionTab()
@@ -3852,9 +3851,14 @@ namespace LotTraceApp
         {
             var grid = sender as DataGridView;
 
-            if (grid.Columns.Contains("Weight"))
+            if (grid.Columns.Contains("Weight") && grid.Columns["Weight"].Visible)
             {
-                dataGridLiquid_CellMouseClick(grid,e);
+                dataGridLiquid_CellMouseClick(grid, e);
+            }
+
+            else if (grid.Columns.Contains("Total_Num") && grid.Columns["Total_Num"].Visible)
+            {
+                DataGridBottle_CellMouseClick(grid, e);
             }
             else
             {
@@ -3872,20 +3876,25 @@ namespace LotTraceApp
 
             // 右クリックした行を選択
 
-            var tab = GetCurrentTabContext();
+            var grid = sender as DataGridView;
+            if (grid == null)
+            {
+                return;
+            }
 
-            tab.GridStart.ClearSelection();
-            tab.GridStart.CurrentCell = tab.GridStart.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            tab.GridStart.Rows[e.RowIndex].Selected = true;
+            grid.ClearSelection();
+            grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            grid.Rows[e.RowIndex].Selected = true;            
 
-            var drv = tab.GridStart.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            var drv = grid.Rows[e.RowIndex].DataBoundItem as DataRowView;
             if (drv == null) return;
 
             DataRow r = drv.Row;
             string Get(string col) =>
                 r.Table.Columns.Contains(col) && r[col] != DBNull.Value ? Convert.ToString(r[col]) : "";
 
-            string productionOrderNumber = Get("OrderNumber");
+            
+                        string productionOrderNumber = Get("OrderNumber");
             string itemCode = Get("ItemCode");
             string itemName = Get("ItemName");
             string lotNumber = Get("Lot");
@@ -3903,28 +3912,43 @@ namespace LotTraceApp
         #endregion
 
 
-        private void dgvEndBottle_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void DataGridBottle_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
             if (e.RowIndex < 0) return; // ヘッダ除外
 
-            // 右クリック行を選択状態にする（任意）
-            dgvEndBottle.ClearSelection();
-            dgvEndBottle.Rows[e.RowIndex].Selected = true;
-            if (e.ColumnIndex >= 0)
-                dgvEndBottle.CurrentCell = dgvEndBottle.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
-            var row = dgvEndBottle.Rows[e.RowIndex];
-
-          
-            var orderNumber = Convert.ToString(row.Cells["OrderNumber"].Value);
-            var lotNo = Convert.ToString(row.Cells["Lot"].Value);
-
-            if (string.IsNullOrWhiteSpace(orderNumber) || string.IsNullOrWhiteSpace(lotNo))
+            var grid = sender as DataGridView;
+            if (grid == null)
+            {
                 return;
+            }
 
-            var f = new BottleResult(_bottleResultService,orderNumber,lotNo);
-            f.Show(this); 
+
+            // 右クリック行を選択状態にする（任意）
+            grid.ClearSelection();
+            grid.Rows[e.RowIndex].Selected = true;
+            if (e.ColumnIndex >= 0)
+                grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+            var row = grid.Rows[e.RowIndex];
+
+            BottleNodeInfo node = new BottleNodeInfo();
+
+            node.OrderNumber = Convert.ToString(row.Cells["OrderNumber"].Value);
+            node.ProductLotNo = Convert.ToString(row.Cells["Lot"].Value);
+            node.ProductItemCode = Convert.ToString(row.Cells["ItemCode"].Value);
+            node.ProductItemName = Convert.ToString(row.Cells["ItemName"].Value);
+
+            if (new[] { node.OrderNumber, node.ProductLotNo }.Any(string.IsNullOrWhiteSpace))
+            {
+                return;
+            }
+
+            using (var f = new BottleResult(_bottleResultService, node))
+            {
+                f.ShowDialog (this);
+            }
+            
         }
 
     }

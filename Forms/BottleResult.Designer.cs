@@ -30,9 +30,14 @@
         {
             this.BottleDataGridView = new System.Windows.Forms.DataGridView();
             this.grp2 = new System.Windows.Forms.GroupBox();
+            this.lbl_PageNum = new System.Windows.Forms.Label();
+            this.btn_PagePrev = new System.Windows.Forms.Button();
+            this.btn_RowsSetting = new System.Windows.Forms.Button();
+            this.btn_PageNext = new System.Windows.Forms.Button();
+            this.lbl_DispNum = new System.Windows.Forms.Label();
             this.grp1 = new System.Windows.Forms.GroupBox();
-            this.rdoActualOnly = new System.Windows.Forms.RadioButton();
-            this.rdoOrderOnly = new System.Windows.Forms.RadioButton();
+            this.rdo_Result = new System.Windows.Forms.RadioButton();
+            this.rdo_Order = new System.Windows.Forms.RadioButton();
             this.lbl_Pro_LotNo = new System.Windows.Forms.Label();
             this.lbl_Pro_Code = new System.Windows.Forms.Label();
             this.lbl_Pro_Name = new System.Windows.Forms.Label();
@@ -41,11 +46,6 @@
             this.lbl_Disp_Pro_Code = new System.Windows.Forms.Label();
             this.lbl_Disp_Pro_Name = new System.Windows.Forms.Label();
             this.lbl_Disp_Pro_OrederNo = new System.Windows.Forms.Label();
-            this.btn_PageNest = new System.Windows.Forms.Button();
-            this.btn_PagePrev = new System.Windows.Forms.Button();
-            this.lbl_PageNum = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.lbl_DispNum = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BottleDataGridView)).BeginInit();
             this.grp2.SuspendLayout();
             this.grp1.SuspendLayout();
@@ -69,8 +69,8 @@
             this.grp2.BackColor = System.Drawing.SystemColors.Control;
             this.grp2.Controls.Add(this.lbl_PageNum);
             this.grp2.Controls.Add(this.btn_PagePrev);
-            this.grp2.Controls.Add(this.button1);
-            this.grp2.Controls.Add(this.btn_PageNest);
+            this.grp2.Controls.Add(this.btn_RowsSetting);
+            this.grp2.Controls.Add(this.btn_PageNext);
             this.grp2.Controls.Add(this.BottleDataGridView);
             this.grp2.Controls.Add(this.lbl_DispNum);
             this.grp2.Font = new System.Drawing.Font("游ゴシック", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -82,10 +82,70 @@
             this.grp2.TabStop = false;
             this.grp2.Text = "履歴詳細データ";
             // 
+            // lbl_PageNum
+            // 
+            this.lbl_PageNum.BackColor = System.Drawing.Color.White;
+            this.lbl_PageNum.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lbl_PageNum.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_PageNum.Location = new System.Drawing.Point(694, 485);
+            this.lbl_PageNum.Name = "lbl_PageNum";
+            this.lbl_PageNum.Size = new System.Drawing.Size(120, 30);
+            this.lbl_PageNum.TabIndex = 2;
+            this.lbl_PageNum.Text = "9999 / 9999";
+            this.lbl_PageNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // btn_PagePrev
+            // 
+            this.btn_PagePrev.BackColor = System.Drawing.Color.SteelBlue;
+            this.btn_PagePrev.FlatAppearance.BorderSize = 0;
+            this.btn_PagePrev.Font = new System.Drawing.Font("Segoe UI Symbol", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_PagePrev.ForeColor = System.Drawing.Color.Black;
+            this.btn_PagePrev.Location = new System.Drawing.Point(628, 485);
+            this.btn_PagePrev.Name = "btn_PagePrev";
+            this.btn_PagePrev.Size = new System.Drawing.Size(60, 30);
+            this.btn_PagePrev.TabIndex = 1;
+            this.btn_PagePrev.Text = "◀◀";
+            this.btn_PagePrev.UseCompatibleTextRendering = true;
+            this.btn_PagePrev.UseVisualStyleBackColor = true;
+            // 
+            // btn_RowsSetting
+            // 
+            this.btn_RowsSetting.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btn_RowsSetting.ForeColor = System.Drawing.Color.Black;
+            this.btn_RowsSetting.Location = new System.Drawing.Point(805, 19);
+            this.btn_RowsSetting.Name = "btn_RowsSetting";
+            this.btn_RowsSetting.Size = new System.Drawing.Size(75, 25);
+            this.btn_RowsSetting.TabIndex = 1;
+            this.btn_RowsSetting.Text = "列設定";
+            this.btn_RowsSetting.UseVisualStyleBackColor = true;
+            // 
+            // btn_PageNext
+            // 
+            this.btn_PageNext.Font = new System.Drawing.Font("Segoe UI Symbol", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_PageNext.ForeColor = System.Drawing.Color.Black;
+            this.btn_PageNext.Location = new System.Drawing.Point(820, 485);
+            this.btn_PageNext.Name = "btn_PageNext";
+            this.btn_PageNext.Size = new System.Drawing.Size(60, 30);
+            this.btn_PageNext.TabIndex = 1;
+            this.btn_PageNext.Text = "▶▶";
+            this.btn_PageNext.UseCompatibleTextRendering = true;
+            this.btn_PageNext.UseVisualStyleBackColor = true;
+            // 
+            // lbl_DispNum
+            // 
+            this.lbl_DispNum.AutoSize = true;
+            this.lbl_DispNum.Font = new System.Drawing.Font("游ゴシック", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lbl_DispNum.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lbl_DispNum.Location = new System.Drawing.Point(17, 485);
+            this.lbl_DispNum.Name = "lbl_DispNum";
+            this.lbl_DispNum.Size = new System.Drawing.Size(118, 17);
+            this.lbl_DispNum.TabIndex = 3;
+            this.lbl_DispNum.Text = "表示件数：9999 件";
+            // 
             // grp1
             // 
-            this.grp1.Controls.Add(this.rdoActualOnly);
-            this.grp1.Controls.Add(this.rdoOrderOnly);
+            this.grp1.Controls.Add(this.rdo_Result);
+            this.grp1.Controls.Add(this.rdo_Order);
             this.grp1.Controls.Add(this.lbl_Pro_LotNo);
             this.grp1.Controls.Add(this.lbl_Pro_Code);
             this.grp1.Controls.Add(this.lbl_Pro_Name);
@@ -103,27 +163,27 @@
             this.grp1.TabStop = false;
             this.grp1.Text = "指図情報";
             // 
-            // rdoActualOnly
+            // rdo_Result
             // 
-            this.rdoActualOnly.AutoSize = true;
-            this.rdoActualOnly.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rdoActualOnly.Location = new System.Drawing.Point(714, 60);
-            this.rdoActualOnly.Name = "rdoActualOnly";
-            this.rdoActualOnly.Size = new System.Drawing.Size(158, 25);
-            this.rdoActualOnly.TabIndex = 4;
-            this.rdoActualOnly.Text = "瓶 / ドラム缶実績";
-            this.rdoActualOnly.UseVisualStyleBackColor = true;
+            this.rdo_Result.AutoSize = true;
+            this.rdo_Result.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.rdo_Result.Location = new System.Drawing.Point(714, 60);
+            this.rdo_Result.Name = "rdo_Result";
+            this.rdo_Result.Size = new System.Drawing.Size(158, 25);
+            this.rdo_Result.TabIndex = 4;
+            this.rdo_Result.Text = "瓶 / ドラム缶実績";
+            this.rdo_Result.UseVisualStyleBackColor = true;
             // 
-            // rdoOrderOnly
+            // rdo_Order
             // 
-            this.rdoOrderOnly.AutoSize = true;
-            this.rdoOrderOnly.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rdoOrderOnly.Location = new System.Drawing.Point(714, 32);
-            this.rdoOrderOnly.Name = "rdoOrderOnly";
-            this.rdoOrderOnly.Size = new System.Drawing.Size(60, 25);
-            this.rdoOrderOnly.TabIndex = 4;
-            this.rdoOrderOnly.Text = "指図";
-            this.rdoOrderOnly.UseVisualStyleBackColor = true;
+            this.rdo_Order.AutoSize = true;
+            this.rdo_Order.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.rdo_Order.Location = new System.Drawing.Point(714, 32);
+            this.rdo_Order.Name = "rdo_Order";
+            this.rdo_Order.Size = new System.Drawing.Size(60, 25);
+            this.rdo_Order.TabIndex = 4;
+            this.rdo_Order.Text = "指図";
+            this.rdo_Order.UseVisualStyleBackColor = true;
             // 
             // lbl_Pro_LotNo
             // 
@@ -213,66 +273,6 @@
             this.lbl_Disp_Pro_OrederNo.TabIndex = 3;
             this.lbl_Disp_Pro_OrederNo.Text = "SA01_aa";
             // 
-            // btn_PageNest
-            // 
-            this.btn_PageNest.Font = new System.Drawing.Font("Segoe UI Symbol", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_PageNest.ForeColor = System.Drawing.Color.Black;
-            this.btn_PageNest.Location = new System.Drawing.Point(820, 485);
-            this.btn_PageNest.Name = "btn_PageNest";
-            this.btn_PageNest.Size = new System.Drawing.Size(60, 30);
-            this.btn_PageNest.TabIndex = 1;
-            this.btn_PageNest.Text = "▶▶";
-            this.btn_PageNest.UseCompatibleTextRendering = true;
-            this.btn_PageNest.UseVisualStyleBackColor = true;
-            // 
-            // btn_PagePrev
-            // 
-            this.btn_PagePrev.BackColor = System.Drawing.Color.SteelBlue;
-            this.btn_PagePrev.FlatAppearance.BorderSize = 0;
-            this.btn_PagePrev.Font = new System.Drawing.Font("Segoe UI Symbol", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_PagePrev.ForeColor = System.Drawing.Color.Black;
-            this.btn_PagePrev.Location = new System.Drawing.Point(628, 485);
-            this.btn_PagePrev.Name = "btn_PagePrev";
-            this.btn_PagePrev.Size = new System.Drawing.Size(60, 30);
-            this.btn_PagePrev.TabIndex = 1;
-            this.btn_PagePrev.Text = "◀◀";
-            this.btn_PagePrev.UseCompatibleTextRendering = true;
-            this.btn_PagePrev.UseVisualStyleBackColor = true;
-            // 
-            // lbl_PageNum
-            // 
-            this.lbl_PageNum.BackColor = System.Drawing.Color.White;
-            this.lbl_PageNum.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbl_PageNum.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_PageNum.Location = new System.Drawing.Point(694, 485);
-            this.lbl_PageNum.Name = "lbl_PageNum";
-            this.lbl_PageNum.Size = new System.Drawing.Size(120, 30);
-            this.lbl_PageNum.TabIndex = 2;
-            this.lbl_PageNum.Text = "9999 / 9999";
-            this.lbl_PageNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // button1
-            // 
-            this.button1.Font = new System.Drawing.Font("游ゴシック", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.button1.ForeColor = System.Drawing.Color.Black;
-            this.button1.Location = new System.Drawing.Point(805, 19);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 25);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "列設定";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // lbl_DispNum
-            // 
-            this.lbl_DispNum.AutoSize = true;
-            this.lbl_DispNum.Font = new System.Drawing.Font("游ゴシック", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lbl_DispNum.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.lbl_DispNum.Location = new System.Drawing.Point(17, 485);
-            this.lbl_DispNum.Name = "lbl_DispNum";
-            this.lbl_DispNum.Size = new System.Drawing.Size(118, 17);
-            this.lbl_DispNum.TabIndex = 3;
-            this.lbl_DispNum.Text = "表示件数：9999 件";
-            // 
             // BottleResult
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -298,8 +298,8 @@
         private System.Windows.Forms.DataGridView BottleDataGridView;
         private System.Windows.Forms.GroupBox grp2;
         private System.Windows.Forms.GroupBox grp1;
-        private System.Windows.Forms.RadioButton rdoActualOnly;
-        private System.Windows.Forms.RadioButton rdoOrderOnly;
+        private System.Windows.Forms.RadioButton rdo_Result;
+        private System.Windows.Forms.RadioButton rdo_Order;
         private System.Windows.Forms.Label lbl_Pro_LotNo;
         private System.Windows.Forms.Label lbl_Pro_Code;
         private System.Windows.Forms.Label lbl_Pro_Name;
@@ -308,10 +308,10 @@
         private System.Windows.Forms.Label lbl_Disp_Pro_Code;
         private System.Windows.Forms.Label lbl_Disp_Pro_Name;
         private System.Windows.Forms.Label lbl_Disp_Pro_OrederNo;
-        private System.Windows.Forms.Button btn_PageNest;
+        private System.Windows.Forms.Button btn_PageNext;
         private System.Windows.Forms.Button btn_PagePrev;
         private System.Windows.Forms.Label lbl_PageNum;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_RowsSetting;
         private System.Windows.Forms.Label lbl_DispNum;
     }
 }
