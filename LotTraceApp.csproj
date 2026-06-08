@@ -90,6 +90,12 @@
     <Compile Include="Forms\BottleResult.Designer.cs">
       <DependentUpon>BottleResult.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\BottleResultSet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BottleResultSet.Designer.cs">
+      <DependentUpon>BottleResultSet.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\BottleTraceForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,6 +139,9 @@
     <Compile Include="Utils\📄 FileOutputHelper.cs" />
     <EmbeddedResource Include="Forms\BottleResult.resx">
       <DependentUpon>BottleResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BottleResultSet.resx">
+      <DependentUpon>BottleResultSet.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BottleTraceForm.resx">
       <DependentUpon>BottleTraceForm.cs</DependentUpon>

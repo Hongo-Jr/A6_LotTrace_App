@@ -107,6 +107,7 @@
             this.btn_PagePrev.Text = "◀◀";
             this.btn_PagePrev.UseCompatibleTextRendering = true;
             this.btn_PagePrev.UseVisualStyleBackColor = true;
+            this.btn_PagePrev.Click += new System.EventHandler(this.btn_PagePrev_Click);
             // 
             // btn_RowsSetting
             // 
@@ -118,6 +119,7 @@
             this.btn_RowsSetting.TabIndex = 1;
             this.btn_RowsSetting.Text = "列設定";
             this.btn_RowsSetting.UseVisualStyleBackColor = true;
+            this.btn_RowsSetting.Click += new System.EventHandler(this.btn_RowsSetting_Click);
             // 
             // btn_PageNext
             // 
@@ -130,6 +132,7 @@
             this.btn_PageNext.Text = "▶▶";
             this.btn_PageNext.UseCompatibleTextRendering = true;
             this.btn_PageNext.UseVisualStyleBackColor = true;
+            this.btn_PageNext.Click += new System.EventHandler(this.btn_PageNext_Click);
             // 
             // lbl_DispNum
             // 
@@ -169,7 +172,7 @@
             this.rdo_Result.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.rdo_Result.Location = new System.Drawing.Point(714, 60);
             this.rdo_Result.Name = "rdo_Result";
-            this.rdo_Result.Size = new System.Drawing.Size(158, 25);
+            this.rdo_Result.Size = new System.Drawing.Size(157, 25);
             this.rdo_Result.TabIndex = 4;
             this.rdo_Result.Text = "瓶 / ドラム缶実績";
             this.rdo_Result.UseVisualStyleBackColor = true;

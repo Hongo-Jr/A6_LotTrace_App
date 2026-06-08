@@ -17,9 +17,11 @@ namespace LotTraceApp.Forms
         private readonly BottleResultService _service;
         private readonly BottleNodeInfo _node;
 
-        private readonly int _pageNo;
+        private  int _pageNo;
         private readonly int _pageSize = 100;
 
+        private   List<BottleRowSettings> _bottleRowSettings = new List<BottleRowSettings>();
+        private List<BottleRowSettings> _drumRowSettings = new List<BottleRowSettings>();
 
 
         public BottleResult(BottleResultService service, BottleNodeInfo node)
@@ -42,6 +44,38 @@ namespace LotTraceApp.Forms
             InitialDispLabel();
             InitialRadio();
             InitialGrid();
+            InitialRowSet();
+        }
+
+        private void InitialRowSet()
+        {
+            //Bottle
+
+            int bottleColumns = 19;
+            int drumColumns = 18;
+
+            for (int i = 0; i <= bottleColumns; i++)
+            {
+                var set = new BottleRowSettings();
+                set.SetNo = i + 1;
+                set.Visility = true;
+                set.Index = i + 1;
+
+                _bottleRowSettings.Add(set);
+            }
+
+            for (int i = 0; i <= drumColumns; i++)
+            {
+                var set = new BottleRowSettings();
+                set.SetNo = i + 1;
+                set.Visility = true;
+                set.Index = i + 1;
+
+                _drumRowSettings.Add(set);
+            }
+
+
+
         }
 
         private void InitialDispLabel()
@@ -224,12 +258,43 @@ namespace LotTraceApp.Forms
         private void SetBottelResultGrid()
         {
             SetFromResultMode();
+            RefreshResultView();
+        }
+        private void RefreshResultView()
+        {
+            ClearBottleGrid();
 
+            var pages = _service.GetFillingResultPage(_node.OrderNumber, _node.ProductLotNo, _pageNo, _pageSize);
 
-            DataTable dt = _service.GetFillingResult(_node.OrderNumber, _node.ProductLotNo, _pageNo, _pageSize);
+            lbl_DispNum.Text = $"表示件数：{pages.TotalCount}件";
+            lbl_PageNum.Text = $"{_pageNo} / {pages.MaxPageNo}";
 
-            SetBottleResultGrid(dt);
-            SetBottleResultVisibility();
+            btn_PagePrev.Enabled = (_pageNo > 1);
+            btn_PageNext.Enabled = (_pageNo < pages.MaxPageNo);
+
+            if ( pages.BottleTable.Rows.Count != 0)
+            {
+                SetBottleResultGrid(pages.BottleTable);
+                SetBottleResultVisibility();
+                SetBottleResultDesign();
+                return;
+            }
+
+            else if( pages.DrumTable.Rows.Count != 0)
+            {
+                SetDrumResultGrid(pages.DrumTable);
+                SetDrumResultVisibility();
+                SetBottleResultDesign();
+                return;
+            }
+            else
+            {
+                //何もしない
+
+                //BottleDataGridView.DataSource = null;
+                //BottleDataGridView.Columns.Clear();
+            }
+
             SetBottleResultDesign();
         }
 
@@ -240,39 +305,50 @@ namespace LotTraceApp.Forms
             btn_PagePrev.Visible = true;
             lbl_PageNum.Visible = true;
             btn_RowsSetting.Visible = true;
-
-            int displayCount = 0;
-            lbl_DispNum.Text = $"表示件数：{displayCount}件";
-
-            int pageNo = 0;
-            int maxPage = 0;
-            lbl_PageNum.Text = $"{pageNo} / {maxPage}";
-
-           
-
         }
 
         private void SetBottleResultVisibility()
         {
-            BottleDataGridView.Columns["OrderNumber"].Visible = true;
-            BottleDataGridView.Columns["ProductLotNumber"].Visible = true;
-            BottleDataGridView.Columns["ProductItemCode"].Visible = true;
-            BottleDataGridView.Columns["MiddleProductLotNumber"].Visible = true;
-            BottleDataGridView.Columns["MiddleProductItemCode"].Visible = true;
-            BottleDataGridView.Columns["BottleID"].Visible = true;
-            BottleDataGridView.Columns["SamplingGroup"].Visible = true;
-            BottleDataGridView.Columns["BottleINumber"].Visible = true;
-            BottleDataGridView.Columns["FillingNozzleNumber"].Visible = true;
-            BottleDataGridView.Columns["CapTighteningTorqueValue"].Visible = true;
-            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Visible = true;
-            BottleDataGridView.Columns["CapTiltDetectionJudgment"].Visible = true;
-            BottleDataGridView.Columns["FillingMachineNumber"].Visible = true;
-            BottleDataGridView.Columns["TotalCahckJudgment"].Visible = true;
-            BottleDataGridView.Columns["BottleLocation"].Visible = true;
-            BottleDataGridView.Columns["FillingWeight"].Visible = true;
-            BottleDataGridView.Columns["FillingTime"].Visible = true;
-            BottleDataGridView.Columns["FillingStartDate"].Visible = true;
-            BottleDataGridView.Columns["FillingEndDate"].Visible = true;
+            BottleDataGridView.Columns["OrderNumber"].Visible = _bottleRowSettings[0].Visility;
+            BottleDataGridView.Columns["ProductLotNumber"].Visible = _bottleRowSettings[1].Visility;
+            BottleDataGridView.Columns["ProductItemCode"].Visible = _bottleRowSettings[2].Visility;
+            BottleDataGridView.Columns["MiddleProductLotNumber"].Visible = _bottleRowSettings[3].Visility;
+            BottleDataGridView.Columns["MiddleProductItemCode"].Visible = _bottleRowSettings[4].Visility;
+            BottleDataGridView.Columns["BottleID"].Visible = _bottleRowSettings[5].Visility;
+            BottleDataGridView.Columns["SamplingGroup"].Visible = _bottleRowSettings[6].Visility;
+            BottleDataGridView.Columns["BottleINumber"].Visible = _bottleRowSettings[7].Visility;
+            BottleDataGridView.Columns["FillingNozzleNumber"].Visible = _bottleRowSettings[8].Visility;
+            BottleDataGridView.Columns["CapTighteningTorqueValue"].Visible = _bottleRowSettings[9].Visility;
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Visible = _bottleRowSettings[10].Visility;
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].Visible = _bottleRowSettings[11].Visility;
+            BottleDataGridView.Columns["FillingMachineNumber"].Visible = _bottleRowSettings[12].Visility;
+            BottleDataGridView.Columns["TotalCahckJudgment"].Visible = _bottleRowSettings[13].Visility;
+            BottleDataGridView.Columns["BottleLocation"].Visible = _bottleRowSettings[14].Visility;
+            BottleDataGridView.Columns["FillingWeight"].Visible = _bottleRowSettings[15].Visility;
+            BottleDataGridView.Columns["FillingTime"].Visible = _bottleRowSettings[16].Visility;
+            BottleDataGridView.Columns["FillingStartDate"].Visible = _bottleRowSettings[17].Visility;
+            BottleDataGridView.Columns["FillingEndDate"].Visible = _bottleRowSettings[18].Visility;
+        }
+        private void SetDrumResultVisibility()
+        {
+            BottleDataGridView.Columns["OrderNumber"].Visible = _drumRowSettings[0].Visility;
+            BottleDataGridView.Columns["ProductLotNumber"].Visible = _drumRowSettings[1].Visility;
+            BottleDataGridView.Columns["ProductItemCode"].Visible = _drumRowSettings[2].Visility;
+            BottleDataGridView.Columns["MiddleProductLotNumber"].Visible = _drumRowSettings[3].Visility;
+            BottleDataGridView.Columns["MiddleProductItemCode"].Visible = _drumRowSettings[4].Visility;
+            BottleDataGridView.Columns["DrumcanNumber"].Visible = _drumRowSettings[5].Visility;
+            BottleDataGridView.Columns["FillingNozzleNumber"].Visible = _drumRowSettings[6].Visility;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].Visible = _drumRowSettings[7].Visility;
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Visible = _drumRowSettings[8].Visility;
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].Visible = _drumRowSettings[9].Visility;
+            BottleDataGridView.Columns["TotalCahckJudgment"].Visible = _drumRowSettings[10].Visility;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].Visible = _drumRowSettings[11].Visility;
+            BottleDataGridView.Columns["FillingWeightJudgment"].Visible = _drumRowSettings[12].Visility;
+            BottleDataGridView.Columns["BottleLocation"].Visible = _drumRowSettings[13].Visility;
+            BottleDataGridView.Columns["FillingWeight"].Visible = _drumRowSettings[14].Visility;
+            BottleDataGridView.Columns["FillingTime"].Visible = _drumRowSettings[15].Visility;
+            BottleDataGridView.Columns["FillingStartDate"].Visible = _drumRowSettings[16].Visility;
+            BottleDataGridView.Columns["FillingEndDate"].Visible = _drumRowSettings[17].Visility;
         }
 
         private void SetBottleResultGrid(DataTable dt)
@@ -351,6 +427,70 @@ namespace LotTraceApp.Forms
 
         }
 
+        private void SetDrumResultGrid(DataTable dt)
+        {
+            int ColumnSize1 = 150;
+            int ColumnSize2 = 100;
+            int ColumnSize3 = 200;
+
+            BottleDataGridView.AutoGenerateColumns = true;
+            BottleDataGridView.DataSource = dt;
+
+            BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"].Caption;
+            BottleDataGridView.Columns["OrderNumber"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["ProductLotNumber"].HeaderText = dt.Columns["ProductLotNumber"].Caption;
+            BottleDataGridView.Columns["ProductLotNumber"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["ProductItemCode"].HeaderText = dt.Columns["ProductItemCode"].Caption;
+            BottleDataGridView.Columns["ProductItemCode"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["MiddleProductLotNumber"].HeaderText = dt.Columns["MiddleProductLotNumber"].Caption;
+            BottleDataGridView.Columns["MiddleProductLotNumber"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["MiddleProductItemCode"].HeaderText = dt.Columns["MiddleProductItemCode"].Caption;
+            BottleDataGridView.Columns["MiddleProductItemCode"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["DrumcanNumber"].HeaderText = dt.Columns["DrumcanNumber"].Caption;
+            BottleDataGridView.Columns["DrumcanNumber"].Width = ColumnSize2;
+
+            BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"].Caption;
+            BottleDataGridView.Columns["FillingNozzleNumber"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].HeaderText = dt.Columns["CapTighteningTorqueValue_Big"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].Width = ColumnSize3;
+
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].HeaderText = dt.Columns["CapTighteningTorqueJudgment"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Width = ColumnSize3;
+
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].HeaderText = dt.Columns["CapTiltDetectionJudgment"].Caption;
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].Width = ColumnSize3;
+
+            BottleDataGridView.Columns["TotalCahckJudgment"].HeaderText = dt.Columns["TotalCahckJudgment"].Caption;
+            BottleDataGridView.Columns["TotalCahckJudgment"].Width = ColumnSize2;
+
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].HeaderText = dt.Columns["CapTighteningTorqueValue_Small"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].Width = ColumnSize3;
+
+            BottleDataGridView.Columns["FillingWeightJudgment"].HeaderText = dt.Columns["FillingWeightJudgment"].Caption;
+            BottleDataGridView.Columns["FillingWeightJudgment"].Width = ColumnSize2;
+
+            BottleDataGridView.Columns["BottleLocation"].HeaderText = dt.Columns["BottleLocation"].Caption;
+            BottleDataGridView.Columns["BottleLocation"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["FillingWeight"].HeaderText = dt.Columns["FillingWeight"].Caption;
+            BottleDataGridView.Columns["FillingWeight"].Width = ColumnSize2;
+
+            BottleDataGridView.Columns["FillingTime"].HeaderText = dt.Columns["FillingTime"].Caption;
+            BottleDataGridView.Columns["FillingTime"].Width = ColumnSize2;
+
+            BottleDataGridView.Columns["FillingStartDate"].HeaderText = dt.Columns["FillingStartDate"].Caption;
+            BottleDataGridView.Columns["FillingStartDate"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"].Caption;
+            BottleDataGridView.Columns["FillingEndDate"].Width = ColumnSize1;
+        }
+
         private void SetBottleResultDesign()
         {
             var grid = BottleDataGridView;
@@ -368,6 +508,38 @@ namespace LotTraceApp.Forms
 
             grid.DefaultCellStyle.Font = new Font(grid.Font.FontFamily, 9F, FontStyle.Regular);
             grid.RowTemplate.Height = 28;
+
+            // 並び替え無効（要望）
+            foreach (DataGridViewColumn col in grid.Columns)
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
+        }
+
+        private void btn_PagePrev_Click(object sender, EventArgs e)
+        {
+            if(_pageNo > 1) _pageNo--;
+            RefreshResultView();
+        }
+
+        private void btn_PageNext_Click(object sender, EventArgs e)
+        {
+            _pageNo++;
+            RefreshResultView();
+        }
+
+        private void btn_RowsSetting_Click(object sender, EventArgs e)
+        {
+            using (var f = new BottleResultSet(_bottleRowSettings))
+            {
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    _bottleRowSettings = f.RowSet;
+
+
+                    //画面に反映
+                    SetBottleResultVisibility();
+                }
+
+            }
         }
     }
 }

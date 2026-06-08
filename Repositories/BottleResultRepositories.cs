@@ -332,7 +332,7 @@ namespace LotTraceApp.Repositories
                         row.FillingMachineNumber = reader.IsDBNull(13) ? (int?)null : reader.GetInt32(13);
                         row.TotalCahckJudgment = reader.IsDBNull(14) ? (int?)null : reader.GetInt32(14);
                         row.BottleLocation = reader.IsDBNull(15) ? (int?)null : reader.GetInt32(15);
-                        row.FillingWeight = reader.IsDBNull(16) ? (int?)null : reader.GetInt32(16);
+                        row.FillingWeight = reader.IsDBNull(16) ? (long?)null : reader.GetInt64(16);
                         row.FillingTime = reader.IsDBNull(17)? (TimeSpan?) null : reader.GetTimeSpan(17);
                         row.FillingStartDate = reader.IsDBNull(18) ?(DateTime?) null : reader.GetDateTime(18);
                         row.FillingEndDate = reader.IsDBNull(19) ? (DateTime?)null : reader.GetDateTime(19);
@@ -390,7 +390,7 @@ namespace LotTraceApp.Repositories
             sql.AppendLine("  AND [OrderNumber] = @order");
             sql.AppendLine("  AND [ProductLotNumber] = @lot");
             
-            sql.AppendLine("ORDER BY [FillingStartDate] DESC, [BottleID]");
+            sql.AppendLine("ORDER BY [FillingStartDate] ASC, [BottleID]");
             sql.AppendLine("OFFSET @Offset ROWS");
             sql.AppendLine("FETCH NEXT @PageSize ROWS ONLY");
 
@@ -442,7 +442,7 @@ namespace LotTraceApp.Repositories
                         row.CapTighteningTorqueValue_Small = reader.IsDBNull(12) ? (int?)null : reader.GetInt32(12);
                         row.FillingWeightJudgment = reader.IsDBNull(13) ? (int?)null : reader.GetInt32(13);
                         row.BottleLocation = reader.IsDBNull(14) ? (int?)null : reader.GetInt32(14);
-                        row.FillingWeight = reader.IsDBNull(15) ? (int?)null : reader.GetInt32(15);
+                        row.FillingWeight = reader.IsDBNull(15) ? (long?)null : reader.GetInt64(15);
                         row.FillingTime = reader.IsDBNull(16) ? (TimeSpan?)null : reader.GetTimeSpan(16);
                         row.FillingStartDate = reader.IsDBNull(17) ? (DateTime?)null : reader.GetDateTime(17);
                         row.FillingEndDate = reader.IsDBNull(18) ? (DateTime?)null : reader.GetDateTime(18);

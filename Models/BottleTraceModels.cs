@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Presentation;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
@@ -141,6 +142,23 @@ namespace LotTraceApp.Models
     }
 
     #region 瓶詳細
+
+    public class BottleRowSettings
+    {
+        public int SetNo { get; set; }
+        public bool Visility { get; set; }
+        public int Index { get; set; }
+
+    }
+
+    public class FillingResultTable
+    {
+        public DataTable BottleTable { get; set; }
+        public DataTable DrumTable { get; set; }
+        public int TotalCount { get; set; }
+        public int MaxPageNo { get; set; }
+        public int PageNo { get; set; }
+    }
 
     public class BottleNodeInfo
     {
