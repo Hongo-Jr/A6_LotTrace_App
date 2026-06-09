@@ -129,8 +129,8 @@ namespace LotTraceApp.Services
             result.Columns["BottleLocation"].Caption = "瓶ロケーション";
             result.Columns["FillingWeight"].Caption = "充填重量";
             result.Columns["FillingTime"].Caption = "充填時間";
-            result.Columns["FillingStartDate"].Caption = "充填開始時間";
-            result.Columns["FillingEndDate"].Caption = "充填終了時間";
+            result.Columns["FillingStartDate"].Caption = "充填開始日時";
+            result.Columns["FillingEndDate"].Caption = "充填終了日時";
             result.Columns["ProcessType"].Caption = "工程種別";
 
 
@@ -177,11 +177,11 @@ namespace LotTraceApp.Services
             result.Columns["TotalCahckJudgment"].Caption = "総合判定";
             result.Columns["CapTighteningTorqueValue_Small"].Caption = "キャップ締付トルク値(小)";
             result.Columns["FillingWeightJudgment"].Caption = "充填重量判定";
-            result.Columns["BottleLocation"].Caption = "容器ロケーション";
+            result.Columns["BottleLocation"].Caption = "瓶ロケーション";
             result.Columns["FillingWeight"].Caption = "充填重量";
             result.Columns["FillingTime"].Caption = "充填時間";
-            result.Columns["FillingStartDate"].Caption = "充填開始時間";
-            result.Columns["FillingEndDate"].Caption = "充填終了時間";
+            result.Columns["FillingStartDate"].Caption = "充填開始日時";
+            result.Columns["FillingEndDate"].Caption = "充填終了日時";
 
             return result;
         }

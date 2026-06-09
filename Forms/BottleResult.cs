@@ -23,6 +23,8 @@ namespace LotTraceApp.Forms
         private   List<BottleRowSettings> _bottleRowSettings = new List<BottleRowSettings>();
         private List<BottleRowSettings> _drumRowSettings = new List<BottleRowSettings>();
 
+        private  FillingResultTable _pages = new FillingResultTable();
+
 
         public BottleResult(BottleResultService service, BottleNodeInfo node)
         {
@@ -31,6 +33,7 @@ namespace LotTraceApp.Forms
 
             _node = node;
             _pageNo = 1;
+            
 
             InitializeComponent();
             InitialFrom();
@@ -54,7 +57,7 @@ namespace LotTraceApp.Forms
             int bottleColumns = 19;
             int drumColumns = 18;
 
-            for (int i = 0; i <= bottleColumns; i++)
+            for (int i = 0; i < bottleColumns; i++)
             {
                 var set = new BottleRowSettings();
                 set.SetNo = i + 1;
@@ -64,7 +67,7 @@ namespace LotTraceApp.Forms
                 _bottleRowSettings.Add(set);
             }
 
-            for (int i = 0; i <= drumColumns; i++)
+            for (int i = 0; i < drumColumns; i++)
             {
                 var set = new BottleRowSettings();
                 set.SetNo = i + 1;
@@ -202,9 +205,7 @@ namespace LotTraceApp.Forms
             g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             g.ColumnHeadersHeight = 28;
 
-            // 並び替え無効（要望）
-            foreach (DataGridViewColumn col in g.Columns)
-                col.SortMode = DataGridViewColumnSortMode.NotSortable;
+            
 
         }
         private void BottleOrderGridDesign()
@@ -264,25 +265,26 @@ namespace LotTraceApp.Forms
         {
             ClearBottleGrid();
 
-            var pages = _service.GetFillingResultPage(_node.OrderNumber, _node.ProductLotNo, _pageNo, _pageSize);
+            _pages.Clear();
+            _pages = _service.GetFillingResultPage(_node.OrderNumber, _node.ProductLotNo, _pageNo, _pageSize);
 
-            lbl_DispNum.Text = $"表示件数：{pages.TotalCount}件";
-            lbl_PageNum.Text = $"{_pageNo} / {pages.MaxPageNo}";
+            lbl_DispNum.Text = $"総件数：{_pages.TotalCount}件";
+            lbl_PageNum.Text = $"{_pageNo} / {_pages.MaxPageNo}";
 
             btn_PagePrev.Enabled = (_pageNo > 1);
-            btn_PageNext.Enabled = (_pageNo < pages.MaxPageNo);
+            btn_PageNext.Enabled = (_pageNo < _pages.MaxPageNo);
 
-            if ( pages.BottleTable.Rows.Count != 0)
+            if (_pages.BottleTable.Rows.Count != 0)
             {
-                SetBottleResultGrid(pages.BottleTable);
+                SetBottleResultGrid(_pages.BottleTable);
                 SetBottleResultVisibility();
                 SetBottleResultDesign();
                 return;
             }
 
-            else if( pages.DrumTable.Rows.Count != 0)
+            else if(_pages.DrumTable.Rows.Count != 0)
             {
-                SetDrumResultGrid(pages.DrumTable);
+                SetDrumResultGrid(_pages.DrumTable);
                 SetDrumResultVisibility();
                 SetBottleResultDesign();
                 return;
@@ -357,7 +359,7 @@ namespace LotTraceApp.Forms
             int ColumnSize2 = 100;
             int ColumnSize3 = 200;
 
-            
+            BottleDataGridView.RowTemplate.Height = 28;
             BottleDataGridView.AutoGenerateColumns = true;
             BottleDataGridView.DataSource = dt;
 
@@ -383,7 +385,7 @@ namespace LotTraceApp.Forms
             BottleDataGridView.Columns["BottleID"].Width = ColumnSize2;
 
             BottleDataGridView.Columns["SamplingGroup"].HeaderText = dt.Columns["SamplingGroup"].Caption;
-            BottleDataGridView.Columns["SamplingGroup"].Width = ColumnSize2;
+            BottleDataGridView.Columns["SamplingGroup"].Width = ColumnSize3;
 
             BottleDataGridView.Columns["BottleINumber"].HeaderText = dt.Columns["BottleINumber"].Caption;
             BottleDataGridView.Columns["BottleINumber"].Width = ColumnSize2;
@@ -434,6 +436,7 @@ namespace LotTraceApp.Forms
             int ColumnSize3 = 200;
 
             BottleDataGridView.AutoGenerateColumns = true;
+            BottleDataGridView.RowTemplate.Height = 28;
             BottleDataGridView.DataSource = dt;
 
             BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"].Caption;
@@ -452,7 +455,7 @@ namespace LotTraceApp.Forms
             BottleDataGridView.Columns["MiddleProductItemCode"].Width = ColumnSize1;
 
             BottleDataGridView.Columns["DrumcanNumber"].HeaderText = dt.Columns["DrumcanNumber"].Caption;
-            BottleDataGridView.Columns["DrumcanNumber"].Width = ColumnSize2;
+            BottleDataGridView.Columns["DrumcanNumber"].Width = ColumnSize1;
 
             BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"].Caption;
             BottleDataGridView.Columns["FillingNozzleNumber"].Width = ColumnSize1;
@@ -489,6 +492,10 @@ namespace LotTraceApp.Forms
 
             BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"].Caption;
             BottleDataGridView.Columns["FillingEndDate"].Width = ColumnSize1;
+
+            BottleDataGridView.Columns["ProcessType"].Visible = false;
+            BottleDataGridView.Columns["ProcessType"].HeaderText = dt.Columns["ProcessType"].Caption;
+            BottleDataGridView.Columns["ProcessType"].Width = 0;
         }
 
         private void SetBottleResultDesign()
@@ -499,19 +506,16 @@ namespace LotTraceApp.Forms
             grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
 
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black; 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(235, 242, 250);
+            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(250, 238, 238);
             grid.ColumnHeadersDefaultCellStyle.Font = new Font(grid.Font.FontFamily,11F, FontStyle.Bold);
             grid.ColumnHeadersHeight = 32;
             grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             grid.ColumnHeadersDefaultCellStyle.Padding = new Padding(5, 0, 0, 0);
 
 
-            grid.DefaultCellStyle.Font = new Font(grid.Font.FontFamily, 9F, FontStyle.Regular);
-            grid.RowTemplate.Height = 28;
-
-            // 並び替え無効（要望）
-            foreach (DataGridViewColumn col in grid.Columns)
-                col.SortMode = DataGridViewColumnSortMode.NotSortable;
+            grid.DefaultCellStyle.Font = new Font(grid.Font.FontFamily, 9F, FontStyle.Bold);
+            grid.DefaultCellStyle.Padding = new Padding(5, 0, 0, 0);
+            
         }
 
         private void btn_PagePrev_Click(object sender, EventArgs e)
@@ -528,15 +532,28 @@ namespace LotTraceApp.Forms
 
         private void btn_RowsSetting_Click(object sender, EventArgs e)
         {
-            using (var f = new BottleResultSet(_bottleRowSettings))
+            var screenPos = btn_RowsSetting.PointToScreen(Point.Empty);
+
+            using (var f = new BottleResultSet(_bottleRowSettings,_drumRowSettings))
             {
-                if (f.ShowDialog() == DialogResult.OK)
+                f.StartPosition = FormStartPosition.Manual;
+                f.Location = new Point(screenPos.X + (btn_RowsSetting.Width - f.Width) / 2, screenPos.Y );
+                if (f.ShowDialog(this) == DialogResult.OK)
                 {
-                    _bottleRowSettings = f.RowSet;
+                    _bottleRowSettings = f.BottleRowSet;
+                    _drumRowSettings = f.DrumRowSet;
 
 
-                    //画面に反映
-                    SetBottleResultVisibility();
+                    if (_pages.BottleTable.Rows.Count > 0)
+                    {
+                        SetBottleResultVisibility();
+                    }
+
+                    if (_pages.DrumTable.Rows.Count > 0)
+                    {
+                        SetDrumResultVisibility();
+                    }
+                    
                 }
 
             }

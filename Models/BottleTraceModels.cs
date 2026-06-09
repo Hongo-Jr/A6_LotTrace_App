@@ -158,6 +158,18 @@ namespace LotTraceApp.Models
         public int TotalCount { get; set; }
         public int MaxPageNo { get; set; }
         public int PageNo { get; set; }
+
+        public FillingResultTable()
+        {
+            BottleTable = new DataTable();
+            DrumTable = new DataTable();
+        }
+
+        public void Clear()
+        {
+            BottleTable.Clear();
+            DrumTable.Clear();
+        }
     }
 
     public class BottleNodeInfo
