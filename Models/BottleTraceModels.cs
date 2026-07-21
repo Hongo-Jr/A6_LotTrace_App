@@ -242,5 +242,25 @@ namespace LotTraceApp.Models
         public DateTime? FillingEndDate { get; set; }
     }
 
+    public class BottleTraceGridRow
+    {
+        public string OrderNumber { get; set; }
+        public string ProcessType { get; set; }
+        public string ProductLotNumber { get; set; }
+        public string ProductItemCode { get; set; }
+        public string MiddleProductLotNumber { get; set; }
+        public string MiddleProductItemCode { get; set; }
+        public DateTime? StartDate { get; set; }            
+        public DateTime? EndDate { get; set; }              
+        public int FillingBottleNum_OK { get; set; }
+        public int FillingBottleNum_NG { get; set; }
+        public int FillingBottleNum_Total
+        {
+            get { return FillingBottleNum_OK + FillingBottleNum_NG; }
+        }
+
+    }
+
+
     #endregion
 }

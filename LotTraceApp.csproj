@@ -134,9 +134,9 @@
     <Compile Include="Utils\CsvExportHelper.cs" />
     <Compile Include="Utils\DisplayNameCsvLoader.cs" />
     <Compile Include="Utils\ExcelExportHelper.cs" />
+    <Compile Include="Utils\FileOutputHelper.cs" />
     <Compile Include="Utils\IniFile.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="Utils\📄 FileOutputHelper.cs" />
     <EmbeddedResource Include="Forms\BottleResult.resx">
       <DependentUpon>BottleResult.cs</DependentUpon>
     </EmbeddedResource>
