@@ -14,6 +14,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LotTraceApp.Forms;
+
 
 namespace LotTraceApp
 {
@@ -188,6 +190,15 @@ namespace LotTraceApp
         private readonly ToolTip _itemNameToolTip = new ToolTip();
         private readonly Font _itemNameToolTipFont = new Font("Segoe UI", 12F, FontStyle.Regular);
         private string _currentItemToolTipText = string.Empty;
+        private readonly Color _gridHoverCellBackColor = Color.FromArgb(225, 235, 250);
+        private readonly Color _gridSelectedRowBorderColor = Color.FromArgb(150, 56, 112, 190);
+        private DataGridView _hoverGrid = null;
+        private int _hoverRowIndex = -1;
+        private int _hoverColumnIndex = -1;
+        private readonly Dictionary<DataGridView, int> _selectedRowIndexByGrid =
+            new Dictionary<DataGridView, int>();
+        private bool _syncingBottleGridSelection;
+        private readonly BottleResultService _bottleResultService;
 
 
         private Button _btnIntersectionCsv;
@@ -205,10 +216,15 @@ namespace LotTraceApp
 
         #region コンストラクタ・初期化
 
-        public BottleTraceForm(BottleTraceService service, ResultService resultService)
+        public BottleTraceForm(BottleTraceService service, ResultService resultService, BottleResultService bottleResultService)
         {
+            if (bottleResultService == null) throw new ArgumentNullException("bottleResultService");
+
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _resultService = resultService;
+            _bottleResultService = bottleResultService;
+
+
             InitializeComponent();
             ConfigureBottleTraceTabOwnerDraw();
 
@@ -225,6 +241,7 @@ namespace LotTraceApp
 
             swichBottleTab.SelectedIndexChanged -= SwichBottleTab_SelectedIndexChanged;
             swichBottleTab.SelectedIndexChanged += SwichBottleTab_SelectedIndexChanged;
+
         }
 
         private void InitializeBottleTraceTabContexts()
@@ -274,7 +291,9 @@ namespace LotTraceApp
 
             btnBottleDetectCrossPoints.Click -= btnBottleDetectCrossPoints_Click;
             btnBottleDetectCrossPoints.Click += btnBottleDetectCrossPoints_Click;
-            
+
+
+          
         }
 
         private void InitializeBottleIntersectionTab()
@@ -422,6 +441,7 @@ namespace LotTraceApp
 
             grid.KeyDown -= Grid_KeyDown_CopyCurrentCell;
             grid.KeyDown += Grid_KeyDown_CopyCurrentCell;
+            RegisterGridSelectionVisualEvents(grid);
         }
 
         private void Grid_KeyDown_CopyCurrentCell(object sender, KeyEventArgs e)
@@ -497,6 +517,7 @@ namespace LotTraceApp
             if (grid == null || paintHandler == null)
                 return;
 
+            RegisterGridSelectionVisualEvents(grid);
             grid.Paint -= paintHandler;
             grid.Paint += paintHandler;
 
@@ -504,6 +525,8 @@ namespace LotTraceApp
             grid.CellFormatting += OnBottleNodeKeyGroupForeColorFormattingFromCache;
             grid.CellFormatting -= OnBottleCrossPointNodeBackColorFormatting;
             grid.CellFormatting += OnBottleCrossPointNodeBackColorFormatting;
+            grid.CellFormatting -= Grid_CellFormatting_SelectionAndHover;
+            grid.CellFormatting += Grid_CellFormatting_SelectionAndHover;
 
             grid.CellMouseEnter -= Grid_CellMouseEnter_ToolTip;
             grid.CellMouseEnter += Grid_CellMouseEnter_ToolTip;
@@ -516,11 +539,30 @@ namespace LotTraceApp
 
             grid.MouseLeave -= Grid_ItemNameToolTipHideOnMouseLeave;
             grid.MouseLeave += Grid_ItemNameToolTipHideOnMouseLeave;
+            grid.MouseLeave -= Grid_MouseLeave_Hover;
+            grid.MouseLeave += Grid_MouseLeave_Hover;
 
             
                 grid.CellMouseClick -= dataGrid_CellMouseClick;
                 grid.CellMouseClick += dataGrid_CellMouseClick;
             
+        }
+
+        private void RegisterGridSelectionVisualEvents(DataGridView grid)
+        {
+            if (grid == null)
+                return;
+
+            grid.Paint -= Grid_SelectedRowOutlinePaint;
+            grid.Paint += Grid_SelectedRowOutlinePaint;
+            grid.CellFormatting -= Grid_CellFormatting_SelectionAndHover;
+            grid.CellFormatting += Grid_CellFormatting_SelectionAndHover;
+            grid.CellMouseMove -= Grid_CellMouseMove_Hover;
+            grid.CellMouseMove += Grid_CellMouseMove_Hover;
+            grid.MouseLeave -= Grid_MouseLeave_Hover;
+            grid.MouseLeave += Grid_MouseLeave_Hover;
+            grid.SelectionChanged -= Grid_SelectionVisualChanged;
+            grid.SelectionChanged += Grid_SelectionVisualChanged;
         }
 
         private void UnregisterTraceGridBorderPaint(DataGridView grid)
@@ -530,6 +572,284 @@ namespace LotTraceApp
 
             grid.Paint -= LiquidTableBorderPaint;
             grid.Paint -= BottleTableBorderPaint;
+        }
+
+        private void Grid_CellFormatting_SelectionAndHover(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null)
+                return;
+
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            e.CellStyle.SelectionBackColor = ResolveGridSelectionBackColor(e.CellStyle.BackColor);
+            e.CellStyle.SelectionForeColor = e.CellStyle.ForeColor;
+
+            bool isHoverCell = ReferenceEquals(_hoverGrid, grid) &&
+                e.RowIndex == _hoverRowIndex &&
+                e.ColumnIndex == _hoverColumnIndex;
+
+            if (isHoverCell)
+            {
+                e.CellStyle.BackColor = _gridHoverCellBackColor;
+                e.CellStyle.SelectionBackColor = _gridHoverCellBackColor;
+            }
+        }
+
+        private void Grid_CellMouseMove_Hover(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null)
+                return;
+
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+            {
+                ClearHover(grid);
+                return;
+            }
+
+            bool gridChanged = !ReferenceEquals(_hoverGrid, grid);
+            bool cellChanged = _hoverRowIndex != e.RowIndex || _hoverColumnIndex != e.ColumnIndex;
+            if (!gridChanged && !cellChanged)
+                return;
+
+            var previousGrid = _hoverGrid;
+            int previousRow = _hoverRowIndex;
+            int previousCol = _hoverColumnIndex;
+
+            _hoverGrid = grid;
+            _hoverRowIndex = e.RowIndex;
+            _hoverColumnIndex = e.ColumnIndex;
+
+            if (previousGrid != null)
+                InvalidateHoverCell(previousGrid, previousRow, previousCol);
+
+            InvalidateHoverCell(grid, _hoverRowIndex, _hoverColumnIndex);
+        }
+
+        private void Grid_MouseLeave_Hover(object sender, EventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null || !ReferenceEquals(_hoverGrid, grid))
+                return;
+
+            ClearHover(grid);
+        }
+
+        private void ClearHover(DataGridView grid)
+        {
+            if (grid == null)
+                return;
+
+            int oldRow = _hoverRowIndex;
+            int oldCol = _hoverColumnIndex;
+            var oldGrid = _hoverGrid;
+
+            _hoverGrid = null;
+            _hoverRowIndex = -1;
+            _hoverColumnIndex = -1;
+
+            if (oldGrid != null)
+                InvalidateHoverCell(oldGrid, oldRow, oldCol);
+        }
+
+        private void InvalidateHoverCell(DataGridView grid, int rowIndex, int columnIndex)
+        {
+            if (grid == null || rowIndex < 0 || columnIndex < 0)
+                return;
+
+            if (rowIndex >= grid.Rows.Count || columnIndex >= grid.Columns.Count)
+                return;
+
+            Rectangle rect = grid.GetCellDisplayRectangle(columnIndex, rowIndex, false);
+            if (!rect.IsEmpty)
+                grid.Invalidate(rect);
+            else
+                grid.Invalidate();
+        }
+
+        private Color ResolveGridSelectionBackColor(Color backColor)
+        {
+            return backColor.IsEmpty ? SystemColors.Window : backColor;
+        }
+
+        private void Grid_SelectionVisualChanged(object sender, EventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null)
+                return;
+
+            if (!_syncingBottleGridSelection)
+                SyncBottleGridSelection(grid);
+
+            UpdateSelectionVisual(grid);
+        }
+
+        private void UpdateSelectionVisual(DataGridView grid)
+        {
+            if (grid == null)
+                return;
+
+            int previousRowIndex;
+            if (!_selectedRowIndexByGrid.TryGetValue(grid, out previousRowIndex))
+                previousRowIndex = -1;
+
+            int currentRowIndex = GetSelectedRowIndex(grid);
+            _selectedRowIndexByGrid[grid] = currentRowIndex;
+
+            InvalidateDisplayedRow(grid, previousRowIndex);
+            InvalidateDisplayedRow(grid, currentRowIndex);
+        }
+
+        private void SyncBottleGridSelection(DataGridView sourceGrid)
+        {
+            DataGridView targetGrid;
+            if (!TryGetBottleSelectionPeerGrid(sourceGrid, out targetGrid))
+                return;
+
+            _syncingBottleGridSelection = true;
+            try
+            {
+                int rowIndex = GetSelectedRowIndex(sourceGrid);
+                if (rowIndex < 0 || rowIndex >= targetGrid.Rows.Count)
+                {
+                    targetGrid.ClearSelection();
+                    return;
+                }
+
+                DataGridViewCell targetCell = GetFirstVisibleCell(targetGrid, rowIndex);
+                if (targetCell == null)
+                    return;
+
+                targetGrid.ClearSelection();
+                targetGrid.CurrentCell = targetCell;
+                targetGrid.Rows[rowIndex].Selected = true;
+            }
+            finally
+            {
+                _syncingBottleGridSelection = false;
+            }
+        }
+
+        private bool TryGetBottleSelectionPeerGrid(DataGridView sourceGrid, out DataGridView targetGrid)
+        {
+            targetGrid = null;
+            if (sourceGrid == null)
+                return false;
+
+            foreach (var pair in _bottleTraceTabContexts)
+            {
+                var tab = pair.Value;
+                if (tab == null)
+                    continue;
+
+                if (ReferenceEquals(sourceGrid, tab.GridStart))
+                {
+                    targetGrid = tab.GridEnd;
+                    return targetGrid != null;
+                }
+
+                if (ReferenceEquals(sourceGrid, tab.GridEnd))
+                {
+                    targetGrid = tab.GridStart;
+                    return targetGrid != null;
+                }
+            }
+
+            return false;
+        }
+
+        private DataGridViewCell GetFirstVisibleCell(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+                return null;
+
+            foreach (DataGridViewColumn column in grid.Columns)
+            {
+                if (column != null && column.Visible)
+                    return grid.Rows[rowIndex].Cells[column.Index];
+            }
+
+            return null;
+        }
+
+        private int GetSelectedRowIndex(DataGridView grid)
+        {
+            if (grid == null || grid.SelectedRows.Count == 0)
+                return -1;
+
+            return grid.SelectedRows[0].Index;
+        }
+
+        private void InvalidateDisplayedRow(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+                return;
+
+            Rectangle rect = GetDisplayedRowBounds(grid, rowIndex);
+            if (!rect.IsEmpty)
+            {
+                rect.Inflate(2, 2);
+                grid.Invalidate(rect);
+            }
+        }
+
+        private void Grid_SelectedRowOutlinePaint(object sender, PaintEventArgs e)
+        {
+            var grid = sender as DataGridView;
+            if (grid == null || e == null)
+                return;
+
+            using (var pen = new Pen(_gridSelectedRowBorderColor, 2))
+            {
+                foreach (DataGridViewRow row in grid.SelectedRows)
+                {
+                    if (row == null || row.IsNewRow || !row.Visible || !row.Selected)
+                        continue;
+
+                    Rectangle rect = GetDisplayedRowBounds(grid, row.Index);
+                    if (rect.IsEmpty)
+                        continue;
+
+                    int left = rect.Left;
+                    int right = rect.Right - 1;
+                    int top = rect.Top;
+                    int bottom = rect.Bottom - 1;
+
+                    e.Graphics.DrawLine(pen, left, top, right, top);
+                    e.Graphics.DrawLine(pen, left, bottom, right, bottom);
+                }
+            }
+        }
+
+        private Rectangle GetDisplayedRowBounds(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+                return Rectangle.Empty;
+
+            Rectangle rowRect = grid.GetRowDisplayRectangle(rowIndex, true);
+            if (rowRect.Height <= 0)
+                return Rectangle.Empty;
+
+            Rectangle bounds = Rectangle.Empty;
+            foreach (DataGridViewColumn column in grid.Columns)
+            {
+                if (column == null || !column.Visible)
+                    continue;
+
+                Rectangle cellRect = grid.GetCellDisplayRectangle(column.Index, rowIndex, true);
+                if (cellRect.Width <= 0 || cellRect.Height <= 0)
+                    continue;
+
+                bounds = bounds.IsEmpty ? cellRect : Rectangle.Union(bounds, cellRect);
+            }
+
+            if (bounds.IsEmpty)
+                return Rectangle.Empty;
+
+            bounds.Intersect(grid.DisplayRectangle);
+            return bounds;
         }
 
         private void RegisterBottleTraceTabNameEvents()
@@ -1076,6 +1396,8 @@ namespace LotTraceApp
 
             HideBottleInternalColumns(tab.GridStart);
             HideBottleInternalColumns(tab.GridEnd);
+            ApplyTraceGridSortMode(tab.GridStart);
+            ApplyTraceGridSortMode(tab.GridEnd);
             ApplyBottleGridWidthsFromColumns(tab);
             RefreshBottleHeaderPanels(tab);
         }
@@ -1151,8 +1473,22 @@ namespace LotTraceApp
 
             HideBottleInternalColumns(tab.GridStart);
             HideBottleInternalColumns(tab.GridEnd);
+            ApplyTraceGridSortMode(tab.GridStart);
+            ApplyTraceGridSortMode(tab.GridEnd);
             ApplyBottleGridWidthsFromColumns(tab);
             RefreshBottleHeaderPanels(tab);
+        }
+
+        private void ApplyTraceGridSortMode(DataGridView grid)
+        {
+            if (grid == null)
+                return;
+
+            foreach (DataGridViewColumn column in grid.Columns)
+            {
+                if (column != null)
+                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
         }
 
         private void HideBottleInternalColumns(DataGridView grid)
@@ -2388,10 +2724,11 @@ namespace LotTraceApp
                 if (cache == null)
                     continue;
 
-                //if (cache.RowIndex < firstRowIndex || cache.RowIndex > lastRowIndex)
-                //    continue;
+                int rowIndex = cache.RowIndex - 1;
+                if (rowIndex < firstRowIndex || rowIndex > lastRowIndex)
+                    continue;
 
-                Rectangle rect = grid.GetRowDisplayRectangle(cache.RowIndex-1, true);
+                Rectangle rect = grid.GetRowDisplayRectangle(rowIndex, true);
                 if (rect.Height <= 0)
                     continue;
 
@@ -2439,10 +2776,11 @@ namespace LotTraceApp
                 if (cache == null)
                     continue;
 
-                //if (cache.RowIndex < firstRowIndex || cache.RowIndex > lastRowIndex)
-                //    continue;
+                int rowIndex = cache.RowIndex - 1;
+                if (rowIndex < firstRowIndex || rowIndex > lastRowIndex)
+                    continue;
 
-                Rectangle rect = grid.GetRowDisplayRectangle(cache.RowIndex-1, true);
+                Rectangle rect = grid.GetRowDisplayRectangle(rowIndex, true);
                 if (rect.Height <= 0)
                     continue;
 
@@ -3513,9 +3851,14 @@ namespace LotTraceApp
         {
             var grid = sender as DataGridView;
 
-            if (grid.Columns.Contains("Weight"))
+            if (grid.Columns.Contains("Weight") && grid.Columns["Weight"].Visible)
             {
-                dataGridLiquid_CellMouseClick(grid,e);
+                dataGridLiquid_CellMouseClick(grid, e);
+            }
+
+            else if (grid.Columns.Contains("Total_Num") && grid.Columns["Total_Num"].Visible)
+            {
+                DataGridBottle_CellMouseClick(grid, e);
             }
             else
             {
@@ -3533,20 +3876,25 @@ namespace LotTraceApp
 
             // 右クリックした行を選択
 
-            var tab = GetCurrentTabContext();
+            var grid = sender as DataGridView;
+            if (grid == null)
+            {
+                return;
+            }
 
-            tab.GridStart.ClearSelection();
-            tab.GridStart.CurrentCell = tab.GridStart.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            tab.GridStart.Rows[e.RowIndex].Selected = true;
+            grid.ClearSelection();
+            grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            grid.Rows[e.RowIndex].Selected = true;            
 
-            var drv = tab.GridStart.Rows[e.RowIndex].DataBoundItem as DataRowView;
+            var drv = grid.Rows[e.RowIndex].DataBoundItem as DataRowView;
             if (drv == null) return;
 
             DataRow r = drv.Row;
             string Get(string col) =>
                 r.Table.Columns.Contains(col) && r[col] != DBNull.Value ? Convert.ToString(r[col]) : "";
 
-            string productionOrderNumber = Get("OrderNumber");
+            
+                        string productionOrderNumber = Get("OrderNumber");
             string itemCode = Get("ItemCode");
             string itemName = Get("ItemName");
             string lotNumber = Get("Lot");
@@ -3562,5 +3910,46 @@ namespace LotTraceApp
 
 
         #endregion
+
+
+        private void DataGridBottle_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+            if (e.RowIndex < 0) return; // ヘッダ除外
+
+            var grid = sender as DataGridView;
+            if (grid == null)
+            {
+                return;
+            }
+
+
+            // 右クリック行を選択状態にする（任意）
+            grid.ClearSelection();
+            grid.Rows[e.RowIndex].Selected = true;
+            if (e.ColumnIndex >= 0)
+                grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+            var row = grid.Rows[e.RowIndex];
+
+            BottleNodeInfo node = new BottleNodeInfo();
+
+            node.OrderNumber = Convert.ToString(row.Cells["OrderNumber"].Value);
+            node.ProductLotNo = Convert.ToString(row.Cells["Lot"].Value);
+            node.ProductItemCode = Convert.ToString(row.Cells["ItemCode"].Value);
+            node.ProductItemName = Convert.ToString(row.Cells["ItemName"].Value);
+
+            if (new[] { node.OrderNumber, node.ProductLotNo }.Any(string.IsNullOrWhiteSpace))
+            {
+                return;
+            }
+
+            using (var f = new BottleResult(_bottleResultService, node))
+            {
+                f.ShowDialog (this);
+            }
+            
+        }
+
     }
 }

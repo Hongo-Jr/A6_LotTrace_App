@@ -99,6 +99,9 @@ namespace LotTraceApp
             var bottleRepo = new BottleTraceRepository(connBottle,liquidRepo);
             var bottleService = new BottleTraceService(bottleRepo, customerItemRepo);
 
+            var bottleResultRepo = new BottleResultRepositories(connBottle);
+            var bottleResultService = new BottleResultService(bottleResultRepo);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -113,7 +116,7 @@ namespace LotTraceApp
                     return;
                 }
 
-                var form = new MainForm(liquidService, bottleService, resultService);
+                var form = new MainForm(liquidService, bottleService, resultService,bottleResultService);
 
                 if (options.Mode == 2)
                 {
@@ -126,7 +129,7 @@ namespace LotTraceApp
                 return;
             }
 
-            Application.Run(new MainForm(liquidService, bottleService, resultService));
+            Application.Run(new MainForm(liquidService, bottleService, resultService, bottleResultService));
         }
 
         private static void RunHeadlessCommandLine(MainForm form, CommandLineOptions options)

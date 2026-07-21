@@ -1,11 +1,13 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using LotTraceApp.Forms;
+using LotTraceApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LotTraceApp.Models;
 
 
 namespace LotTraceApp.Repositories
@@ -41,6 +43,12 @@ namespace LotTraceApp.Repositories
         public List<ProductionResultNode> FindStartNodesFromMaterialTableA(TraceSearchParameters p)
         {
             var list = new List<ProductionResultNode>();
+
+            if (string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode))
+            {
+                return list;
+            }
+
             var uniqueMasterKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             
@@ -462,6 +470,12 @@ namespace LotTraceApp.Repositories
     TraceSearchParameters p)
         {
             var list = new List<ProductionResultNode>();
+
+            if (string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode))
+            {
+                return list;
+            }
+
             var uniqueNodeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             
@@ -793,6 +807,12 @@ namespace LotTraceApp.Repositories
     TraceSearchParameters p)
         {
             var result = new List<ChildCandidate>();
+
+            if (string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode))
+            {
+                return result;
+            }
+
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             var d1 = FindForwardStartDCandidatesFromDrumHit(p);

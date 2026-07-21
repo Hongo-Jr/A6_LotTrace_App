@@ -74,6 +74,11 @@ namespace LotTraceApp.Repositories
         public List<ProductionResultNode> B_GetStartNodesFromA(TraceSearchParameters p)
         {
             var result = new List<ProductionResultNode>();
+            if(string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode))
+            {
+                return result;
+            }
+            
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -285,14 +290,14 @@ namespace LotTraceApp.Repositories
 
             if (p != null && p.From.HasValue)
             {
-                sql.AppendLine("  AND " + alias + ".StartDate >= @From");
+                sql.AppendLine("  AND " + alias + ".FillingStartDate >= @From");
                 if (!cmd.Parameters.Contains("@From"))
                     cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
             }
 
             if (p != null && p.To.HasValue)
             {
-                sql.AppendLine("  AND " + alias + ".StartDate <= @To");
+                sql.AppendLine("  AND " + alias + ".FillingStartDate <= @To");
                 if (!cmd.Parameters.Contains("@To"))
                     cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
             }
@@ -584,9 +589,9 @@ namespace LotTraceApp.Repositories
         {
             var sql = new StringBuilder();
 
-            sql.AppendLine("SELECT fo.OrderNumber,fb.ProductLotNumber,fb.ProductItemCode,fo.FillingBottleNumberResult_OK,fo.FillingBottleNumberResult_NG,fo.StartDate,fo.EndDate, fb.MiddleProductLotNumber");
+            sql.AppendLine("SELECT fo.OrderNumber,fb.ProductLotNumber,fb.ProductItemCode,fo.FillingBottleNumberResult_OK,fo.FillingBottleNumberResult_NG,fb.FillingStartDate, fb.FillingEndDate, fb.MiddleProductLotNumber");
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
-            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode,MiddleProductLotNumber");
+            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode,MiddleProductLotNumber,FillingStartDate,FillingEndDate");
             sql.AppendLine(" FROM FillingBottleTable) fb");
             sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");
@@ -635,9 +640,9 @@ namespace LotTraceApp.Repositories
         {
             var sql = new StringBuilder();
 
-            sql.AppendLine("SELECT fo.OrderNumber,fd.ProductLotNumber,fd.ProductItemCode,fo.FillingBottleNumberResult_OK,fo.FillingBottleNumberResult_NG,fo.StartDate,fo.EndDate, fd.MiddleProductLotNumber");
+            sql.AppendLine("SELECT fo.OrderNumber,fd.ProductLotNumber,fd.ProductItemCode,fo.FillingBottleNumberResult_OK,fo.FillingBottleNumberResult_NG,fd.FillingStartDate,fd.FillingEndDate, fd.MiddleProductLotNumber");
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
-            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode, MiddleProductLotNumber");
+            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode, MiddleProductLotNumber,FillingStartDate,FillingEndDate");
             sql.AppendLine(" FROM FillingDrumcanTable) fd");
             sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber");
             sql.AppendLine("WHERE 1 = 1");

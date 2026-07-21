@@ -787,7 +787,7 @@ namespace LotTraceApp.Models
         {
             get
             {
-                return StartNodes.Count == 0 && MiddleNodes.Count == 0 && EndNodes.Count == 0;
+                return PathRows.Count == 0;
             }
         }
 

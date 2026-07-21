@@ -658,6 +658,7 @@ namespace LotTraceApp
             this.dgvEndBottle.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvEndBottle.Size = new System.Drawing.Size(920, 650);
             this.dgvEndBottle.TabIndex = 31;
+            
             // 
             // rdoBackwardBottle
             // 
