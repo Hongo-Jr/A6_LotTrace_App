@@ -186,9 +186,9 @@ namespace LotTraceApp
 
         private sealed class TraceSearchWorkResult
         {
-            public TraceResult Result { get; set; }
-            public TraceDisplayResult DisplayResult { get; set; }
-            public DataTable DisplayTable { get; set; }
+            public TraceResult Result { get; set; } = new();
+            public TraceDisplayResult DisplayResult { get; set; } = new();
+            public DataTable DisplayTable { get; set; } = new();
         }
         private readonly GridPaintCache _gridPaintCache = new GridPaintCache();
 
@@ -199,8 +199,8 @@ namespace LotTraceApp
             public Color GroupBackColor { get; set; }
             public Color GroupForeColor { get; set; }
             public Color BorderColor { get; set; }
-            public Font GroupFont { get; set; }
-            public Font ColumnFont { get; set; }
+            public Font GroupFont { get; set; } = SystemFonts.DefaultFont;
+            public Font ColumnFont { get; set; } = SystemFonts.DefaultFont;
         }
         // タブごとの表示テーブルも保持（切替時に再表示するため）
         private readonly Dictionary<int, DataTable> _tabDisplayTables = new Dictionary<int, DataTable>();
@@ -2946,7 +2946,7 @@ namespace LotTraceApp
 
         private TraceSearchWorkResult ExecuteTraceWork(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

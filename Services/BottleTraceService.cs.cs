@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using LotTraceApp.Models;
+﻿using LotTraceApp.Models;
 using LotTraceApp.Repositories;
 using System;
 using System.Collections.Generic;
@@ -50,7 +49,7 @@ namespace LotTraceApp.Services
 
         public BottleTraceResult B_TraceForwardResult(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress = null,
+            IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (p == null) throw new ArgumentNullException("p");
@@ -99,7 +98,7 @@ namespace LotTraceApp.Services
         
         public BottleTraceResult B_TraceBackwardResult(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress = null,
+            IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
 
@@ -149,7 +148,7 @@ namespace LotTraceApp.Services
         #region 汎用
 
 
-        private static void ReportProgress(IProgress<TraceProgressState> progress, string message, int? percent = null)
+        private static void ReportProgress(IProgress<TraceProgressState>? progress, string message, int? percent = null)
         {
             if (progress != null)
                 progress.Report(new TraceProgressState(message, percent));
@@ -157,7 +156,7 @@ namespace LotTraceApp.Services
 
         private List<BottleDisplayGroup> B_BuildDisplaylane(
             List<BottleCandidate> candidates,
-            IProgress<TraceProgressState> progress = null,
+            IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = new List<BottleDisplayGroup>();
@@ -192,7 +191,7 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private void ResolveLiquidNodeComplements(List<BottleDisplayGroup> displayGroups)
+        private void ResolveLiquidNodeComplements(List<BottleDisplayGroup>? displayGroups)
         {
             if (displayGroups == null || displayGroups.Count == 0)
                 return;
@@ -211,37 +210,41 @@ namespace LotTraceApp.Services
             ResolveLiquidStartDateLabels(nodes.Where(IsRouteSystemA));
         }
 
-        private bool IsRouteSystemA(ProductionResultNode node)
+        private bool IsRouteSystemA(ProductionResultNode? node)
         {
             return node != null &&
                 string.Equals(node.RouteSystem, "A", StringComparison.OrdinalIgnoreCase);
         }
 
-        private void ResolveLiquidItemNames(IEnumerable<ProductionResultNode> nodes)
+        private void ResolveLiquidItemNames(
+    IEnumerable<ProductionResultNode?>? nodes)
         {
             if (nodes == null || _customerItemMasterRepository == null)
+            {
                 return;
+            }
 
             var nodeList = nodes
-                .Where(n => n != null && !string.IsNullOrWhiteSpace(n.ItemCode))
+                .OfType<ProductionResultNode>()
+                .Where(node => !string.IsNullOrWhiteSpace(node.ItemCode))
                 .ToList();
 
             if (nodeList.Count == 0)
+            {
                 return;
+            }
 
             var itemCodes = nodeList
-                .Select(n => n.ItemCode.Trim())
+                .Select(node => node.ItemCode!.Trim())
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
-            if (itemCodes.Count == 0)
-                return;
 
             Dictionary<string, string> itemNameMap;
 
             try
             {
-                itemNameMap = _customerItemMasterRepository.GetItemNamesByCodes(itemCodes);
+                itemNameMap =
+                    _customerItemMasterRepository.GetItemNamesByCodes(itemCodes);
             }
             catch
             {
@@ -250,15 +253,23 @@ namespace LotTraceApp.Services
 
             foreach (var node in nodeList)
             {
-                string itemName;
-                if (itemNameMap.TryGetValue(node.ItemCode.Trim(), out itemName))
+                var itemCode = node.ItemCode;
+
+                if (string.IsNullOrWhiteSpace(itemCode))
+                {
+                    continue;
+                }
+
+                if (itemNameMap.TryGetValue(
+                    itemCode.Trim(),
+                    out var itemName))
                 {
                     node.ItemName = itemName;
                 }
             }
         }
 
-        private void ResolveLiquidStartDateLabels(IEnumerable<ProductionResultNode> nodes)
+        private void ResolveLiquidStartDateLabels(IEnumerable<ProductionResultNode?> nodes)
         {
             if (nodes == null)
                 return;
@@ -343,7 +354,7 @@ namespace LotTraceApp.Services
 
         private BottleDisplayTables B_BuildDisplayTable(
             List<BottleDisplayGroup> groups,
-            IProgress<TraceProgressState> progress = null,
+            IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var liquid = new DataTable();
@@ -449,24 +460,45 @@ namespace LotTraceApp.Services
 
         }
 
-        public void B_SetLiquidNode(BottleDisplayTables tables, BottleDisplayLaneNode liquid)
+        public void B_SetLiquidNode(
+    BottleDisplayTables tables,
+    BottleDisplayLaneNode liquid)
         {
-            string OrderNumber = liquid.SourceLiquidNode.ProductionOrderNumber;
-            string Lot = liquid.SourceLiquidNode.LotNumber;
-            string ItemName = liquid.SourceLiquidNode.ItemName;
-            string StartDate = liquid.SourceLiquidNode.StartDate.HasValue
-                ? liquid.SourceLiquidNode.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
-                : liquid.SourceLiquidNode.StartDateLabel;
-            object Weight = liquid.SourceLiquidNode.Weight == null ? (object)DBNull.Value: liquid.SourceLiquidNode.Weight;
-            string NodeKey = liquid.SourceLiquidNode.NodeIdentityKey;
-            string DisplayKey = liquid.DisplayNodeKey;
-            string ItemCode = liquid.SourceLiquidNode.ItemCode;
-            string MasterKey = liquid.SourceLiquidNode.ControlMasterKey;
-            string StartDateLabel = liquid.SourceLiquidNode.StartDateLabel;
-            string InputSourceType = liquid.SourceLiquidNode.InputSourceType;
+            var sourceNode = liquid.SourceLiquidNode
+                ?? throw new InvalidOperationException(
+                    "BottleDisplayLaneNode.SourceLiquidNodeが設定されていません。");
 
-            tables.LiquidTable.Rows.Add(OrderNumber, Lot, ItemName, StartDate, Weight, NodeKey, DisplayKey, ItemCode, MasterKey, StartDateLabel, InputSourceType);
+            string? orderNumber = sourceNode.ProductionOrderNumber;
+            string? lot = sourceNode.LotNumber;
+            string? itemName = sourceNode.ItemName;
 
+            string? startDate = sourceNode.StartDate.HasValue
+                ? sourceNode.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
+                : sourceNode.StartDateLabel;
+
+            object weight = sourceNode.Weight.HasValue
+                ? sourceNode.Weight.Value
+                : DBNull.Value;
+
+            string nodeKey = sourceNode.NodeIdentityKey;
+            string? displayKey = liquid.DisplayNodeKey;
+            string? itemCode = sourceNode.ItemCode;
+            string? masterKey = sourceNode.ControlMasterKey;
+            string? startDateLabel = sourceNode.StartDateLabel;
+            string? inputSourceType = sourceNode.InputSourceType;
+
+            tables.LiquidTable.Rows.Add(
+                orderNumber,
+                lot,
+                itemName,
+                startDate,
+                weight,
+                nodeKey,
+                displayKey,
+                itemCode,
+                masterKey,
+                startDateLabel,
+                inputSourceType);
         }
 
 
@@ -501,21 +533,41 @@ namespace LotTraceApp.Services
 
         }
 
-        private void B_SetBottleNode(BottleDisplayTables tables, BottleDisplayLaneNode bottle)
+        private void B_SetBottleNode(
+    BottleDisplayTables tables,
+    BottleDisplayLaneNode bottle)
         {
-            string OrderNumber = bottle.SourceBottleNode.OrderNumber;
-            string Lot = bottle.SourceBottleNode.ProductLotNumber;
-            string ItemName = bottle.SourceBottleNode.ProductItemName;
-            string StartDate = bottle.SourceBottleNode.StartDate.ToString();
-            int OK_Num = bottle.SourceBottleNode.FillingBottleNum_OK;
-            int NG_Num = bottle.SourceBottleNode.FillingBottleNum_NG;
-            int Total_Num = bottle.SourceBottleNode.FillingBottleNum_Total;
+            var sourceNode = bottle.SourceBottleNode
+                ?? throw new InvalidOperationException(
+                    "BottleDisplayLaneNode.SourceBottleNodeが設定されていません。");
 
-            string NodeKey = bottle.SourceBottleNode.NodeIdentifyKey;
-            string DisplayKey = bottle.DisplayNodeKey;
-            string ItemCode = bottle.SourceBottleNode.ProductItemCode;
+            string? orderNumber = sourceNode.OrderNumber;
+            string? lot = sourceNode.ProductLotNumber;
+            string? itemName = sourceNode.ProductItemName;
+            string? startDate = sourceNode.StartDate.ToString();
 
-            tables.BottleTable.Rows.Add( OrderNumber, Lot, ItemName, StartDate, OK_Num, NG_Num, Total_Num, NodeKey, DisplayKey, ItemCode, null, null, null);
+            int okNum = sourceNode.FillingBottleNum_OK;
+            int ngNum = sourceNode.FillingBottleNum_NG;
+            int totalNum = sourceNode.FillingBottleNum_Total;
+
+            string nodeKey = sourceNode.NodeIdentifyKey;
+            string? displayKey = bottle.DisplayNodeKey;
+            string? itemCode = sourceNode.ProductItemCode;
+
+            tables.BottleTable.Rows.Add(
+                orderNumber,
+                lot,
+                itemName,
+                startDate,
+                okNum,
+                ngNum,
+                totalNum,
+                nodeKey,
+                displayKey,
+                itemCode,
+                null,
+                null,
+                null);
         }
 
         private void B_AdjustTableRow(BottleDisplayTables tables)

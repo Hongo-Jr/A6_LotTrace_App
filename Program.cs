@@ -1,12 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows.Forms;
-using LotTraceApp.Models;
+﻿using LotTraceApp.Models;
 using LotTraceApp.Repositories;
 using LotTraceApp.Services;
 using LotTraceApp.Utils;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace LotTraceApp
 {
@@ -21,6 +22,7 @@ namespace LotTraceApp
         [STAThread]
         private static void Main(string[] args)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             bool createdNew;
             using (var singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out createdNew))
             {

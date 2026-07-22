@@ -1,13 +1,11 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Office.Word;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿
 using LotTraceApp.Forms;
 using LotTraceApp.Models;
 using LotTraceApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
@@ -105,7 +103,7 @@ namespace LotTraceApp.Repositories
                         node.Weight = reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
                         node.ControlMasterKey = reader.IsDBNull(3) ? null : reader.GetString(3);
                         node.RouteSystem = reader.IsDBNull(5) ? null : reader.GetString(5);
-                        string SlotNoText = reader.IsDBNull(6) ? null : reader.GetString(6);
+                        string? SlotNoText = reader.IsDBNull(6) ? null : reader.GetString(6);
                         int slotNo = 0;
                         int.TryParse(SlotNoText, out slotNo);
                         node.InputSlotNo = slotNo;
@@ -248,10 +246,10 @@ namespace LotTraceApp.Repositories
 
         private void B_AppendStartNodeSearchConditions(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, bool includeStartDate)
         {
-            B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+            B_AppendSearchParameterCondition(p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
            
             
-            B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
+            B_AppendSearchParameterCondition(p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
 
             B_AppendItemCodeCondition(p, cmd, sql, alias, "ItemCode", "@ItemCode");
 
@@ -277,10 +275,10 @@ namespace LotTraceApp.Repositories
 
         private void B_BottleAppendStartNodeSearchConditions(TraceSearchParameters p, SqlCommand cmd, StringBuilder sql, string alias, bool includeStartDate)
         {
-            B_AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "OrderNumber", "@Order");
+            B_AppendSearchParameterCondition(p.ProductionOrderNumber, cmd, sql, alias, "OrderNumber", "@Order");
 
 
-            B_AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "ProductLotNumber", "@Lot");
+            B_AppendSearchParameterCondition(p.LotNumber, cmd, sql, alias, "ProductLotNumber", "@Lot");
 
             B_AppendItemCodeCondition(p, cmd, sql, alias, "ProductItemCode", "@ItemCode");
 
@@ -304,7 +302,7 @@ namespace LotTraceApp.Repositories
         }
 
         public void B_AppendSearchParameterCondition(
-            string rawValue,
+            string? rawValue,
             SqlCommand cmd,
             StringBuilder sql,
             string alias,
@@ -413,9 +411,14 @@ namespace LotTraceApp.Repositories
             return result;
         }
 
-        private List<Bottle_ProductionResultNode> B_FindForwardBottleNodes(string midLot)
+        private List<Bottle_ProductionResultNode> B_FindForwardBottleNodes(string? midLot)
         {
             var result = new List<Bottle_ProductionResultNode>();
+
+            if (midLot == null)
+            {
+                return result;
+            }                
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -459,9 +462,14 @@ namespace LotTraceApp.Repositories
             
             return sql.ToString();
         }
-        private List<Bottle_ProductionResultNode> B_FindForwardDrumNodes(string midLot)
+        private List<Bottle_ProductionResultNode> B_FindForwardDrumNodes(string? midLot)
         {
             var result = new List<Bottle_ProductionResultNode>();
+
+            if (midLot == null)
+            {
+                return result;
+            }   
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -687,9 +695,14 @@ namespace LotTraceApp.Repositories
             return result;
         }
 
-        public List<ProductionResultNode> B_GetBackwardNodesFromA(string midLot)
+        public List<ProductionResultNode> B_GetBackwardNodesFromA(string? midLot)
         {
             var result = new List<ProductionResultNode>();
+
+            if (midLot == null)
+            {
+                return result;
+            }   
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())
@@ -717,7 +730,7 @@ namespace LotTraceApp.Repositories
                         node.Weight = reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
                         node.ControlMasterKey = reader.IsDBNull(3) ? null : reader.GetString(3);
                         node.RouteSystem = reader.IsDBNull(5) ? null : reader.GetString(5);
-                        string SlotNoText = reader.IsDBNull(6) ? null : reader.GetString(6);
+                        string? SlotNoText = reader.IsDBNull(6) ? null : reader.GetString(6);
                         int slotNo = 0;
                         int.TryParse(SlotNoText, out slotNo);
                         node.InputSlotNo = slotNo;
@@ -775,9 +788,14 @@ namespace LotTraceApp.Repositories
             return sql.ToString();
         }
 
-        public List<ProductionResultNode> B_GetBackwardNodesFromB(string midLot)
+        public List<ProductionResultNode> B_GetBackwardNodesFromB(string? midLot)
         {
             var result = new List<ProductionResultNode>();
+
+            if (midLot == null)
+            {
+                return result;
+            }
 
             using (var conn = CreateConnection())
             using (var cmd = conn.CreateCommand())

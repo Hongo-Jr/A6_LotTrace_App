@@ -4,7 +4,7 @@ using LotTraceApp.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 
 namespace LotTraceApp.Repositories
@@ -109,7 +109,7 @@ namespace LotTraceApp.Repositories
 
             foreach (var code in normalizedCodes)
             {
-                string cachedName;
+                string? cachedName;
                 if (_itemNameCache.TryGetValue(code, out cachedName))
                 {
                     result[code] = cachedName;
@@ -158,11 +158,11 @@ namespace LotTraceApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        string itemCode = reader[settings.ItemCodeColumnName] == DBNull.Value
+                        string? itemCode = reader[settings.ItemCodeColumnName] == DBNull.Value
                             ? null
                             : Convert.ToString(reader[settings.ItemCodeColumnName]);
 
-                        string itemName = reader[settings.ItemNameColumnName] == DBNull.Value
+                        string? itemName = reader[settings.ItemNameColumnName] == DBNull.Value
                             ? null
                             : Convert.ToString(reader[settings.ItemNameColumnName]);
 
@@ -183,7 +183,7 @@ namespace LotTraceApp.Repositories
 
             foreach (var code in codesToFetch)
             {
-                string itemName;
+                string? itemName;
                 if (fetched.TryGetValue(code, out itemName))
                 {
                     _itemNameCache[code] = itemName;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -563,7 +563,7 @@ ORDER BY
             return list;
         }
 
-        private static object GetValue(DataRow row, string columnName)
+        private static object? GetValue(DataRow row, string columnName)
         {
             if (row == null || row.Table == null || !row.Table.Columns.Contains(columnName))
             {
@@ -574,7 +574,7 @@ ORDER BY
             return value == DBNull.Value ? null : value;
         }
 
-        private static string ToNullableString(DataRow row, string columnName)
+        private static string? ToNullableString(DataRow row, string columnName)
         {
             var value = GetValue(row, columnName);
             return value == null ? null : value.ToString();
