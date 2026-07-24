@@ -10,7 +10,7 @@ namespace LotTraceApp.Utils
         public static void ExportCurrentGridsToCsv(
             string filePath,
             DataGridView dgvLeft,
-            DataGridView dgvMiddle,
+            DataGridView? dgvMiddle,
             DataGridView dgvRight)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -25,11 +25,11 @@ namespace LotTraceApp.Utils
 
             for (int rowIndex = 0; rowIndex < visibleRows.MaxVisibleRowCount; rowIndex++)
             {
-                var values = new List<string>();
+                var values = new List<string?>();
 
                 foreach (var plan in plans)
                 {
-                    DataGridViewRow row = GetVisibleRow(visibleRows, plan.Area, rowIndex);
+                    DataGridViewRow? row = GetVisibleRow(visibleRows, plan.Area, rowIndex);
                     values.Add(GetCellText(row, plan.GridColumn));
                 }
 
@@ -41,7 +41,7 @@ namespace LotTraceApp.Utils
 
         private static List<CsvColumnPlan> BuildExportColumnPlans(
             DataGridView dgvLeft,
-            DataGridView dgvMiddle,
+            DataGridView? dgvMiddle,
             DataGridView dgvRight)
         {
             var result = new List<CsvColumnPlan>();
@@ -54,8 +54,8 @@ namespace LotTraceApp.Utils
         }
 
         private static void AddGridPlans(
-            List<CsvColumnPlan> plans,
-            DataGridView dgv,
+            List<CsvColumnPlan>? plans,
+            DataGridView? dgv,
             CsvGridArea area)
         {
             if (plans == null || dgv == null)
@@ -77,7 +77,7 @@ namespace LotTraceApp.Utils
 
         private static CsvVisibleRowMaps BuildVisibleRowMaps(
             DataGridView dgvLeft,
-            DataGridView dgvMiddle,
+            DataGridView? dgvMiddle,
             DataGridView dgvRight)
         {
             var maps = new CsvVisibleRowMaps();
@@ -90,7 +90,7 @@ namespace LotTraceApp.Utils
             return maps;
         }
 
-        private static List<DataGridViewRow> GetVisibleRows(DataGridView dgv)
+        private static List<DataGridViewRow> GetVisibleRows(DataGridView? dgv)
         {
             var list = new List<DataGridViewRow>();
             if (dgv == null)
@@ -107,7 +107,7 @@ namespace LotTraceApp.Utils
             return list;
         }
 
-        private static DataGridViewRow GetVisibleRow(
+        private static DataGridViewRow? GetVisibleRow(
             CsvVisibleRowMaps visibleRows,
             CsvGridArea area,
             int rowIndex)
@@ -137,7 +137,7 @@ namespace LotTraceApp.Utils
             return rows[rowIndex];
         }
 
-        private static string GetCellText(DataGridViewRow row, DataGridViewColumn column)
+        private static string? GetCellText(DataGridViewRow? row, DataGridViewColumn? column)
         {
             if (row == null || column == null)
                 return string.Empty;
@@ -146,7 +146,7 @@ namespace LotTraceApp.Utils
             return value == null ? string.Empty : Convert.ToString(value);
         }
 
-        private static string BuildCsvLine(List<string> values)
+        private static string BuildCsvLine(List<string?>? values)
         {
             if (values == null || values.Count == 0)
                 return string.Empty;
@@ -164,7 +164,7 @@ namespace LotTraceApp.Utils
             return sb.ToString();
         }
 
-        private static string EscapeCsv(string value)
+        private static string? EscapeCsv(string? value)
         {
             if (value == null)
                 return string.Empty;
@@ -191,8 +191,8 @@ namespace LotTraceApp.Utils
         private sealed class CsvColumnPlan
         {
             public CsvGridArea Area { get; set; }
-            public DataGridViewColumn GridColumn { get; set; }
-            public string HeaderText { get; set; }
+            public DataGridViewColumn? GridColumn { get; set; }
+            public string? HeaderText { get; set; }
         }
 
         private sealed class CsvVisibleRowMaps

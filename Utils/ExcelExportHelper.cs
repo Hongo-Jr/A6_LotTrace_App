@@ -52,28 +52,28 @@ namespace LotTraceApp.Utils
 
         public sealed class TraceGridExcelExportRequest
         {
-            public string WorksheetName { get; set; }
-            public DataGridView LeftGrid { get; set; }
-            public DataGridView MiddleGrid { get; set; }
-            public DataGridView RightGrid { get; set; }
-            public TraceDisplayResult DisplayResult { get; set; }
-            public TraceGridDrawContext DrawContext { get; set; }
-            public ISet<string> CrossPointNodeKeys { get; set; }
+            public string? WorksheetName { get; set; }
+            public DataGridView? LeftGrid { get; set; }
+            public DataGridView? MiddleGrid { get; set; }
+            public DataGridView? RightGrid { get; set; }
+            public TraceDisplayResult? DisplayResult { get; set; }
+            public TraceGridDrawContext? DrawContext { get; set; }
+            public ISet<string>? CrossPointNodeKeys { get; set; }
         }
 
         public sealed class DataTableExcelExportRequest
         {
-            public string WorksheetName { get; set; }
-            public DataTable Table { get; set; }
+            public string? WorksheetName { get; set; }
+            public DataTable? Table { get; set; }
         }
 
         public sealed class BottleTraceGridExcelExportRequest
         {
-            public string WorksheetName { get; set; }
-            public DataGridView LeftGrid { get; set; }
-            public DataGridView RightGrid { get; set; }
-            public IEnumerable<BottleLineRanges> LineRanges { get; set; }
-            public ISet<string> CrossPointNodeKeys { get; set; }
+            public string? WorksheetName { get; set; }
+            public DataGridView? LeftGrid { get; set; }
+            public DataGridView? RightGrid { get; set; }
+            public IEnumerable<BottleLineRanges>? LineRanges { get; set; }
+            public ISet<string>? CrossPointNodeKeys { get; set; }
         }
 
         public static void ExportCurrentGridsToExcel(
@@ -84,7 +84,7 @@ namespace LotTraceApp.Utils
     string worksheetName,
     TraceDisplayResult displayResult,
     TraceGridDrawContext drawContext,
-    ISet<string> crossPointNodeKeys = null)
+    ISet<string>? crossPointNodeKeys = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("filePath is null or empty.", nameof(filePath));
@@ -118,7 +118,7 @@ namespace LotTraceApp.Utils
         public static void ExportTraceSheetsToExcel(
             string filePath,
             IEnumerable<TraceGridExcelExportRequest> traceSheets,
-            DataGridView intersectionGrid,
+            DataGridView? intersectionGrid,
             string intersectionWorksheetName)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -212,7 +212,7 @@ namespace LotTraceApp.Utils
         public static void ExportBottleTraceSheetsToExcel(
             string filePath,
             IEnumerable<BottleTraceGridExcelExportRequest> traceSheets,
-            DataGridView intersectionGrid,
+            DataGridView? intersectionGrid,
             string intersectionWorksheetName)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -254,14 +254,14 @@ namespace LotTraceApp.Utils
         }
 
         private static void WriteTraceSheet(
-            XLWorkbook wb,
-            string worksheetName,
-            DataGridView dgvLeft,
-            DataGridView dgvMiddle,
-            DataGridView dgvRight,
-            TraceDisplayResult displayResult,
-            TraceGridDrawContext drawContext,
-            ISet<string> crossPointNodeKeys)
+            XLWorkbook? wb,
+            string? worksheetName,
+            DataGridView? dgvLeft,
+            DataGridView? dgvMiddle,
+            DataGridView? dgvRight,
+            TraceDisplayResult? displayResult,
+            TraceGridDrawContext? drawContext,
+            ISet<string>? crossPointNodeKeys)
         {
             if (wb == null)
                 throw new ArgumentNullException(nameof(wb));
@@ -294,7 +294,7 @@ namespace LotTraceApp.Utils
         private static void WriteDataGridSheet(
             XLWorkbook wb,
             string worksheetName,
-            DataGridView grid)
+            DataGridView? grid)
         {
             if (wb == null)
                 throw new ArgumentNullException(nameof(wb));
@@ -342,7 +342,7 @@ namespace LotTraceApp.Utils
 
         private static void WriteDataTableSheet(
             XLWorkbook wb,
-            string worksheetName,
+            string? worksheetName,
             DataTable table)
         {
             if (wb == null)
@@ -412,7 +412,7 @@ namespace LotTraceApp.Utils
             for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
             {
                 int excelRow = FirstBodyExcelRow + rowIndex;
-                DataGridViewRow heightSource = rowIndex < leftRows.Count ? leftRows[rowIndex] :
+                DataGridViewRow? heightSource = rowIndex < leftRows.Count ? leftRows[rowIndex] :
                     (rowIndex < rightRows.Count ? rightRows[rowIndex] : null);
                 if (heightSource != null)
                     ws.Row(excelRow).Height = ConvertPixelToExcelRowHeight(heightSource.Height);
@@ -454,7 +454,7 @@ namespace LotTraceApp.Utils
 
         private static void WriteBottleColumnHeaders(
             IXLWorksheet ws,
-            DataGridView grid,
+            DataGridView? grid,
             List<DataGridViewColumn> columns,
             int startColumn)
         {
@@ -476,16 +476,16 @@ namespace LotTraceApp.Utils
             List<DataGridViewColumn> columns,
             int rowIndex,
             int startColumn,
-            ISet<string> crossPointNodeKeys)
+            ISet<string>? crossPointNodeKeys)
         {
-            DataGridViewRow gridRow = rowIndex < rows.Count ? rows[rowIndex] : null;
+            DataGridViewRow? gridRow = rowIndex < rows.Count ? rows[rowIndex] : null;
             int excelRow = FirstBodyExcelRow + rowIndex;
 
             for (int colIndex = 0; colIndex < columns.Count; colIndex++)
             {
                 var column = columns[colIndex];
                 var xlCell = ws.Cell(excelRow, startColumn + colIndex);
-                DataGridViewCell gridCell = gridRow == null ? null : gridRow.Cells[column.Index];
+                DataGridViewCell? gridCell = gridRow == null ? null : gridRow.Cells[column.Index];
 
                 WriteCellValue(xlCell, gridCell);
                 ApplySimpleGridCellStyle(xlCell, gridCell);
@@ -504,8 +504,8 @@ namespace LotTraceApp.Utils
         }
 
         private static void ApplyBottleTraceLines(
-            IXLWorksheet ws,
-            IEnumerable<BottleLineRanges> lineRanges,
+            IXLWorksheet? ws,
+            IEnumerable<BottleLineRanges>? lineRanges,
             int totalColumns,
             int maxRows)
         {
@@ -549,12 +549,12 @@ namespace LotTraceApp.Utils
             }
         }
 
-        private static void ApplyBottleRuntimeForeColor(IXLCell xlCell, DataGridViewRow row)
+        private static void ApplyBottleRuntimeForeColor(IXLCell? xlCell, DataGridViewRow? row)
         {
             if (xlCell == null || row == null)
                 return;
 
-            string nodeKey = GetRowValue(row, "NodeKey");
+            string? nodeKey = GetRowValue(row, "NodeKey");
             if (string.IsNullOrWhiteSpace(nodeKey))
                 return;
 
@@ -562,14 +562,14 @@ namespace LotTraceApp.Utils
         }
 
         private static void ApplyBottleRuntimeCrossPointBackColor(
-            IXLCell xlCell,
-            DataGridViewRow row,
-            ISet<string> crossPointNodeKeys)
+            IXLCell? xlCell,
+            DataGridViewRow? row,
+            ISet<string>? crossPointNodeKeys)
         {
             if (xlCell == null || row == null || crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
                 return;
 
-            string uiKey = BuildBottleCrossPointUiKeyFromRow(row);
+            string? uiKey = BuildBottleCrossPointUiKeyFromRow(row);
             if (string.IsNullOrWhiteSpace(uiKey) || !crossPointNodeKeys.Contains(uiKey))
                 return;
 
@@ -577,15 +577,15 @@ namespace LotTraceApp.Utils
             xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(GetCrossPointNodeBackColor(uiKey));
         }
 
-        private static string BuildBottleCrossPointUiKeyFromRow(DataGridViewRow row)
+        private static string? BuildBottleCrossPointUiKeyFromRow(DataGridViewRow row)
         {
             if (row == null)
                 return null;
 
-            string masterKey = GetRowValue(row, "MasterKey");
-            string nodeKey = GetRowValue(row, "NodeKey");
-            string startDateLabel = GetRowValue(row, "StartDateLabel");
-            string inputSourceType = GetRowValue(row, "InputSourceType");
+            string? masterKey = GetRowValue(row, "MasterKey");
+            string? nodeKey = GetRowValue(row, "NodeKey");
+            string? startDateLabel = GetRowValue(row, "StartDateLabel");
+            string? inputSourceType = GetRowValue(row, "InputSourceType");
 
             bool isManual =
                 string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
@@ -600,7 +600,7 @@ namespace LotTraceApp.Utils
             return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
         }
 
-        private static bool HasVisibleData(DataGridView grid)
+        private static bool HasVisibleData(DataGridView? grid)
         {
             if (grid == null)
                 return false;
@@ -671,7 +671,7 @@ namespace LotTraceApp.Utils
             return maps;
         }
 
-        private static List<DataGridViewRow> GetVisibleRows(DataGridView dgv)
+        private static List<DataGridViewRow> GetVisibleRows(DataGridView? dgv)
         {
             var list = new List<DataGridViewRow>();
             if (dgv == null)
@@ -690,7 +690,7 @@ namespace LotTraceApp.Utils
             return list;
         }
 
-        private static List<DataGridViewColumn> GetVisibleColumns(DataGridView dgv)
+        private static List<DataGridViewColumn> GetVisibleColumns(DataGridView? dgv)
         {
             var list = new List<DataGridViewColumn>();
             if (dgv == null)
@@ -770,7 +770,7 @@ namespace LotTraceApp.Utils
                 var plan = plans[i];
                 var cell = ws.Cell(ColumnHeaderExcelRow, plan.ExcelColumnIndex);
 
-                cell.Value = NullToEmpty(plan.GridColumn.HeaderText);
+                cell.Value = NullToEmpty(plan.GridColumn?.HeaderText);
                 ApplyColumnHeaderStyle(cell, plan.Grid, plan.GridColumn, plan.Area);
             }
         }
@@ -779,13 +779,13 @@ namespace LotTraceApp.Utils
             IXLWorksheet ws,
             List<ExportColumnPlan> plans,
             VisibleRowMaps visibleRows,
-            ISet<string> crossPointNodeKeys)
+            ISet<string>? crossPointNodeKeys)
         {
             for (int visibleRowIndex = 0; visibleRowIndex < visibleRows.MaxVisibleRowCount; visibleRowIndex++)
             {
                 int excelRow = FirstBodyExcelRow + visibleRowIndex;
 
-                DataGridViewRow baseRow = GetBaseVisibleRow(visibleRows, visibleRowIndex);
+                DataGridViewRow? baseRow = GetBaseVisibleRow(visibleRows, visibleRowIndex);
                 if (baseRow != null)
                 {
                     ws.Row(excelRow).Height = ConvertPixelToExcelRowHeight(baseRow.Height);
@@ -804,7 +804,7 @@ namespace LotTraceApp.Utils
                         continue;
                     }
 
-                    var dgvCell = gridRow.Cells[plan.GridColumn.Index];
+                    DataGridViewCell? dgvCell = plan.GridColumn is { } gridColumn ? gridRow.Cells[gridColumn.Index] : null;
                     WriteCellValue(xlCell, dgvCell);
                     ApplyCellStyle(xlCell, dgvCell, plan, crossPointNodeKeys);
                 }
@@ -815,8 +815,8 @@ namespace LotTraceApp.Utils
     IXLWorksheet ws,
     List<ExportColumnPlan> plans,
     VisibleRowMaps visibleRows,
-    TraceDisplayResult displayResult,
-    TraceGridDrawContext drawContext)
+    TraceDisplayResult? displayResult,
+    TraceGridDrawContext? drawContext)
         {
             ApplyLeftStartBoundaryLinesFromDrawContext(ws, plans, drawContext);
             ApplyMiddleAndRightTraceLinesFromDrawContext(ws, plans, drawContext);
@@ -825,7 +825,7 @@ namespace LotTraceApp.Utils
         private static void ApplyLeftStartBoundaryLinesFromDrawContext(
     IXLWorksheet ws,
     List<ExportColumnPlan> plans,
-    TraceGridDrawContext drawContext)
+    TraceGridDrawContext? drawContext)
         {
             int leftStartCol = GetAreaFirstExcelColumn(plans, GridArea.Left);
             int leftEndCol = GetAreaLastExcelColumn(plans, GridArea.Left);
@@ -858,7 +858,7 @@ namespace LotTraceApp.Utils
         private static void ApplyMiddleAndRightTraceLinesFromDrawContext(
     IXLWorksheet ws,
     List<ExportColumnPlan> plans,
-    TraceGridDrawContext drawContext)
+    TraceGridDrawContext? drawContext)
         {
             if (drawContext == null)
                 return;
@@ -957,8 +957,8 @@ namespace LotTraceApp.Utils
                 if (line == null)
                     continue;
 
-                List<MiddleHorizontalLineDrawInfo> rowLines;
-                if (!grouped.TryGetValue(line.StartRowIndex, out rowLines))
+                
+                if (!grouped.TryGetValue(line.StartRowIndex, out var rowLines))
                 {
                     rowLines = new List<MiddleHorizontalLineDrawInfo>();
                     grouped[line.StartRowIndex] = rowLines;
@@ -977,14 +977,14 @@ namespace LotTraceApp.Utils
             return result;
         }
 
-        private static MiddleHorizontalLineDrawInfo ResolvePreferredMiddleHorizontalLine(
+        private static MiddleHorizontalLineDrawInfo? ResolvePreferredMiddleHorizontalLine(
             List<MiddleHorizontalLineDrawInfo> lines)
         {
             if (lines == null || lines.Count == 0)
                 return null;
 
-            MiddleHorizontalLineDrawInfo firstTrunk = null;
-            MiddleHorizontalLineDrawInfo firstBranch = null;
+            MiddleHorizontalLineDrawInfo? firstTrunk = null;
+            MiddleHorizontalLineDrawInfo? firstBranch = null;
 
             foreach (var line in lines)
             {
@@ -1014,7 +1014,7 @@ namespace LotTraceApp.Utils
             return firstBranch;
         }
 
-        private static Color ResolveTraceLineColor(string lineKind)
+        private static Color ResolveTraceLineColor(string? lineKind)
         {
             switch (lineKind)
             {
@@ -1164,7 +1164,7 @@ namespace LotTraceApp.Utils
         {
             foreach (var plan in plans)
             {
-                double excelWidth = ConvertPixelToExcelColumnWidth(plan.GridColumn.Width);
+                double excelWidth = ConvertPixelToExcelColumnWidth(plan.GridColumn?.Width);
                 ws.Column(plan.ExcelColumnIndex).Width = excelWidth;
             }
         }
@@ -1222,11 +1222,11 @@ namespace LotTraceApp.Utils
 
         private static void ApplyColumnHeaderStyle(
             IXLCell xlCell,
-            DataGridView grid,
-            DataGridViewColumn column,
+            DataGridView? grid,
+            DataGridViewColumn? column,
             GridArea area)
         {
-            DataGridViewCellStyle style = grid != null
+            DataGridViewCellStyle? style = grid != null
                 ? grid.ColumnHeadersDefaultCellStyle
                 : null;
 
@@ -1264,13 +1264,13 @@ namespace LotTraceApp.Utils
 
         private static void ApplyCellStyle(
     IXLCell xlCell,
-    DataGridViewCell dgvCell,
+    DataGridViewCell? dgvCell,
     ExportColumnPlan plan,
-    ISet<string> crossPointNodeKeys)
+    ISet<string>?  crossPointNodeKeys)
         {
-            DataGridView grid = plan != null ? plan.Grid : null;
+            DataGridView? grid = plan != null ? plan.Grid : null;
 
-            DataGridViewCellStyle style = dgvCell != null ? dgvCell.InheritedStyle : null;
+            DataGridViewCellStyle? style = dgvCell != null ? dgvCell.InheritedStyle : null;
             if (style == null)
                 style = grid != null ? grid.DefaultCellStyle : null;
 
@@ -1282,10 +1282,10 @@ namespace LotTraceApp.Utils
         }
 
         private static void ApplyRuntimeCrossPointBackColor(
-    IXLCell xlCell,
-    DataGridViewCell dgvCell,
-    ExportColumnPlan plan,
-    ISet<string> crossPointNodeKeys)
+    IXLCell? xlCell,
+    DataGridViewCell? dgvCell,
+    ExportColumnPlan? plan,
+    ISet<string>? crossPointNodeKeys)
         {
             if (xlCell == null || dgvCell == null || plan == null ||
                 crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
@@ -1300,11 +1300,11 @@ namespace LotTraceApp.Utils
                 : string.Empty;
 
             // ★ここが変更点：Start_/LvX_/End_ を特定して MK|/NK| を組み立てる
-            string prefix = ResolveCrossPointGroupPrefix(columnName);
+            string? prefix = ResolveCrossPointGroupPrefix(columnName);
             if (string.IsNullOrWhiteSpace(prefix))
                 return;
 
-            string uiKey = BuildCrossPointUiKeyFromRow(row, prefix);
+            string? uiKey = BuildCrossPointUiKeyFromRow(row, prefix);
             if (string.IsNullOrWhiteSpace(uiKey) || !crossPointNodeKeys.Contains(uiKey))
                 return;
 
@@ -1322,7 +1322,7 @@ namespace LotTraceApp.Utils
             if (GetRowInt(row, "交点") != 1)
                 return;
 
-            string nodeKey = GetRowValue(row, "NodeKey");
+            string? nodeKey = GetRowValue(row, "NodeKey");
             if (string.IsNullOrWhiteSpace(nodeKey))
                 return;
 
@@ -1331,9 +1331,9 @@ namespace LotTraceApp.Utils
         }
 
         private static void ApplyRuntimeForeColor(
-    IXLCell xlCell,
-    DataGridViewCell dgvCell,
-    ExportColumnPlan plan)
+    IXLCell? xlCell,
+    DataGridViewCell? dgvCell,
+    ExportColumnPlan? plan)
         {
             if (xlCell == null || dgvCell == null || plan == null)
                 return;
@@ -1346,10 +1346,10 @@ namespace LotTraceApp.Utils
                 ? dgvCell.OwningColumn.Name ?? string.Empty
                 : string.Empty;
 
-            string nodeKeyColumnName = ResolveNodeKeyColumnNameForForeColorGrouping(columnName);
+            string? nodeKeyColumnName = ResolveNodeKeyColumnNameForForeColorGrouping(columnName);
             if (!string.IsNullOrWhiteSpace(nodeKeyColumnName))
             {
-                string nodeKey = GetRowValue(row, nodeKeyColumnName);
+                string? nodeKey = GetRowValue(row, nodeKeyColumnName);
                 if (!string.IsNullOrWhiteSpace(nodeKey))
                 {
                     Color nodeKeyColor = GetForeColorForNodeKeyGroup(nodeKey);
@@ -1368,7 +1368,7 @@ namespace LotTraceApp.Utils
             }
         }
 
-        private static string ResolveNodeKeyColumnNameForForeColorGrouping(string columnName)
+        private static string? ResolveNodeKeyColumnNameForForeColorGrouping(string columnName)
         {
             if (string.IsNullOrWhiteSpace(columnName))
                 return null;
@@ -1397,7 +1397,7 @@ namespace LotTraceApp.Utils
 
         private static bool IsDuplicateEndRow(DataGridViewRow row)
         {
-            string value = GetRowValue(row, "End_IsDuplicate");
+            string? value = GetRowValue(row, "End_IsDuplicate");
             if (string.IsNullOrWhiteSpace(value))
                 return false;
 
@@ -1458,7 +1458,7 @@ namespace LotTraceApp.Utils
             return ConvertHsvToColor(hue, saturation, value);
         }
 
-        private static int GetStablePositiveHash(string value)
+        private static int GetStablePositiveHash(string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return 0;
@@ -1499,8 +1499,8 @@ namespace LotTraceApp.Utils
 
         private static void ApplyCommonStyle(
             IXLCell xlCell,
-            DataGridViewCellStyle style,
-            DataGridViewCellStyle fallbackStyle,
+            DataGridViewCellStyle? style,
+            DataGridViewCellStyle? fallbackStyle,
             bool isHeader)
         {
             if (style == null)
@@ -1516,7 +1516,7 @@ namespace LotTraceApp.Utils
                 ? style.ForeColor
                 : (fallbackStyle != null ? fallbackStyle.ForeColor : Color.Empty);
 
-            Font font = style.Font ?? (fallbackStyle != null ? fallbackStyle.Font : null);
+            Font? font = style.Font ?? (fallbackStyle != null ? fallbackStyle.Font : null);
 
             if (!IsColorEmptyLike(backColor))
             {
@@ -1606,13 +1606,13 @@ namespace LotTraceApp.Utils
             ApplyDefaultThinBorder(xlCell);
         }
 
-        private static void ApplySimpleGridCellStyle(IXLCell xlCell, DataGridViewCell dgvCell)
+        private static void ApplySimpleGridCellStyle(IXLCell? xlCell, DataGridViewCell? dgvCell)
         {
             if (xlCell == null)
                 return;
 
-            DataGridView grid = dgvCell == null ? null : dgvCell.DataGridView;
-            DataGridViewCellStyle style = dgvCell != null ? dgvCell.InheritedStyle : null;
+            DataGridView? grid = dgvCell == null ? null : dgvCell.DataGridView;
+            DataGridViewCellStyle? style = dgvCell != null ? dgvCell.InheritedStyle : null;
             if (style == null && grid != null)
                 style = grid.DefaultCellStyle;
 
@@ -1659,7 +1659,7 @@ namespace LotTraceApp.Utils
             range.Style.Border.RightBorderColor = XLColor.FromColor(DefaultGridBorderColor);
         }
 
-        private static void WriteCellValue(IXLCell xlCell, DataGridViewCell dgvCell)
+        private static void WriteCellValue(IXLCell xlCell, DataGridViewCell? dgvCell)
         {
             if (dgvCell == null)
             {
@@ -1682,19 +1682,19 @@ namespace LotTraceApp.Utils
             if (plans == null || plans.Count == 0)
                 return 22d;
 
-            DataGridView grid = plans[0].Grid;
+            DataGridView? grid = plans[0].Grid;
             if (grid == null)
                 return 22d;
 
             return ConvertPixelToExcelRowHeight(grid.ColumnHeadersHeight);
         }
 
-        private static double ConvertPixelToExcelColumnWidth(int pixelWidth)
+        private static double ConvertPixelToExcelColumnWidth(int? pixelWidth)
         {
-            if (pixelWidth <= 0)
+            if (pixelWidth <= 0 || pixelWidth == null)
                 return 8.43d;
 
-            double width = (pixelWidth - 5d) / 7d;
+            double width = (pixelWidth.Value - 5d) / 7d;
             if (width < 1d)
                 width = 1d;
 
@@ -1709,9 +1709,9 @@ namespace LotTraceApp.Utils
             return Math.Round(pixelHeight * 0.75d, 2, MidpointRounding.AwayFromZero);
         }
 
-        private static DataGridViewRow GetBaseVisibleRow(VisibleRowMaps visibleRows, int visibleRowIndex)
+        private static DataGridViewRow? GetBaseVisibleRow(VisibleRowMaps visibleRows, int visibleRowIndex)
         {
-            DataGridViewRow row = GetVisibleRowSafe(visibleRows.LeftRows, visibleRowIndex);
+            DataGridViewRow? row = GetVisibleRowSafe(visibleRows.LeftRows, visibleRowIndex);
             if (row != null)
                 return row;
 
@@ -1722,7 +1722,7 @@ namespace LotTraceApp.Utils
             return GetVisibleRowSafe(visibleRows.RightRows, visibleRowIndex);
         }
 
-        private static DataGridViewRow GetVisibleRowByArea(VisibleRowMaps visibleRows, GridArea area, int visibleRowIndex)
+        private static DataGridViewRow? GetVisibleRowByArea(VisibleRowMaps visibleRows, GridArea area, int visibleRowIndex)
         {
             switch (area)
             {
@@ -1737,7 +1737,7 @@ namespace LotTraceApp.Utils
             }
         }
 
-        private static DataGridViewRow GetVisibleRowSafe(List<DataGridViewRow> rows, int index)
+        private static DataGridViewRow? GetVisibleRowSafe(List<DataGridViewRow>? rows, int index)
         {
             if (rows == null)
                 return null;
@@ -1746,7 +1746,7 @@ namespace LotTraceApp.Utils
             return rows[index];
         }
 
-        private static string GetRowValue(DataGridViewRow row, string columnName)
+        private static string? GetRowValue(DataGridViewRow? row, string? columnName)
         {
             if (row == null || string.IsNullOrEmpty(columnName))
                 return null;
@@ -1783,7 +1783,7 @@ namespace LotTraceApp.Utils
 
         private static int GetRowInt(DataGridViewRow row, string columnName)
         {
-            string value = GetRowValue(row, columnName);
+            string? value = GetRowValue(row, columnName);
             if (string.IsNullOrWhiteSpace(value))
                 return 0;
 
@@ -1803,12 +1803,12 @@ namespace LotTraceApp.Utils
             return color.IsEmpty || color == Color.Empty || color.A == 0;
         }
 
-        private static string NullToEmpty(string s)
+        private static string NullToEmpty(string? s)
         {
             return s ?? string.Empty;
         }
 
-        private static string SanitizeWorksheetName(string worksheetName)
+        private static string SanitizeWorksheetName(string? worksheetName)
         {
             string name = string.IsNullOrWhiteSpace(worksheetName) ? "TraceResult" : worksheetName.Trim();
 
@@ -1827,7 +1827,7 @@ namespace LotTraceApp.Utils
             return name;
         }
 
-        private static string GetUniqueWorksheetName(XLWorkbook wb, string worksheetName)
+        private static string GetUniqueWorksheetName(XLWorkbook wb, string? worksheetName)
         {
             string baseName = SanitizeWorksheetName(worksheetName);
             string name = baseName;
@@ -1998,7 +1998,7 @@ namespace LotTraceApp.Utils
                     if (value == null || value == DBNull.Value)
                         continue;
 
-                    string text = Convert.ToString(value, CultureInfo.InvariantCulture);
+                    string? text = Convert.ToString(value, CultureInfo.InvariantCulture);
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         hasDisplayedValue = true;
@@ -2050,7 +2050,7 @@ namespace LotTraceApp.Utils
                     if (value == null || value == DBNull.Value)
                         continue;
 
-                    string text = Convert.ToString(value, CultureInfo.InvariantCulture);
+                    string? text = Convert.ToString(value, CultureInfo.InvariantCulture);
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         hasDisplayedValue = true;
@@ -2074,21 +2074,21 @@ namespace LotTraceApp.Utils
 
         private sealed class ExportColumnPlan
         {
-            public DataGridView Grid { get; set; }
+            public DataGridView? Grid { get; set; }
             public GridArea Area { get; set; }
-            public DataGridViewColumn GridColumn { get; set; }
+            public DataGridViewColumn? GridColumn { get; set; }
             public int ExcelColumnIndex { get; set; }
             public int MiddleLevel { get; set; }
         }
 
         private sealed class VisibleRowMaps
         {
-            public List<DataGridViewRow> LeftRows { get; set; }
-            public List<DataGridViewRow> MiddleRows { get; set; }
-            public List<DataGridViewRow> RightRows { get; set; }
+            public List<DataGridViewRow>? LeftRows { get; set; }
+            public List<DataGridViewRow>? MiddleRows { get; set; }
+            public List<DataGridViewRow>? RightRows { get; set; }
             public int MaxVisibleRowCount { get; set; }
         }
-        private static string ResolveCrossPointGroupPrefix(string columnName)
+        private static string? ResolveCrossPointGroupPrefix(string columnName)
         {
             if (string.IsNullOrWhiteSpace(columnName))
                 return null;
@@ -2109,17 +2109,17 @@ namespace LotTraceApp.Utils
             return null;
         }
 
-        private static string BuildCrossPointUiKeyFromRow(DataGridViewRow row, string prefix)
+        private static string? BuildCrossPointUiKeyFromRow(DataGridViewRow row, string prefix)
         {
             if (row == null || string.IsNullOrWhiteSpace(prefix))
                 return null;
 
-            string masterKey = GetRowValue(row, prefix + "MasterKey");
-            string nodeKey = GetRowValue(row, prefix + "NodeKey");
+            string? masterKey = GetRowValue(row, prefix + "MasterKey");
+            string? nodeKey = GetRowValue(row, prefix + "NodeKey");
 
             // DataTableに入ってる前提（無い場合は null のままでもOK）
-            string startDateLabel = GetRowValue(row, prefix + "StartDateLabel");
-            string inputSourceType = GetRowValue(row, prefix + "InputSourceType");
+            string? startDateLabel = GetRowValue(row, prefix + "StartDateLabel");
+            string? inputSourceType = GetRowValue(row, prefix + "InputSourceType");
 
             bool isManual =
                 string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||

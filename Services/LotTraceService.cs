@@ -51,7 +51,7 @@ namespace LotTraceApp.Services
 
         public TraceResult ExecuteTrace(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             if (p == null) throw new ArgumentNullException("p");
@@ -94,7 +94,7 @@ namespace LotTraceApp.Services
 
         public DataTable BuildDisplayTable(
             TraceDisplayResult displayResult,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             ReportProgress(progress, "グリッド列を準備しています...", 80);
@@ -243,7 +243,7 @@ namespace LotTraceApp.Services
 
         private TraceResult TraceForward(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -310,7 +310,7 @@ namespace LotTraceApp.Services
         /// <returns></returns>
         private TraceResult TraceBackward(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -915,7 +915,7 @@ namespace LotTraceApp.Services
                 Node = node,
 
                 // 表示キー
-                MasterKey = node.ControlMasterKey,
+                MasterKey = node.ControlMasterKey ?? string.Empty,
                 NodeKey = node.NodeIdentityKey,
 
                 ParentMasterKey = node.ParentMasterKey,
@@ -4356,7 +4356,7 @@ namespace LotTraceApp.Services
             if (node == null || node.SourceNode == null)
                 return string.Empty;
 
-            string masterKey = node.SourceNode.ControlMasterKey;
+            string? masterKey = node.SourceNode.ControlMasterKey;
 
             if (string.IsNullOrWhiteSpace(masterKey))
                 return string.Empty;

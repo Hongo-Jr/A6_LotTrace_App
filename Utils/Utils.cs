@@ -43,7 +43,7 @@ namespace LotTraceApp.Utils
                 WriteNodes(traceResult.EndNodes);
             }
 
-            string Quote(string s) =>
+            string Quote(string? s) =>
                 s == null ? "" :
                 "\"" + s.Replace("\"", "\"\"") + "\"";
         }
@@ -132,7 +132,7 @@ namespace LotTraceApp.Utils
                 }
             }
 
-            string Quote(string s) =>
+            string Quote(string? s) =>
                 s == null ? "" :
                 "\"" + s.Replace("\"", "\"\"") + "\"";
         }

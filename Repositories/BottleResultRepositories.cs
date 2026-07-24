@@ -29,7 +29,7 @@ namespace LotTraceApp.Repositories
             return new SqlConnection(_connectionString);
         }
 
-        public DataTable GetBottleOrder(string order, string lot)
+        public DataTable GetBottleOrder(string? order, string? lot)
         {
             var result = SettWideTabel();
 
@@ -218,7 +218,7 @@ namespace LotTraceApp.Repositories
 
 
 
-        public BottleResultPage GetFillingResultPages(string order, string lot, int pageNo, int pageSize)
+        public BottleResultPage GetFillingResultPages(string? order, string? lot, int pageNo, int pageSize)
         {
             var result = new BottleResultPage();
             if (string.IsNullOrWhiteSpace(order)|| string.IsNullOrWhiteSpace(lot))

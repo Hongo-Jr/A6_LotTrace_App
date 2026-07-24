@@ -27,10 +27,10 @@ namespace LotTraceApp
             new Dictionary<int, TraceSearchParameters>();
 
         // タブ番号 → 表示テーブル。サービス実装接続後、タブ切替時の再表示に使う。
-        private readonly Dictionary<int, BottleDisplayTables> _tabDisplayTables =
-            new Dictionary<int, BottleDisplayTables>();
-        private readonly Dictionary<int, BottleTraceResult> _tabBottleTraceResults =
-            new Dictionary<int, BottleTraceResult>();
+        private readonly Dictionary<int, BottleDisplayTables?> _tabDisplayTables =
+            new Dictionary<int, BottleDisplayTables?>();
+        private readonly Dictionary<int, BottleTraceResult?> _tabBottleTraceResults =
+            new Dictionary<int, BottleTraceResult?>();
 
         // タブ番号 → UI コントロール一式。
         private readonly Dictionary<int, BottleTraceTabContext> _bottleTraceTabContexts =
@@ -125,14 +125,14 @@ namespace LotTraceApp
             public Color GroupBackColor { get; set; }
             public Color GroupForeColor { get; set; }
             public Color BorderColor { get; set; }
-            public Font GroupFont { get; set; }
-            public Font ColumnFont { get; set; }
+            public Font GroupFont { get; set; } = SystemFonts.DefaultFont;
+            public Font ColumnFont { get; set; } = SystemFonts.DefaultFont;
         }
 
         private sealed class BottleTraceSearchWorkResult
         {
-            public BottleTraceResult TraceResult { get; set; }
-            public BottleDisplayTables DisplayTables { get; set; }
+            public BottleTraceResult? TraceResult { get; set; }
+            public BottleDisplayTables? DisplayTables { get; set; }
         }
 
         private readonly HeaderVisualStyle _startHeaderStyle = new HeaderVisualStyle
@@ -166,24 +166,24 @@ namespace LotTraceApp
         {
             public int TabNo { get; set; }
 
-            public TextBox TxtOrder { get; set; }
-            public TextBox TxtItemName { get; set; }
-            public TextBox TxtItemCode { get; set; }
-            public TextBox TxtLot { get; set; }
+            public TextBox TxtOrder { get; set; } = new();
+            public TextBox TxtItemName { get; set; } = new();
+            public TextBox TxtItemCode { get; set; } = new();
+            public TextBox TxtLot { get; set; } = new();
 
-            public CheckBox ChkUsePeriod { get; set; }
-            public DateTimePicker DtpFrom { get; set; }
-            public DateTimePicker DtpTo { get; set; }
+            public CheckBox ChkUsePeriod { get; set; } = new();
+            public DateTimePicker DtpFrom { get; set; } = new();
+            public DateTimePicker DtpTo { get; set; } = new();
 
-            public RadioButton RdoForward { get; set; }
-            public RadioButton RdoBackward { get; set; }
+            public RadioButton RdoForward { get; set; } = new();
+            public RadioButton RdoBackward { get; set; } = new();
 
-            public Button BtnSearch { get; set; }
-            public Button BtnClear { get; set; }
-            public Button BtnCsv { get; set; }
+            public Button BtnSearch { get; set; } = new();
+            public Button BtnClear { get; set; } = new();
+            public Button BtnCsv { get; set; } = new();
 
-            public DataGridView GridStart { get; set; }
-            public DataGridView GridEnd { get; set; }
+            public DataGridView GridStart { get; set; } = new();
+            public DataGridView GridEnd { get; set; } = new();
         }
 
         private readonly ToolTip _itemNameToolTip = new ToolTip();
@@ -191,7 +191,7 @@ namespace LotTraceApp
         private string _currentItemToolTipText = string.Empty;
         private readonly Color _gridHoverCellBackColor = Color.FromArgb(225, 235, 250);
         private readonly Color _gridSelectedRowBorderColor = Color.FromArgb(150, 56, 112, 190);
-        private DataGridView _hoverGrid = null;
+        private DataGridView? _hoverGrid = null;
         private int _hoverRowIndex = -1;
         private int _hoverColumnIndex = -1;
         private readonly Dictionary<DataGridView, int> _selectedRowIndexByGrid =
@@ -200,12 +200,12 @@ namespace LotTraceApp
         private readonly BottleResultService _bottleResultService;
 
 
-        private Button _btnIntersectionCsv;
-        private Button _btnIntersectionClear;
+        private Button? _btnIntersectionCsv ;
+        private Button? _btnIntersectionClear;
         // タブ番号 → 交点検出などの対象タブ
         private readonly HashSet<int> _selectedTraceTargetTabs =
             new HashSet<int>();
-        private List<B_CrossPointRecord> _lastBottleCrossPoints;
+        private List<B_CrossPointRecord>? _lastBottleCrossPoints;
         private readonly List<int> _lastBottleCrossPointTargetTabs = new List<int>();
         private readonly Dictionary<int, HashSet<string>> _crossPointNodeKeysByTab =
             new Dictionary<int, HashSet<string>>();
@@ -354,12 +354,12 @@ namespace LotTraceApp
             B_ApplyCrossPointGridColumnWidths();
         }
 
-        private void BottleIntersectionGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void BottleIntersectionGrid_DataBindingComplete(object? sender, DataGridViewBindingCompleteEventArgs e)
         {
             B_ApplyCrossPointGridColumnWidths();
         }
 
-        private void BottleIntersectionGrid_Sorted(object sender, EventArgs e)
+        private void BottleIntersectionGrid_Sorted(object? sender, EventArgs e)
         {
             B_ApplyCrossPointGridColumnWidths();
         }
@@ -375,7 +375,7 @@ namespace LotTraceApp
             };
         }
 
-        private void BottleIntersectionTab_Resize(object sender, EventArgs e)
+        private void BottleIntersectionTab_Resize(object? sender, EventArgs e)
         {
             B_ApplyIntersectionTabLayout();
             B_ApplyCrossPointGridColumnWidths();
@@ -443,7 +443,7 @@ namespace LotTraceApp
             RegisterGridSelectionVisualEvents(grid);
         }
 
-        private void Grid_KeyDown_CopyCurrentCell(object sender, KeyEventArgs e)
+        private void Grid_KeyDown_CopyCurrentCell(object? sender, KeyEventArgs e)
         {
             if (e == null || !e.Control || e.KeyCode != Keys.C)
                 return;
@@ -452,15 +452,16 @@ namespace LotTraceApp
             if (grid == null || grid.CurrentCell == null)
                 return;
 
-            object value = grid.CurrentCell.FormattedValue;
-            Clipboard.SetText(value == null ? string.Empty : Convert.ToString(value));
+            object? value = grid.CurrentCell.FormattedValue;
+            Clipboard.SetText(Convert.ToString(value) ?? string.Empty);
+
             e.Handled = true;
             e.SuppressKeyPress = true;
         }
 
         private void InitializeBottleHeaderPanel(DataGridView grid, string title, HeaderVisualStyle style)
         {
-            Panel panel = FindHeaderPanelForGrid(grid);
+            Panel? panel = FindHeaderPanelForGrid(grid);
             if (panel == null || style == null)
                 return;
 
@@ -494,8 +495,8 @@ namespace LotTraceApp
             UnregisterTraceGridBorderPaint(tab.GridStart);
             UnregisterTraceGridBorderPaint(tab.GridEnd);
 
-            TraceSearchParameters p;
-            if (!_tabSearchParameters.TryGetValue(tab.TabNo, out p))
+            
+            if (!_tabSearchParameters.TryGetValue(tab.TabNo, out var p))
                 return;
 
             if (p.Direction == TraceDirection.Forward)
@@ -573,7 +574,7 @@ namespace LotTraceApp
             grid.Paint -= BottleTableBorderPaint;
         }
 
-        private void Grid_CellFormatting_SelectionAndHover(object sender, DataGridViewCellFormattingEventArgs e)
+        private void Grid_CellFormatting_SelectionAndHover(object? sender, DataGridViewCellFormattingEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null)
@@ -582,7 +583,7 @@ namespace LotTraceApp
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
                 return;
 
-            e.CellStyle.SelectionBackColor = ResolveGridSelectionBackColor(e.CellStyle.BackColor);
+            e.CellStyle!.SelectionBackColor = ResolveGridSelectionBackColor(e.CellStyle.BackColor);
             e.CellStyle.SelectionForeColor = e.CellStyle.ForeColor;
 
             bool isHoverCell = ReferenceEquals(_hoverGrid, grid) &&
@@ -596,7 +597,7 @@ namespace LotTraceApp
             }
         }
 
-        private void Grid_CellMouseMove_Hover(object sender, DataGridViewCellMouseEventArgs e)
+        private void Grid_CellMouseMove_Hover(object? sender, DataGridViewCellMouseEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null)
@@ -627,7 +628,7 @@ namespace LotTraceApp
             InvalidateHoverCell(grid, _hoverRowIndex, _hoverColumnIndex);
         }
 
-        private void Grid_MouseLeave_Hover(object sender, EventArgs e)
+        private void Grid_MouseLeave_Hover(object? sender, EventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null || !ReferenceEquals(_hoverGrid, grid))
@@ -673,7 +674,7 @@ namespace LotTraceApp
             return backColor.IsEmpty ? SystemColors.Window : backColor;
         }
 
-        private void Grid_SelectionVisualChanged(object sender, EventArgs e)
+        private void Grid_SelectionVisualChanged(object? sender, EventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null)
@@ -703,26 +704,26 @@ namespace LotTraceApp
 
         private void SyncBottleGridSelection(DataGridView sourceGrid)
         {
-            DataGridView targetGrid;
-            if (!TryGetBottleSelectionPeerGrid(sourceGrid, out targetGrid))
+            
+            if (!TryGetBottleSelectionPeerGrid(sourceGrid, out var targetGrid))
                 return;
 
             _syncingBottleGridSelection = true;
             try
             {
                 int rowIndex = GetSelectedRowIndex(sourceGrid);
-                if (rowIndex < 0 || rowIndex >= targetGrid.Rows.Count)
+                if (rowIndex < 0 || rowIndex >= targetGrid!.Rows.Count)
                 {
-                    targetGrid.ClearSelection();
+                    targetGrid!.ClearSelection();
                     return;
                 }
 
-                DataGridViewCell targetCell = GetFirstVisibleCell(targetGrid, rowIndex);
+                DataGridViewCell? targetCell = GetFirstVisibleCell(targetGrid!, rowIndex);
                 if (targetCell == null)
                     return;
 
-                targetGrid.ClearSelection();
-                targetGrid.CurrentCell = targetCell;
+                targetGrid!.ClearSelection();
+                targetGrid!.CurrentCell = targetCell;
                 targetGrid.Rows[rowIndex].Selected = true;
             }
             finally
@@ -731,7 +732,7 @@ namespace LotTraceApp
             }
         }
 
-        private bool TryGetBottleSelectionPeerGrid(DataGridView sourceGrid, out DataGridView targetGrid)
+        private bool TryGetBottleSelectionPeerGrid(DataGridView? sourceGrid, out DataGridView? targetGrid)
         {
             targetGrid = null;
             if (sourceGrid == null)
@@ -759,7 +760,7 @@ namespace LotTraceApp
             return false;
         }
 
-        private DataGridViewCell GetFirstVisibleCell(DataGridView grid, int rowIndex)
+        private DataGridViewCell? GetFirstVisibleCell(DataGridView grid, int rowIndex)
         {
             if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
                 return null;
@@ -794,7 +795,7 @@ namespace LotTraceApp
             }
         }
 
-        private void Grid_SelectedRowOutlinePaint(object sender, PaintEventArgs e)
+        private void Grid_SelectedRowOutlinePaint(object? sender, PaintEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null || e == null)
@@ -892,7 +893,7 @@ namespace LotTraceApp
             }
         }
 
-        private void BottleTracePeriodCheckChanged(object sender, EventArgs e)
+        private void BottleTracePeriodCheckChanged(object? sender, EventArgs e)
         {
             RefreshBottleTracePeriodControls();
         }
@@ -939,8 +940,8 @@ namespace LotTraceApp
             var tab = GetTabContext(tabNo);
             if (tab == null) return;
 
-            BottleDisplayTables tables;
-            if (!_tabDisplayTables.TryGetValue(tabNo, out tables) || tables == null)
+            
+            if (!_tabDisplayTables.TryGetValue(tabNo, out var tables) || tables == null)
             {
                 _gridForeColorCaches.Remove(tab.GridStart);
                 _gridForeColorCaches.Remove(tab.GridEnd);
@@ -958,8 +959,8 @@ namespace LotTraceApp
             tab.GridStart.DataSource = tables.LiquidTable;
             tab.GridEnd.DataSource = tables.BottleTable;
 
-            TraceSearchParameters p;
-            if (!_tabSearchParameters.TryGetValue(tabNo, out p))
+            
+            if (!_tabSearchParameters.TryGetValue(tabNo, out var p))
                 return;
 
             if (p.Direction == TraceDirection.Forward) { SetForwardGrid(tab, tables); }
@@ -973,7 +974,7 @@ namespace LotTraceApp
             RefreshBottleHeaderPanels(tab);
         }
 
-        private void SwichBottleTab_SelectedIndexChanged(object sender, EventArgs e)
+        private void SwichBottleTab_SelectedIndexChanged(object? sender, EventArgs e)
         {
             var tab = GetCurrentTabContext();
             if (tab == null) return;
@@ -988,7 +989,7 @@ namespace LotTraceApp
             swichBottleTab.DrawItem += SwichBottleTab_DrawItem;
         }
 
-        private void SwichBottleTab_DrawItem(object sender, DrawItemEventArgs e)
+        private void SwichBottleTab_DrawItem(object? sender, DrawItemEventArgs e)
         {
             var tabControl = sender as TabControl;
             if (tabControl == null || e.Index < 0 || e.Index >= tabControl.TabPages.Count)
@@ -1024,19 +1025,19 @@ namespace LotTraceApp
             return (tabNo >= 1 && tabNo <= 10) ? tabNo : -1;
         }
 
-        private BottleTraceTabContext GetTabContext(int tabNo)
+        private BottleTraceTabContext? GetTabContext(int tabNo)
         {
-            BottleTraceTabContext tab;
-            return _bottleTraceTabContexts.TryGetValue(tabNo, out tab) ? tab : null;
+            
+            return _bottleTraceTabContexts.TryGetValue(tabNo, out var tab) ? tab : null;
         }
 
-        private BottleTraceTabContext GetCurrentTabContext()
+        private BottleTraceTabContext? GetCurrentTabContext()
         {
             int tabNo = GetCurrentBottleTraceTabNo();
             return tabNo > 0 ? GetTabContext(tabNo) : null;
         }
 
-        private BottleTraceTabContext CreateBottleTraceTabContext(int tabNo)
+        private BottleTraceTabContext? CreateBottleTraceTabContext(int tabNo)
         {
             switch (tabNo)
             {
@@ -1247,12 +1248,12 @@ namespace LotTraceApp
 
         
 
-        private void BottleTraceTabNameSourceChanged(object sender, EventArgs e)
+        private void BottleTraceTabNameSourceChanged(object? sender, EventArgs e)
         {
             RefreshBottleTraceTabNames();
         }
 
-        private void BottleTraceTabNameModeChanged(object sender, EventArgs e)
+        private void BottleTraceTabNameModeChanged(object? sender, EventArgs e)
         {
             RefreshBottleTraceTabNames();
         }
@@ -1271,7 +1272,7 @@ namespace LotTraceApp
             }
         }
 
-        private TabPage GetBottleTraceTabPage(int tabNo)
+        private TabPage? GetBottleTraceTabPage(int tabNo)
         {
             if (swichBottleTab == null || tabNo < 1 || tabNo > 10)
                 return null;
@@ -1291,7 +1292,7 @@ namespace LotTraceApp
                 ? tab.TxtItemCode
                 : tab.TxtOrder;
 
-            string value = source == null ? null : source.Text;
+            string? value = source == null ? null : source.Text;
 
             if (!string.IsNullOrWhiteSpace(value))
                 return value.Trim();
@@ -1300,7 +1301,7 @@ namespace LotTraceApp
         }
 
 
-        private CheckBox GetTraceTargetCheckBox(int tabNo)
+        private CheckBox? GetTraceTargetCheckBox(int tabNo)
         {
             switch (tabNo)
             {
@@ -1330,23 +1331,23 @@ namespace LotTraceApp
             tab.GridStart.DataSource = tables.LiquidTable;
 
             tab.GridStart.Columns["OrderNumber"].Visible = true;
-            tab.GridStart.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"].Caption;
+            tab.GridStart.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"]!.Caption;
             tab.GridStart.Columns["OrderNumber"].Width = 120;
 
             tab.GridStart.Columns["Lot"].Visible = true;
-            tab.GridStart.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"].Caption;
+            tab.GridStart.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"]!.Caption;
             tab.GridStart.Columns["Lot"].Width = 120;
 
             tab.GridStart.Columns["ItemName"].Visible = true;
-            tab.GridStart.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"].Caption;
+            tab.GridStart.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"]!.Caption;
             tab.GridStart.Columns["ItemName"].Width = 120;
 
             tab.GridStart.Columns["StartDate"].Visible = true;
-            tab.GridStart.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"].Caption;
+            tab.GridStart.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"]!.Caption;
             tab.GridStart.Columns["StartDate"].Width = 150;
 
             tab.GridStart.Columns["Weight"].Visible = true;
-            tab.GridStart.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"].Caption;
+            tab.GridStart.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"]!.Caption;
             tab.GridStart.Columns["Weight"].Width = 120;
 
             tab.GridStart.Columns["NodeKey"].Visible = false;
@@ -1358,31 +1359,31 @@ namespace LotTraceApp
             tab.GridEnd.DataSource = tables.BottleTable;
 
             tab.GridEnd.Columns["OrderNumber"].Visible = true;
-            tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"].Caption;
+            tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"]!.Caption;
             tab.GridEnd.Columns["OrderNumber"].Width = 120;
 
             tab.GridEnd.Columns["Lot"].Visible = true;
-            tab.GridEnd.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"].Caption;
+            tab.GridEnd.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"]!.Caption;
             tab.GridEnd.Columns["Lot"].Width = 120;
 
             tab.GridEnd.Columns["ItemName"].Visible = true;
-            tab.GridEnd.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"].Caption;
+            tab.GridEnd.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"]!.Caption;
             tab.GridEnd.Columns["ItemName"].Width = 120;
 
             tab.GridEnd.Columns["StartDate"].Visible = true;
-            tab.GridEnd.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"].Caption;
+            tab.GridEnd.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"]!.Caption;
             tab.GridEnd.Columns["StartDate"].Width = 150;
 
             tab.GridEnd.Columns["OK_Num"].Visible = true;
-            tab.GridEnd.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"].Caption;
+            tab.GridEnd.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"]!.Caption;
             tab.GridEnd.Columns["OK_Num"].Width = 120;
 
             tab.GridEnd.Columns["NG_Num"].Visible = true;
-            tab.GridEnd.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"].Caption;
+            tab.GridEnd.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"]!.Caption;
             tab.GridEnd.Columns["NG_Num"].Width = 120;
 
             tab.GridEnd.Columns["Total_Num"].Visible = true;
-            tab.GridEnd.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"].Caption;
+            tab.GridEnd.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"]!.Caption;
             tab.GridEnd.Columns["Total_Num"].Width = 120;
 
 
@@ -1408,23 +1409,23 @@ namespace LotTraceApp
             tab.GridEnd.DataSource = tables.LiquidTable;
 
             tab.GridEnd.Columns["OrderNumber"].Visible = true;
-            tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"].Caption;
+            tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"]!.Caption;
             tab.GridEnd.Columns["OrderNumber"].Width = 120;
 
             tab.GridEnd.Columns["Lot"].Visible = true;
-            tab.GridEnd.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"].Caption;
+            tab.GridEnd.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"]!.Caption;
             tab.GridEnd.Columns["Lot"].Width = 120;
 
             tab.GridEnd.Columns["ItemName"].Visible = true;
-            tab.GridEnd.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"].Caption;
+            tab.GridEnd.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"]!.Caption;
             tab.GridEnd.Columns["ItemName"].Width = 120;
 
             tab.GridEnd.Columns["StartDate"].Visible = true;
-            tab.GridEnd.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"].Caption;
+            tab.GridEnd.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"]!.Caption;
             tab.GridEnd.Columns["StartDate"].Width = 150;
 
             tab.GridEnd.Columns["Weight"].Visible = true;
-            tab.GridEnd.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"].Caption;
+            tab.GridEnd.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"]!.Caption;
             tab.GridEnd.Columns["Weight"].Width = 120;
 
             tab.GridEnd.Columns["NodeKey"].Visible = false;
@@ -1436,31 +1437,31 @@ namespace LotTraceApp
             tab.GridStart.DataSource = tables.BottleTable;
 
             tab.GridStart.Columns["OrderNumber"].Visible = true;
-            tab.GridStart.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"].Caption;
+            tab.GridStart.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"]!.Caption;
             tab.GridStart.Columns["OrderNumber"].Width = 120;
 
             tab.GridStart.Columns["Lot"].Visible = true;
-            tab.GridStart.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"].Caption;
+            tab.GridStart.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"]!.Caption;
             tab.GridStart.Columns["Lot"].Width = 120;
 
             tab.GridStart.Columns["ItemName"].Visible = true;
-            tab.GridStart.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"].Caption;
+            tab.GridStart.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"]!.Caption;
             tab.GridStart.Columns["ItemName"].Width = 120;
 
             tab.GridStart.Columns["StartDate"].Visible = true;
-            tab.GridStart.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"].Caption;
+            tab.GridStart.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"]!.Caption;
             tab.GridStart.Columns["StartDate"].Width = 150;
 
             tab.GridStart.Columns["OK_Num"].Visible = true;
-            tab.GridStart.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"].Caption;
+            tab.GridStart.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"]!.Caption;
             tab.GridStart.Columns["OK_Num"].Width = 120;
 
             tab.GridStart.Columns["NG_Num"].Visible = true;
-            tab.GridStart.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"].Caption;
+            tab.GridStart.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"]!.Caption;
             tab.GridStart.Columns["NG_Num"].Width = 120;
 
             tab.GridStart.Columns["Total_Num"].Visible = true;
-            tab.GridStart.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"].Caption;
+            tab.GridStart.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"]!.Caption;
             tab.GridStart.Columns["Total_Num"].Width = 120;
 
 
@@ -1522,7 +1523,7 @@ namespace LotTraceApp
 
         private void RefreshBottleHeaderPanel(DataGridView grid, string title)
         {
-            Panel panel = FindHeaderPanelForGrid(grid);
+            Panel? panel = FindHeaderPanelForGrid(grid);
             if (panel == null)
                 return;
 
@@ -1540,14 +1541,14 @@ namespace LotTraceApp
             panel.Invalidate();
         }
 
-        private Panel FindHeaderPanelForGrid(DataGridView grid)
+        private Panel? FindHeaderPanelForGrid(DataGridView grid)
         {
             if (grid == null || grid.Parent == null)
                 return null;
 
             foreach (Control control in grid.Parent.Controls)
             {
-                Panel panel = control as Panel;
+                Panel? panel = control as Panel;
                 if (panel == null)
                     continue;
 
@@ -1586,7 +1587,7 @@ namespace LotTraceApp
                     if (value == null || value == DBNull.Value)
                         continue;
 
-                    string text = Convert.ToString(value);
+                    string? text = Convert.ToString(value);
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         hasDisplayedValue = true;
@@ -1617,7 +1618,7 @@ namespace LotTraceApp
                 return;
 
             int left = tab.GridStart.Right + gap;
-            Panel endHeaderPanel = FindHeaderPanelForGrid(tab.GridEnd);
+            Panel? endHeaderPanel = FindHeaderPanelForGrid(tab.GridEnd);
 
             tab.GridEnd.Left = left;
 
@@ -1646,7 +1647,7 @@ namespace LotTraceApp
 
             grid.Width = targetWidth;
 
-            Panel panel = FindHeaderPanelForGrid(grid);
+            Panel? panel = FindHeaderPanelForGrid(grid);
             if (panel != null)
             {
                 panel.Left = grid.Left;
@@ -1710,7 +1711,7 @@ namespace LotTraceApp
             _itemNameToolTip.Draw += ItemNameToolTip_Draw;
         }
 
-        private void ItemNameToolTip_Popup(object sender, PopupEventArgs e)
+        private void ItemNameToolTip_Popup(object? sender, PopupEventArgs e)
         {
             if (e == null) return;
 
@@ -1732,11 +1733,11 @@ namespace LotTraceApp
                 Math.Max(32, measured.Height + 12));
         }
 
-        private void ItemNameToolTip_Draw(object sender, DrawToolTipEventArgs e)
+        private void ItemNameToolTip_Draw(object? sender, DrawToolTipEventArgs e)
         {
             if (e == null) return;
 
-            string text = string.IsNullOrWhiteSpace(_currentItemToolTipText)
+            string? text = string.IsNullOrWhiteSpace(_currentItemToolTipText)
                 ? e.ToolTipText
                 : _currentItemToolTipText;
 
@@ -1757,7 +1758,7 @@ namespace LotTraceApp
                 TextFormatFlags.WordBreak | TextFormatFlags.Left | TextFormatFlags.NoPrefix);
         }
 
-        private void Grid_CellMouseEnter_ToolTip(object sender, DataGridViewCellEventArgs e)
+        private void Grid_CellMouseEnter_ToolTip(object? sender, DataGridViewCellEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null) return;
@@ -1777,7 +1778,7 @@ namespace LotTraceApp
             object value = row.Cells[e.ColumnIndex].Value;
             if (value == null || value == DBNull.Value) return;
 
-            string cellText = Convert.ToString(value);
+            string? cellText = Convert.ToString(value);
             if (string.IsNullOrWhiteSpace(cellText)) return;
 
             string text;
@@ -1785,7 +1786,7 @@ namespace LotTraceApp
             if (string.Equals(column.Name, "ItemName", StringComparison.OrdinalIgnoreCase))
             {
                 string itemName = cellText;
-                string itemCode = GetGridCellString(row, "ItemCode");
+                string? itemCode = GetGridCellString(row, "ItemCode");
 
                 text = string.IsNullOrWhiteSpace(itemCode)
                     ? "品目名：" + itemName
@@ -1816,7 +1817,7 @@ namespace LotTraceApp
             _itemNameToolTip.Show(_currentItemToolTipText, grid, showPoint, _itemNameToolTip.AutoPopDelay);
         }
 
-        private string GetGridCellString(DataGridViewRow row, string columnName)
+        private string? GetGridCellString(DataGridViewRow row, string columnName)
         {
             if (row == null || row.DataGridView == null)
                 return string.Empty;
@@ -1829,7 +1830,7 @@ namespace LotTraceApp
             return value == null || value == DBNull.Value ? string.Empty : Convert.ToString(value);
         }
 
-        private void Grid_CellMouseLeave_ToolTip(object sender, DataGridViewCellEventArgs e)
+        private void Grid_CellMouseLeave_ToolTip(object? sender, DataGridViewCellEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null) return;
@@ -1838,7 +1839,7 @@ namespace LotTraceApp
             _itemNameToolTip.Hide(grid);
         }
 
-        private void Grid_ItemNameToolTipHideOnScroll(object sender, ScrollEventArgs e)
+        private void Grid_ItemNameToolTipHideOnScroll(object? sender, ScrollEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null) return;
@@ -1847,7 +1848,7 @@ namespace LotTraceApp
             _itemNameToolTip.Hide(grid);
         }
 
-        private void Grid_ItemNameToolTipHideOnMouseLeave(object sender, EventArgs e)
+        private void Grid_ItemNameToolTipHideOnMouseLeave(object? sender, EventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null) return;
@@ -1892,7 +1893,7 @@ namespace LotTraceApp
 
         #region トレース実行
 
-        private async void TraceSearch_FromAnyTab_Click(object sender, EventArgs e)
+        private async void TraceSearch_FromAnyTab_Click(object? sender, EventArgs e)
         {
             var tab = GetCurrentTabContext();
             if (tab == null) return;
@@ -1918,8 +1919,8 @@ namespace LotTraceApp
             bool showProgress = true,
             bool showErrors = true)
         {
-            LotTraceApp.Forms.ProgressForm progressForm = null;
-            CancellationTokenSource cancellation = null;
+            LotTraceApp.Forms.ProgressForm? progressForm = null;
+            CancellationTokenSource? cancellation = null;
             IProgress<TraceProgressState> progress =
                 new Progress<TraceProgressState>(state =>
                 {
@@ -1951,7 +1952,7 @@ namespace LotTraceApp
                         showProgress ? progress : null,
                         cancellation == null ? CancellationToken.None : cancellation.Token));
 
-                if (workResult.DisplayTables == null || workResult.TraceResult.IsEmpty)
+                if (workResult.DisplayTables == null || workResult.TraceResult!.IsEmpty)
                 {
                     MessageBox.Show(
                         "検索結果は0件です。",
@@ -2015,7 +2016,7 @@ namespace LotTraceApp
 
         private BottleTraceSearchWorkResult ExecuteBottleTraceWork(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -2049,9 +2050,9 @@ namespace LotTraceApp
             RegisterTraceGridEvents(tab);
 
             if (p.Direction == TraceDirection.Backward)
-                SetBackwardGrid(tab, workResult.DisplayTables);
+                SetBackwardGrid(tab, workResult.DisplayTables!);
             else
-                SetForwardGrid(tab, workResult.DisplayTables);
+                SetForwardGrid(tab, workResult.DisplayTables!);
 
             _tabDisplayTables[tab.TabNo] = workResult.DisplayTables;
             _tabBottleTraceResults[tab.TabNo] = workResult.TraceResult;
@@ -2103,7 +2104,7 @@ namespace LotTraceApp
             return logDir;
         }
 
-        private void WriteBottleTraceLog(string message, Exception ex = null)
+        private void WriteBottleTraceLog(string message, Exception? ex = null)
         {
             try
             {
@@ -2176,13 +2177,13 @@ namespace LotTraceApp
             }
 
             int[] columnGroupIndexes = new int[columnCount];
-            var nodeKeyColumnNames = new List<string>();
+            var nodeKeyColumnNames = new List<string?>();
             var groupIndexByNodeKeyColumnName =
                 new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                string nodeKeyColumnName =
+                string? nodeKeyColumnName =
                     ResolveBottleNodeKeyColumnNameForForeColorGrouping(grid, columnIndex);
                 string groupKey = nodeKeyColumnName ?? string.Empty;
 
@@ -2212,14 +2213,14 @@ namespace LotTraceApp
 
                 for (int groupIndex = 0; groupIndex < nodeKeyColumnNames.Count; groupIndex++)
                 {
-                    string nodeKeyColumnName = nodeKeyColumnNames[groupIndex];
+                    string? nodeKeyColumnName = nodeKeyColumnNames[groupIndex];
                     if (string.IsNullOrEmpty(nodeKeyColumnName))
                     {
                         rowGroupColors[rowIndex, groupIndex] = defaultForeColor;
                         continue;
                     }
 
-                    string nodeKey = GetTableString(boundItem.Row, nodeKeyColumnName);
+                    string? nodeKey = GetTableString(boundItem.Row, nodeKeyColumnName);
                     if (string.IsNullOrWhiteSpace(nodeKey))
                     {
                         rowGroupColors[rowIndex, groupIndex] = defaultForeColor;
@@ -2253,7 +2254,7 @@ namespace LotTraceApp
             }
         }
 
-        private string ResolveBottleNodeKeyColumnNameForForeColorGrouping(
+        private string? ResolveBottleNodeKeyColumnNameForForeColorGrouping(
             DataGridView grid,
             int columnIndex)
         {
@@ -2273,14 +2274,14 @@ namespace LotTraceApp
                 string.Equals(name, "ItemCode", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            DataTable table = ResolveGridDataTable(grid);
+            DataTable? table = ResolveGridDataTable(grid);
             if (table == null || !table.Columns.Contains("NodeKey"))
                 return null;
 
             return "NodeKey";
         }
 
-        private DataTable ResolveGridDataTable(DataGridView grid)
+        private DataTable? ResolveGridDataTable(DataGridView grid)
         {
             if (grid == null)
                 return null;
@@ -2303,7 +2304,7 @@ namespace LotTraceApp
         }
 
         private void OnBottleNodeKeyGroupForeColorFormattingFromCache(
-            object sender,
+            object? sender,
             DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
@@ -2313,15 +2314,15 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            GridForeColorCache cache;
-            if (!_gridForeColorCaches.TryGetValue(grid, out cache))
+            
+            if (!_gridForeColorCaches.TryGetValue(grid, out var cache))
                 return;
 
             if (e.RowIndex >= cache.RowGroupColors.GetLength(0) ||
                 e.ColumnIndex >= cache.ColumnGroupIndexes.Length)
                 return;
 
-            e.CellStyle.ForeColor = cache.GetRequiredColor(e.RowIndex, e.ColumnIndex);
+            e.CellStyle!.ForeColor = cache.GetRequiredColor(e.RowIndex, e.ColumnIndex);
         }
 
         private Color GetForeColorForNodeKeyGroup(string key)
@@ -2386,7 +2387,7 @@ namespace LotTraceApp
             }
         }
 
-        private string GetTableString(DataRow row, string columnName)
+        private string? GetTableString(DataRow row, string columnName)
         {
             if (row == null || row.Table == null || string.IsNullOrEmpty(columnName))
                 return string.Empty;
@@ -2398,7 +2399,7 @@ namespace LotTraceApp
             return value == null || value == DBNull.Value ? string.Empty : Convert.ToString(value);
         }
 
-        private int GetTableInt(DataRow row, string columnName)
+        private int GetTableInt(DataRow? row, string? columnName)
         {
             if (row == null || row.Table == null || string.IsNullOrEmpty(columnName) ||
                 !row.Table.Columns.Contains(columnName))
@@ -2429,8 +2430,8 @@ namespace LotTraceApp
             if (tab == null || grid == null)
                 return;
 
-            HashSet<string> crossPointNodeKeys;
-            if (!_crossPointNodeKeysByTab.TryGetValue(tab.TabNo, out crossPointNodeKeys) ||
+            
+            if (!_crossPointNodeKeysByTab.TryGetValue(tab.TabNo, out var crossPointNodeKeys) ||
                 crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
             {
                 _gridBackColorCaches.Remove(grid);
@@ -2441,13 +2442,13 @@ namespace LotTraceApp
             int rowCount = grid.Rows.Count;
 
             int[] columnGroupIndexes = new int[columnCount];
-            var nodeKeyColumnNames = new List<string>();
+            var nodeKeyColumnNames = new List<string?>();
             var groupIndexByNodeKeyColumnName =
                 new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                string nodeKeyColumnName = ResolveBottleCrossPointNodeKeyColumnName(grid, columnIndex);
+                string? nodeKeyColumnName = ResolveBottleCrossPointNodeKeyColumnName(grid, columnIndex);
                 string groupKey = nodeKeyColumnName ?? string.Empty;
 
                 int groupIndex;
@@ -2474,16 +2475,16 @@ namespace LotTraceApp
 
                 for (int groupIndex = 0; groupIndex < nodeKeyColumnNames.Count; groupIndex++)
                 {
-                    string nodeKeyColumnName = nodeKeyColumnNames[groupIndex];
+                    string? nodeKeyColumnName = nodeKeyColumnNames[groupIndex];
                     if (string.IsNullOrEmpty(nodeKeyColumnName))
                         continue;
 
-                    string key = BuildBottleCrossPointUiKeyFromRow(boundItem.Row);
+                    string? key = BuildBottleCrossPointUiKeyFromRow(boundItem.Row);
                     if (string.IsNullOrWhiteSpace(key) || !crossPointNodeKeys.Contains(key))
                         continue;
 
-                    Tuple<Color, Color> colors;
-                    if (!colorByNodeKey.TryGetValue(key, out colors))
+                    
+                    if (!colorByNodeKey.TryGetValue(key, out var colors))
                     {
                         colors = GetCrossPointNodeColors(key);
                         colorByNodeKey[key] = colors;
@@ -2503,7 +2504,7 @@ namespace LotTraceApp
                     rowGroupHasBackColor);
         }
 
-        private string ResolveBottleCrossPointNodeKeyColumnName(DataGridView grid, int columnIndex)
+        private string? ResolveBottleCrossPointNodeKeyColumnName(DataGridView grid, int columnIndex)
         {
             if (grid == null || columnIndex < 0 || columnIndex >= grid.Columns.Count)
                 return null;
@@ -2521,7 +2522,7 @@ namespace LotTraceApp
                 string.Equals(name, "InputSourceType", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            DataTable table = ResolveGridDataTable(grid);
+            DataTable? table = ResolveGridDataTable(grid);
             if (table == null || !table.Columns.Contains("NodeKey"))
                 return null;
 
@@ -2529,7 +2530,7 @@ namespace LotTraceApp
         }
 
         private void OnBottleCrossPointNodeBackColorFormatting(
-            object sender,
+            object? sender,
             DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
@@ -2539,8 +2540,8 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            GridBackColorCache cache;
-            if (!_gridBackColorCaches.TryGetValue(grid, out cache))
+            
+            if (!_gridBackColorCaches.TryGetValue(grid, out var cache))
                 return;
 
             if (e.RowIndex >= cache.RowGroupHasBackColor.GetLength(0) ||
@@ -2552,12 +2553,12 @@ namespace LotTraceApp
             if (!cache.TryGetBackColor(e.RowIndex, e.ColumnIndex, out backColor, out selectionBackColor))
                 return;
 
-            e.CellStyle.BackColor = backColor;
+            e.CellStyle!.BackColor = backColor;
             e.CellStyle.SelectionBackColor = selectionBackColor;
         }
 
         private void OnBottleIntersectionGridCrossPointBackColorFormatting(
-            object sender,
+            object? sender,
             DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0)
@@ -2578,24 +2579,24 @@ namespace LotTraceApp
             if (GetTableInt(boundItem.Row, "交点") != 1)
                 return;
 
-            string nodeKey = GetTableString(boundItem.Row, "NodeKey");
+            string? nodeKey = GetTableString(boundItem.Row, "NodeKey");
             if (string.IsNullOrWhiteSpace(nodeKey))
                 return;
 
             var colors = GetCrossPointNodeColors(nodeKey);
-            e.CellStyle.BackColor = colors.Item1;
+            e.CellStyle!.BackColor = colors.Item1;
             e.CellStyle.SelectionBackColor = colors.Item2;
         }
 
-        private string BuildBottleCrossPointUiKeyFromRow(DataRow row)
+        private string? BuildBottleCrossPointUiKeyFromRow(DataRow row)
         {
             if (row == null)
                 return null;
 
-            string masterKey = GetTableString(row, "MasterKey");
-            string nodeKey = GetTableString(row, "NodeKey");
-            string startDateLabel = GetTableString(row, "StartDateLabel");
-            string inputSourceType = GetTableString(row, "InputSourceType");
+            string? masterKey = GetTableString(row, "MasterKey");
+            string? nodeKey = GetTableString(row, "NodeKey");
+            string? startDateLabel = GetTableString(row, "StartDateLabel");
+            string? inputSourceType = GetTableString(row, "InputSourceType");
 
             bool isManual =
                 string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
@@ -2615,8 +2616,8 @@ namespace LotTraceApp
             if (string.IsNullOrWhiteSpace(nodeKey))
                 return Tuple.Create(Color.Empty, Color.Empty);
 
-            Tuple<Color, Color> colors;
-            if (_crossPointColorsByNodeKey.TryGetValue(nodeKey, out colors))
+            
+            if (_crossPointColorsByNodeKey.TryGetValue(nodeKey, out var colors))
                 return colors;
 
             colors = Tuple.Create(
@@ -2666,7 +2667,7 @@ namespace LotTraceApp
 
         #region 罫線描画系
 
-        private void BuildLineColorCache(int tabNo, BottleDisplayTables tableSource)
+        private void BuildLineColorCache(int tabNo, BottleDisplayTables? tableSource)
         {
             var cacheList = new List<LineCache>();
 
@@ -2685,19 +2686,19 @@ namespace LotTraceApp
             _lineCache[tabNo] = cacheList;
         }
 
-        private List<LineCache> GetCurrentLineCache()
+        private List<LineCache>? GetCurrentLineCache()
         {
             int tabNo = GetCurrentBottleTraceTabNo();
 
-            List<LineCache> cache;
-            if (_lineCache.TryGetValue(tabNo, out cache))
+            
+            if (_lineCache.TryGetValue(tabNo, out var cache))
                 return cache;
 
             return null;
         }
 
 
-        private void LiquidTableBorderPaint(object sender, PaintEventArgs e)
+        private void LiquidTableBorderPaint(object? sender, PaintEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null || e == null)
@@ -2749,7 +2750,7 @@ namespace LotTraceApp
 
         }
 
-        private void BottleTableBorderPaint(object sender, PaintEventArgs e)
+        private void BottleTableBorderPaint(object? sender, PaintEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null || e == null)
@@ -2807,13 +2808,13 @@ namespace LotTraceApp
 
         #region CSV処理系
 
-        private void Csv_FromAnyTab_Click(object sender, EventArgs e)
+        private void Csv_FromAnyTab_Click(object? sender, EventArgs e)
         {
             var tab = GetCurrentTabContext();
             if (tab == null) return;
 
-            BottleDisplayTables tables;
-            if (!_tabDisplayTables.TryGetValue(tab.TabNo, out tables) || tables == null)
+            
+            if (!_tabDisplayTables.TryGetValue(tab.TabNo, out var tables) || tables == null)
             {
                 MessageBox.Show("出力する検索結果がありません。", "瓶設備ロットトレース",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -2907,7 +2908,7 @@ namespace LotTraceApp
 
         #region EXCEL出力
 
-        private void btnBottleExcelOutput_Click(object sender, EventArgs e)
+        private void btnBottleExcelOutput_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -2973,16 +2974,16 @@ namespace LotTraceApp
 
             foreach (int tabNo in _selectedTraceTargetTabs.OrderBy(x => x))
             {
-                BottleDisplayTables tables;
-                if (!_tabDisplayTables.TryGetValue(tabNo, out tables) || tables == null)
+                
+                if (!_tabDisplayTables.TryGetValue(tabNo, out var tables) || tables == null)
                     continue;
 
                 var tab = GetTabContext(tabNo);
                 if (tab == null || !HasAnyVisibleDataForBottleExcelExport(tab))
                     continue;
 
-                HashSet<string> crossPointNodeKeys;
-                _crossPointNodeKeysByTab.TryGetValue(tabNo, out crossPointNodeKeys);
+                
+                _crossPointNodeKeysByTab.TryGetValue(tabNo, out var crossPointNodeKeys);
 
                 requests.Add(new ExcelExportHelper.BottleTraceGridExcelExportRequest
                 {
@@ -3031,7 +3032,7 @@ namespace LotTraceApp
                     if (value == null || value == DBNull.Value)
                         continue;
 
-                    string text = Convert.ToString(value);
+                    string? text = Convert.ToString(value);
                     if (!string.IsNullOrWhiteSpace(text))
                         return true;
                 }
@@ -3045,12 +3046,12 @@ namespace LotTraceApp
             if (dialog == null)
                 return;
 
-            string directory = GetOutputInitialDirectory(iniKey);
+            string? directory = GetOutputInitialDirectory(iniKey);
             if (!string.IsNullOrWhiteSpace(directory))
                 dialog.InitialDirectory = directory;
         }
 
-        private string GetOutputInitialDirectory(string iniKey)
+        private string? GetOutputInitialDirectory(string iniKey)
         {
             if (string.IsNullOrWhiteSpace(iniKey))
                 return null;
@@ -3062,7 +3063,7 @@ namespace LotTraceApp
                     return null;
 
                 var ini = new IniFile(iniPath);
-                string directory = ini.GetString(OutputIniSection, iniKey, null);
+                string? directory = ini.GetString(OutputIniSection, iniKey, null);
                 if (string.IsNullOrWhiteSpace(directory))
                     return null;
 
@@ -3087,7 +3088,7 @@ namespace LotTraceApp
 
         #region クリアボタン系
 
-        private void Clear_FromAnyTab_Click(object sender, EventArgs e)
+        private void Clear_FromAnyTab_Click(object? sender, EventArgs e)
         {
             var tab = GetCurrentTabContext();
             if (tab == null) return;
@@ -3109,7 +3110,7 @@ namespace LotTraceApp
             ClearBottleTraceTabGrids(tab);
         }
 
-        private void ClearBottleTraceTabGrids(BottleTraceTabContext tab)
+        private void ClearBottleTraceTabGrids(BottleTraceTabContext? tab)
         {
             if (tab == null)
                 return;
@@ -3119,7 +3120,7 @@ namespace LotTraceApp
             RefreshBottleHeaderPanels(tab);
         }
 
-        private void ClearTraceGrid(DataGridView grid)
+        private void ClearTraceGrid(DataGridView? grid)
         {
             if (grid == null)
                 return;
@@ -3154,7 +3155,7 @@ namespace LotTraceApp
 
         #region 画面遷移
 
-        private void btnBackToLiquid_Click(object sender, EventArgs e)
+        private void btnBackToLiquid_Click(object? sender, EventArgs e)
         {
             Hide();
         }
@@ -3176,7 +3177,7 @@ namespace LotTraceApp
             }
         }
 
-        private void btnBottleDetectCrossPoints_Click(object sender, EventArgs e)
+        private void btnBottleDetectCrossPoints_Click(object? sender, EventArgs e)
         {
             RebuildSelectedTraceTargetTabsFromCheckBoxes();
 
@@ -3191,8 +3192,8 @@ namespace LotTraceApp
             var targets = new Dictionary<int, BottleTraceResult>();
             foreach (int tabNo in _selectedTraceTargetTabs)
             {
-                BottleTraceResult result;
-                if (_tabBottleTraceResults.TryGetValue(tabNo, out result) && result != null)
+                
+                if (_tabBottleTraceResults.TryGetValue(tabNo, out var result) && result != null)
                     targets[tabNo] = result;
             }
 
@@ -3248,8 +3249,8 @@ namespace LotTraceApp
             {
                 string key = kv.Key;
                 var tabs = kv.Value;
-                B_CrossPointRecord record;
-                if (!repByKey.TryGetValue(key, out record) || record == null)
+                
+                if (!repByKey.TryGetValue(key, out var record) || record == null)
                     continue;
 
                 record.CrossPointFlag = tabs.Count >= 2 ? 1 : 0;
@@ -3306,12 +3307,12 @@ namespace LotTraceApp
             if (laneNode == null || tabsByKey == null || repByKey == null)
                 return;
 
-            string key = B_BuildCrossPointUiKey(laneNode);
+            string? key = B_BuildCrossPointUiKey(laneNode);
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-            HashSet<int> tabs;
-            if (!tabsByKey.TryGetValue(key, out tabs))
+            
+            if (!tabsByKey.TryGetValue(key, out var tabs))
             {
                 tabs = new HashSet<int>();
                 tabsByKey[key] = tabs;
@@ -3358,7 +3359,7 @@ namespace LotTraceApp
             return record;
         }
 
-        private string B_BuildCrossPointUiKey(BottleDisplayLaneNode laneNode)
+        private string? B_BuildCrossPointUiKey(BottleDisplayLaneNode laneNode)
         {
             if (laneNode == null)
                 return null;
@@ -3375,7 +3376,7 @@ namespace LotTraceApp
             return null;
         }
 
-        private string B_BuildCrossPointUiKey(ProductionResultNode node)
+        private string? B_BuildCrossPointUiKey(ProductionResultNode node)
         {
             if (node == null)
                 return null;
@@ -3464,7 +3465,7 @@ namespace LotTraceApp
             return float.TryParse(Convert.ToString(value), out result) ? (float?)result : null;
         }
 
-        private void btnBottleIntersectionClear_Click(object sender, EventArgs e)
+        private void btnBottleIntersectionClear_Click(object? sender, EventArgs e)
         {
             _lastBottleCrossPoints = null;
             _lastBottleCrossPointTargetTabs.Clear();
@@ -3481,7 +3482,7 @@ namespace LotTraceApp
             }
         }
 
-        private void btnBottleIntersectionCsv_Click(object sender, EventArgs e)
+        private void btnBottleIntersectionCsv_Click(object? sender, EventArgs e)
         {
             if (_lastBottleCrossPoints == null || _lastBottleCrossPoints.Count == 0)
             {
@@ -3547,7 +3548,7 @@ namespace LotTraceApp
             /// NodeIdentityKey 由来のNode識別子。
             /// 交点判定、通常グリッドのセル強調に使用する。
             /// </summary>
-            public string NodeKey { get; set; }
+            public string NodeKey { get; set; } = string.Empty;
 
             /// <summary>
             /// 複数の対象タブに存在する場合は 1、それ以外は 0。
@@ -3555,10 +3556,10 @@ namespace LotTraceApp
             /// </summary>
             public int CrossPointFlag { get; set; }
 
-            public string ProductionOrderNumber { get; set; }
-            public string LotNumber { get; set; }
-            public string ItemName { get; set; }
-            public string StartDateText { get; set; }
+            public string? ProductionOrderNumber { get; set; }
+            public string? LotNumber { get; set; }
+            public string? ItemName { get; set; }
+            public string? StartDateText { get; set; }
             public float? Weight { get; set; } = null;
             public int? FillingBottleNum_Total { get; set; } = null;
 
@@ -3579,8 +3580,8 @@ namespace LotTraceApp
 
 
         private DataTable B_CreateCrossPointGridTable(
-            IEnumerable<B_CrossPointRecord> records,
-            IEnumerable<int> targetTabs)
+            IEnumerable<B_CrossPointRecord>? records,
+            IEnumerable<int>? targetTabs)
         {
             var table = new DataTable();
 
@@ -3641,7 +3642,7 @@ namespace LotTraceApp
                 return;
 
             dataGridIntersection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            DataGridViewColumn itemNameColumn = null;
+            DataGridViewColumn? itemNameColumn = null;
 
             foreach (DataGridViewColumn col in dataGridIntersection.Columns)
             {
@@ -3702,7 +3703,7 @@ namespace LotTraceApp
                 : DataGridViewColumnSortMode.NotSortable;
         }
 
-        private void B_AdjustBottleCrossPointItemNameWidth(DataGridViewColumn itemNameColumn)
+        private void B_AdjustBottleCrossPointItemNameWidth(DataGridViewColumn? itemNameColumn)
         {
             if (dataGridIntersection == null || itemNameColumn == null || !itemNameColumn.Visible)
                 return;
@@ -3846,9 +3847,11 @@ namespace LotTraceApp
 
         #region 履歴詳細
 
-        private void dataGrid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void dataGrid_CellMouseClick(object? sender, DataGridViewCellMouseEventArgs e)
         {
             var grid = sender as DataGridView;
+
+            if (grid == null) {return; }    
 
             if (grid.Columns.Contains("Weight") && grid.Columns["Weight"].Visible)
             {
@@ -3889,11 +3892,10 @@ namespace LotTraceApp
             if (drv == null) return;
 
             DataRow r = drv.Row;
-            string Get(string col) =>
-                r.Table.Columns.Contains(col) && r[col] != DBNull.Value ? Convert.ToString(r[col]) : "";
+            string Get(string col) => r.Table.Columns.Contains(col) ? Convert.ToString(r[col]) ?? string.Empty : string.Empty;
 
-            
-                        string productionOrderNumber = Get("OrderNumber");
+
+            string productionOrderNumber = Get("OrderNumber");
             string itemCode = Get("ItemCode");
             string itemName = Get("ItemName");
             string lotNumber = Get("Lot");

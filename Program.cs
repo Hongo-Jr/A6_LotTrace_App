@@ -71,8 +71,8 @@ namespace LotTraceApp
             }
 
             // 接続文字列を INI から取得
-            string connLiquid = ini.GetValue("ConnectionStrings", "Mes31");
-            string connBottle = ini.GetValue("ConnectionStrings", "Mes33");
+            string? connLiquid = ini.GetValue("ConnectionStrings", "Mes31");
+            string? connBottle = ini.GetValue("ConnectionStrings", "Mes33");
 
             if (string.IsNullOrEmpty(connLiquid))
             {
@@ -108,7 +108,7 @@ namespace LotTraceApp
             Application.SetCompatibleTextRenderingDefault(false);
 
             CommandLineOptions options;
-            string parseError;
+            string? parseError;
             if (args != null && args.Length > 0)
             {
                 if (!CommandLineOptions.TryParse(args, out options, out parseError))
@@ -175,7 +175,7 @@ namespace LotTraceApp
             get { return Mode == 1 || Mode == 2; }
         }
 
-        public static bool TryParse(string[] args, out CommandLineOptions options, out string errorMessage)
+        public static bool TryParse(string[] args, out CommandLineOptions options, out string? errorMessage)
         {
             options = new CommandLineOptions();
             errorMessage = null;
@@ -187,7 +187,7 @@ namespace LotTraceApp
                     continue;
 
                 string flag;
-                string value;
+                string? value;
                 SplitArgument(raw, out flag, out value);
 
                 if (flag.Equals("-F", StringComparison.OrdinalIgnoreCase))
@@ -200,7 +200,7 @@ namespace LotTraceApp
                 }
                 else if (flag.Equals("-S", StringComparison.OrdinalIgnoreCase))
                 {
-                    string parsedValue;
+                    string? parsedValue;
                     if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
                         return false;
 
@@ -208,7 +208,7 @@ namespace LotTraceApp
                 }
                 else if (flag.Equals("-N", StringComparison.OrdinalIgnoreCase))
                 {
-                    string parsedValue;
+                    string? parsedValue;
                     if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
                         return false;
 
@@ -216,7 +216,7 @@ namespace LotTraceApp
                 }
                 else if (flag.Equals("-C", StringComparison.OrdinalIgnoreCase))
                 {
-                    string parsedValue;
+                    string? parsedValue;
                     if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
                         return false;
 
@@ -224,7 +224,7 @@ namespace LotTraceApp
                 }
                 else if (flag.Equals("-L", StringComparison.OrdinalIgnoreCase))
                 {
-                    string parsedValue;
+                    string? parsedValue;
                     if (!ReadValue(args, ref i, value, flag, out parsedValue, out errorMessage))
                         return false;
 
@@ -232,7 +232,7 @@ namespace LotTraceApp
                 }
                 else if (flag.Equals("-M", StringComparison.OrdinalIgnoreCase))
                 {
-                    string modeText;
+                    string? modeText;
                     if (!ReadValue(args, ref i, value, flag, out modeText, out errorMessage))
                         return false;
 
@@ -261,7 +261,7 @@ namespace LotTraceApp
             return true;
         }
 
-        private static void SplitArgument(string raw, out string flag, out string value)
+        private static void SplitArgument(string raw, out string flag, out string? value)
         {
             int separatorIndex = raw.IndexOf(':');
             if (separatorIndex < 0)
@@ -281,10 +281,10 @@ namespace LotTraceApp
         private static bool ReadValue(
             string[] args,
             ref int index,
-            string inlineValue,
+            string? inlineValue,
             string flag,
-            out string value,
-            out string errorMessage)
+            out string? value,
+            out string? errorMessage)
         {
             errorMessage = null;
 

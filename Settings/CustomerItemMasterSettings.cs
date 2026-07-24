@@ -9,12 +9,12 @@ namespace LotTraceApp.Settings
     public sealed class CustomerItemMasterSettings
     {
         public bool Enabled { get; set; }
-        public string ServerName { get; set; } = string.Empty;
-        public string DatabaseName { get; set; } = string.Empty;
-        public string SchemaName { get; set; } = "dbo";
-        public string TableName { get; set; } = string.Empty;
-        public string ItemCodeColumnName { get; set; } = string.Empty;
-        public string ItemNameColumnName { get; set; } = string.Empty;
+        public string? ServerName { get; set; }
+        public string? DatabaseName { get; set; }
+        public string? SchemaName { get; set; } = "dbo";
+        public string? TableName { get; set; }
+        public string? ItemCodeColumnName { get; set; }
+        public string? ItemNameColumnName { get; set; }
         public bool UseTrustedConnection { get; set; } = true;
         public int TimeoutSeconds { get; set; } = 5;
 

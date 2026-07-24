@@ -64,8 +64,8 @@ namespace LotTraceApp.Utils
             if (displayNameMap == null || displayNameMap.Count == 0)
                 return originalName;
 
-            string displayName;
-            if (displayNameMap.TryGetValue(originalName, out displayName) &&
+            
+            if (displayNameMap.TryGetValue(originalName, out var displayName) &&
                 !string.IsNullOrWhiteSpace(displayName))
             {
                 return displayName;

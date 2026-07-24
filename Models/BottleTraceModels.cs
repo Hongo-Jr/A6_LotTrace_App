@@ -173,10 +173,10 @@ namespace LotTraceApp.Models
 
     public class BottleNodeInfo
     {
-        public string OrderNumber {  get; set; } = string.Empty;
-        public string ProductLotNo {  get; set; } = string.Empty;
-        public string ProductItemCode { get; set; } = string.Empty;
-        public string ProductItemName { get; set; } = string.Empty;
+        public string? OrderNumber {  get; set; }
+        public string? ProductLotNo {  get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? ProductItemName { get; set; }
         public string MasterKey {  get; set; } = string.Empty;
     }
 

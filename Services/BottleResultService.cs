@@ -20,7 +20,7 @@ namespace LotTraceApp.Services
             => _repo.GetBottleOrder(order, lot);
 
 
-        public DataTable GetBottleOrderVerticalAll(string order, string lot)
+        public DataTable GetBottleOrderVerticalAll(string? order, string? lot)
         {
             var wide = _repo.GetBottleOrder(order, lot);
             return ToVerticalAllColumns(wide);
@@ -30,10 +30,10 @@ namespace LotTraceApp.Services
         {
             var vertical = new DataTable();
             vertical.Columns.Add("Item", typeof(string));
-            vertical.Columns["Item"].Caption = "項目";
+            vertical.Columns["Item"]!.Caption = "項目";
 
             vertical.Columns.Add("order", typeof(string));
-            vertical.Columns["order"].Caption = "指図";
+            vertical.Columns["order"]!.Caption = "指図";
 
 
             if (wide == null || wide.Columns.Count == 0)
@@ -46,7 +46,7 @@ namespace LotTraceApp.Services
                 foreach (DataColumn col in wide.Columns)
                 {
 
-                    string value = row.IsNull(col) ? null : Convert.ToString(row[col]);
+                    string? value = row.IsNull(col) ? null : Convert.ToString(row[col]);
                     vertical.Rows.Add(col.Caption, value);
 
                 }
@@ -56,7 +56,7 @@ namespace LotTraceApp.Services
         }
 
 
-        public FillingResultTable GetFillingResultPage(string order, string lot, int pageNo, int pageSize)
+        public FillingResultTable GetFillingResultPage(string? order, string? lot, int pageNo, int pageSize)
         {
             var table = new FillingResultTable();
             table.BottleTable = SetBottleResultTable();
@@ -64,6 +64,12 @@ namespace LotTraceApp.Services
 
             var page = _repo.GetFillingResultPages(order, lot, pageNo, pageSize);
             table.TotalCount = page?.TotalCount ?? 0;
+
+            if (page == null || page.TotalCount == 0)
+            {
+                table.MaxPageNo = 0;
+                return table;
+            }
 
             float fMaxPage = (float)table.TotalCount / (float)pageSize;
             int iMaxPage = (int)Math.Ceiling(fMaxPage);
@@ -112,26 +118,26 @@ namespace LotTraceApp.Services
             result.Columns.Add("FillingEndDate");
             result.Columns.Add("ProcessType");
 
-            result.Columns["OrderNumber"].Caption = "指図番号";
-            result.Columns["ProductLotNumber"].Caption = "製品ロットNo";
-            result.Columns["ProductItemCode"].Caption = "製品品目コード";
-            result.Columns["MiddleProductLotNumber"].Caption = "中間品ロットNo";
-            result.Columns["MiddleProductItemCode"].Caption = "中間品品目コード";
-            result.Columns["BottleID"].Caption = "瓶ID";
-            result.Columns["SamplingGroup"].Caption = "サンプリンググループ";
-            result.Columns["BottleINumber"].Caption = "瓶番号";
-            result.Columns["FillingNozzleNumber"].Caption = "充填ノズルNo";
-            result.Columns["CapTighteningTorqueValue"].Caption = "キャップ締付トルク値";
-            result.Columns["CapTighteningTorqueJudgment"].Caption = "キャップ締付トルク判定";
-            result.Columns["CapTiltDetectionJudgment"].Caption = "キャップ締付方向判定";
-            result.Columns["FillingMachineNumber"].Caption = "充填機番号";
-            result.Columns["TotalCahckJudgment"].Caption = "総合判定";
-            result.Columns["BottleLocation"].Caption = "瓶ロケーション";
-            result.Columns["FillingWeight"].Caption = "充填重量";
-            result.Columns["FillingTime"].Caption = "充填時間";
-            result.Columns["FillingStartDate"].Caption = "充填開始日時";
-            result.Columns["FillingEndDate"].Caption = "充填終了日時";
-            result.Columns["ProcessType"].Caption = "工程種別";
+            result.Columns["OrderNumber"]!.Caption = "指図番号";
+            result.Columns["ProductLotNumber"]!.Caption = "製品ロットNo";
+            result.Columns["ProductItemCode"]!.Caption = "製品品目コード";
+            result.Columns["MiddleProductLotNumber"]!.Caption = "中間品ロットNo";
+            result.Columns["MiddleProductItemCode"]!.Caption = "中間品品目コード";
+            result.Columns["BottleID"]!.Caption = "瓶ID";
+            result.Columns["SamplingGroup"]!.Caption = "サンプリンググループ";
+            result.Columns["BottleINumber"]!.Caption = "瓶番号";
+            result.Columns["FillingNozzleNumber"]!.Caption = "充填ノズルNo";
+            result.Columns["CapTighteningTorqueValue"]!.Caption = "キャップ締付トルク値";
+            result.Columns["CapTighteningTorqueJudgment"]!.Caption = "キャップ締付トルク判定";
+            result.Columns["CapTiltDetectionJudgment"]!.Caption = "キャップ締付方向判定";
+            result.Columns["FillingMachineNumber"]!.Caption = "充填機番号";
+            result.Columns["TotalCahckJudgment"]!.Caption = "総合判定";
+            result.Columns["BottleLocation"]!.Caption = "瓶ロケーション";
+            result.Columns["FillingWeight"]!.Caption = "充填重量";
+            result.Columns["FillingTime"]!.Caption = "充填時間";
+            result.Columns["FillingStartDate"]!.Caption = "充填開始日時";
+            result.Columns["FillingEndDate"]!.Caption = "充填終了日時";
+            result.Columns["ProcessType"]!.Caption = "工程種別";
 
 
 
@@ -163,25 +169,25 @@ namespace LotTraceApp.Services
             result.Columns.Add("FillingStartDate");
             result.Columns.Add("FillingEndDate");
 
-            result.Columns["OrderNumber"].Caption = "指図番号";
-            result.Columns["ProcessType"].Caption = "工程種別";
-            result.Columns["ProductLotNumber"].Caption = "製品ロットNo";
-            result.Columns["ProductItemCode"].Caption = "製品品目コード";
-            result.Columns["MiddleProductLotNumber"].Caption = "中間品ロットNo";
-            result.Columns["MiddleProductItemCode"].Caption = "中間品品目コード";
-            result.Columns["DrumcanNumber"].Caption = "ドラム缶番号";
-            result.Columns["FillingNozzleNumber"].Caption = "充填ノズルNo";
-            result.Columns["CapTighteningTorqueValue_Big"].Caption = "キャップ締付トルク値(大)";
-            result.Columns["CapTighteningTorqueJudgment"].Caption = "キャップ締付トルク判定";
-            result.Columns["CapTiltDetectionJudgment"].Caption = "キャップ締付方向判定";
-            result.Columns["TotalCahckJudgment"].Caption = "総合判定";
-            result.Columns["CapTighteningTorqueValue_Small"].Caption = "キャップ締付トルク値(小)";
-            result.Columns["FillingWeightJudgment"].Caption = "充填重量判定";
-            result.Columns["BottleLocation"].Caption = "瓶ロケーション";
-            result.Columns["FillingWeight"].Caption = "充填重量";
-            result.Columns["FillingTime"].Caption = "充填時間";
-            result.Columns["FillingStartDate"].Caption = "充填開始日時";
-            result.Columns["FillingEndDate"].Caption = "充填終了日時";
+            result.Columns["OrderNumber"]!.Caption = "指図番号";
+            result.Columns["ProcessType"]!.Caption = "工程種別";
+            result.Columns["ProductLotNumber"]!.Caption = "製品ロットNo";
+            result.Columns["ProductItemCode"]!.Caption = "製品品目コード";
+            result.Columns["MiddleProductLotNumber"]!.Caption = "中間品ロットNo";
+            result.Columns["MiddleProductItemCode"]!.Caption = "中間品品目コード";
+            result.Columns["DrumcanNumber"]!.Caption = "ドラム缶番号";
+            result.Columns["FillingNozzleNumber"]!.Caption = "充填ノズルNo";
+            result.Columns["CapTighteningTorqueValue_Big"]!.Caption = "キャップ締付トルク値(大)";
+            result.Columns["CapTighteningTorqueJudgment"]!.Caption = "キャップ締付トルク判定";
+            result.Columns["CapTiltDetectionJudgment"]!.Caption = "キャップ締付方向判定";
+            result.Columns["TotalCahckJudgment"]!.Caption = "総合判定";
+            result.Columns["CapTighteningTorqueValue_Small"]!.Caption = "キャップ締付トルク値(小)";
+            result.Columns["FillingWeightJudgment"]!.Caption = "充填重量判定";
+            result.Columns["BottleLocation"]!.Caption = "瓶ロケーション";
+            result.Columns["FillingWeight"]!.Caption = "充填重量";
+            result.Columns["FillingTime"]!.Caption = "充填時間";
+            result.Columns["FillingStartDate"]!.Caption = "充填開始日時";
+            result.Columns["FillingEndDate"]!.Caption = "充填終了日時";
 
             return result;
         }

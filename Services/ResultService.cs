@@ -47,15 +47,15 @@ namespace LotTraceApp.Services
 
         }
 
-        public bool TryGetDisplayName(string originalName, out string displayName)
+        public bool TryGetDisplayName(string originalName, out string? displayName)
         {
             displayName = null;
 
             if (string.IsNullOrWhiteSpace(originalName))
                 return false;
 
-            string value;
-            if (_dis.Map.TryGetValue(originalName, out value) && !string.IsNullOrWhiteSpace(value))
+            
+            if (_dis.Map.TryGetValue(originalName, out var value) && !string.IsNullOrWhiteSpace(value))
             {
                 displayName = value;
                 return true;
@@ -87,7 +87,7 @@ namespace LotTraceApp.Services
                 _repo.GetAvailableProcessIds(productionOrderNumber, itemCode, lotNumber),
                 StringComparer.OrdinalIgnoreCase);
 
-            return all.Where(p => available.Contains(p.Id)).ToList();
+            return all.Where(p => p.Id is not null && available.Contains(p.Id)).ToList();
         }
 
         public DataTable GetProcessView(string productionOrderNumber, string itemCode, string lotNumber, string processId)
@@ -124,8 +124,8 @@ namespace LotTraceApp.Services
                     ? col.DataPropertyName
                     : col.Name;
 
-                string display;
-                if (TryGetDisplayName(key, out display))
+                
+                if (TryGetDisplayName(key, out var display))
                 {
                     col.HeaderText = display; // CSVにあるものだけ変更
                 }
@@ -195,7 +195,7 @@ namespace LotTraceApp.Services
 
             foreach (var r in merged)
             {
-                string cat = Convert.ToString(r["DataCategory"]);
+                string? cat = Convert.ToString(r["DataCategory"]);
                 string header;
 
                 if (cat == "指図")
@@ -220,7 +220,7 @@ namespace LotTraceApp.Services
             {
                 if (src.Columns.Contains(colName))
                 {
-                    var c = src.Columns[colName];
+                    var c = src.Columns[colName]!;
                     if (!itemColumns.Contains(c)) itemColumns.Add(c);
                 }
             }
@@ -236,8 +236,8 @@ namespace LotTraceApp.Services
                 if (string.Equals(c.ColumnName, "StartDate", StringComparison.OrdinalIgnoreCase)) continue;
                 if (string.Equals(c.ColumnName, "EndDate", StringComparison.OrdinalIgnoreCase)) continue;
 
-                string display;
-                if (_dis.Map.TryGetValue(c.ColumnName, out display) && !string.IsNullOrWhiteSpace(display))
+                
+                if (_dis.Map.TryGetValue(c.ColumnName, out var display) && !string.IsNullOrWhiteSpace(display))
                 {
                     itemColumns.Add(c);
                 }
@@ -374,7 +374,7 @@ namespace LotTraceApp.Services
 
             foreach (var r in merged)
             {
-                string cat = Convert.ToString(r["DataCategory"]);
+                string? cat = Convert.ToString(r["DataCategory"]);
                 string header;
 
                 if (string.Equals(cat, "指図", StringComparison.OrdinalIgnoreCase))
@@ -403,9 +403,9 @@ namespace LotTraceApp.Services
                 var newRow = dst.NewRow();
 
                 // 表示名：CSVにあれば使い、無ければ列名そのまま
-                string disp;
+                
                 if (_filterDis != null && _filterDis.Map != null
-                    && _filterDis.Map.TryGetValue(itemCol.ColumnName, out disp)
+                    && _filterDis.Map.TryGetValue(itemCol.ColumnName, out var disp)
                     && !string.IsNullOrWhiteSpace(disp))
                 {
                     newRow["項目"] = disp;
@@ -464,10 +464,9 @@ namespace LotTraceApp.Services
 
             var all = _filterHistoryStore.LoadAll();
 
-            var hit = all.FirstOrDefault(x =>
-                x != null
-                && x.ContextKey.Equals(ctx, StringComparison.OrdinalIgnoreCase)
-                && x.ProcessId.Equals(processId, StringComparison.OrdinalIgnoreCase));
+            var hit = all.FirstOrDefault(x => x is not null 
+                        && string.Equals( x.ContextKey, ctx, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(x.ProcessId, processId,StringComparison.OrdinalIgnoreCase));
 
             if (hit == null)
             {
@@ -494,11 +493,19 @@ namespace LotTraceApp.Services
         }
 
         // ★ cmbTarget の DataSource にそのまま渡せる（フィルター→区切り→履歴→区切り→通常）
-        public DataTable BuildProcessDropdownTable(string productionOrderNumber, string itemCode, string lotNumber)
+        public DataTable BuildProcessDropdownTable(string? productionOrderNumber, string? itemCode, string? lotNumber)
         {
+
             var dt = new DataTable();
             dt.Columns.Add("Id");
             dt.Columns.Add("Name");
+
+            if (string.IsNullOrWhiteSpace(productionOrderNumber)
+                || string.IsNullOrWhiteSpace(itemCode)
+                || string.IsNullOrWhiteSpace(lotNumber))
+            {
+                return dt;
+            }   
 
             // 制御工程（利用可能なものだけ）
             var available = GetAvailableProcesses(productionOrderNumber, itemCode, lotNumber);
@@ -522,7 +529,7 @@ namespace LotTraceApp.Services
 
             return dt;
         }
-        public string ResolveProcessIdByMasterKey(
+        public string? ResolveProcessIdByMasterKey(
         string productionOrderNumber,string itemCode,string lotNumber,string masterKey)
         {
             if (string.IsNullOrWhiteSpace(masterKey))
@@ -556,8 +563,8 @@ namespace LotTraceApp.Services
         }
         public sealed class ProcessItem
         {
-            public string Id { get; set; }
-            public string Name { get; set; }  // 表示名
+            public string? Id { get; set; }
+            public string? Name { get; set; }  // 表示名
         }
 
         // ==========================
@@ -565,8 +572,8 @@ namespace LotTraceApp.Services
         // ==========================
         private sealed class FilterHistoryEntry
         {
-            public string ContextKey { get; set; }   // 指図|品目コード|ロット
-            public string ProcessId { get; set; }    // 工程ID
+            public string? ContextKey { get; set; }  // 指図|品目コード|ロット
+            public string? ProcessId { get; set; }    // 工程ID
             public int UseCount { get; set; }
             public DateTime LastUsedUtc { get; set; }
         }
@@ -578,7 +585,7 @@ namespace LotTraceApp.Services
             public FilterHistoryStore(string filePath)
             {
                 _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
-                Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
             }
 
             public List<FilterHistoryEntry> LoadAll()

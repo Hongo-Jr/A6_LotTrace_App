@@ -239,10 +239,10 @@ namespace LotTraceApp.Repositories
 
             return string.Format(
                 "SELECT {0}, {1} FROM {2}.{3} WHERE {0} IN ({4})",
-                Bracket(settings.ItemCodeColumnName),
-                Bracket(settings.ItemNameColumnName),
-                Bracket(settings.SchemaName),
-                Bracket(settings.TableName),
+                Bracket(settings.ItemCodeColumnName!),
+                Bracket(settings.ItemNameColumnName!),
+                Bracket(settings.SchemaName!),
+                Bracket(settings.TableName!),
                 string.Join(", ", parameterNames));
         }
 
@@ -251,13 +251,13 @@ namespace LotTraceApp.Repositories
             return string.Format(
                 "SELECT TOP ({0}) {1}, {2} FROM {3}.{4} WHERE {2} LIKE @p ORDER BY {2}, {1}",
                 topCount,
-                Bracket(settings.ItemCodeColumnName),
-                Bracket(settings.ItemNameColumnName),
-                Bracket(settings.SchemaName),
-                Bracket(settings.TableName));
+                Bracket(settings.ItemCodeColumnName!),
+                Bracket(settings.ItemNameColumnName!),
+                Bracket(settings.SchemaName!),
+                Bracket(settings.TableName!));
         }
 
-        private void ValidateSqlIdentifier(string value, string parameterName)
+        private void ValidateSqlIdentifier(string? value, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

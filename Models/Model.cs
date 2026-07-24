@@ -79,7 +79,7 @@ namespace LotTraceApp.Models
         public float? Weight { get; set; }
 
         // 識別補助用
-        public string ControlMasterKey { get; set; } = string.Empty;
+        public string? ControlMasterKey { get; set; }
 
         /// <summary>
         /// 画面互換のため当面残す
@@ -675,13 +675,13 @@ namespace LotTraceApp.Models
         public int EndRowIndex { get; set; }
         public int FromXLevel { get; set; }
         public int ToXLevel { get; set; }
-        public string LineKind { get; set; } = string.Empty;
+        public string? LineKind { get; set; }
     }
 
     public class MiddleVerticalLineDrawInfo
     {
         public int XLevel { get; set; }
-        public string LineKind { get; set; } = string.Empty;    
+        public string? LineKind { get; set; }
         public bool IncludeHeaderArea { get; set; }
     }
 
@@ -699,7 +699,7 @@ namespace LotTraceApp.Models
     {
         public int StartRowIndex { get; set; }
         public int EndRowIndex { get; set; }
-        public string LineKind { get; set; } = string.Empty;
+        public string? LineKind { get; set; }
     }
 
 

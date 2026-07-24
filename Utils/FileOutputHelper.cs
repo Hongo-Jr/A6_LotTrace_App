@@ -43,7 +43,7 @@ public static class FileOutputHelper
     /// <summary>
     /// ログ出力
     /// </summary>
-    public static void WriteLog(string message, Exception ex = null)
+    public static void WriteLog(string message, Exception? ex = null)
     {
         try
         {

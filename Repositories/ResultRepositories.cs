@@ -69,7 +69,7 @@ namespace LotTraceApp.Repositories
      string productionOrderNumber,
      string itemCode,
      string lotNumber,
-     string processId)
+     string? processId)
         {
             var dt = new DataTable();
 
@@ -128,7 +128,7 @@ scp.ManufacturingProcessName;";
 
 
 
-        private string BuildSingleControlSelectColumns(string processId)
+        private string BuildSingleControlSelectColumns(string? processId)
         {
             var sql = new StringBuilder();
             bool first = true;

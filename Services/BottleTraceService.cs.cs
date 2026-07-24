@@ -48,7 +48,7 @@ namespace LotTraceApp.Services
 
 
         public BottleTraceResult B_TraceForwardResult(
-            TraceSearchParameters p,
+            TraceSearchParameters? p,
             IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -97,7 +97,7 @@ namespace LotTraceApp.Services
 
         
         public BottleTraceResult B_TraceBackwardResult(
-            TraceSearchParameters p,
+            TraceSearchParameters? p,
             IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
