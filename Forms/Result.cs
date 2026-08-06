@@ -14,7 +14,7 @@ namespace LotTraceApp.Forms
 
         private readonly string _productionOrderNumber;
         private readonly string _itemCode;
-        private readonly string _itemName;
+        private readonly string? _itemName;
         private readonly string _lotNumber;
         private readonly string _initialProcessId;
         private System.Drawing.Font _dateSmallFont;
@@ -25,7 +25,7 @@ namespace LotTraceApp.Forms
             ResultService resultService,
             string productionOrderNumber,
             string itemCode,
-            string itemName,
+            string? itemName,
             string lotNumber,
             string processId)
         {
@@ -86,7 +86,7 @@ namespace LotTraceApp.Forms
             ResultView.EnableHeadersVisualStyles = false;
             ResultView.ColumnHeadersDefaultCellStyle.ForeColor = c;
         }
-        private void ResultView_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        private void ResultView_RowPrePaint(object? sender, DataGridViewRowPrePaintEventArgs e)
         {
             if (e.RowIndex < 0) return;
             if (!ResultView.Columns.Contains("項目")) return;
@@ -112,7 +112,7 @@ namespace LotTraceApp.Forms
                 var header = col.HeaderText ?? col.Name ?? "";
                 if (!(header.StartsWith("指図") || header.StartsWith("実績"))) continue;
 
-                string s = Convert.ToString(row.Cells[i].Value);
+                string? s = Convert.ToString(row.Cells[i].Value);
                 if (string.IsNullOrWhiteSpace(s)) continue;
 
                 sampleCount++;
@@ -157,7 +157,7 @@ namespace LotTraceApp.Forms
 
             row.Tag = true; // 判定済みマーク
         }
-        private void Result_Load(object sender, EventArgs e)
+        private void Result_Load(object? sender, EventArgs e)
         {
             _loading = true;
 
@@ -191,7 +191,7 @@ namespace LotTraceApp.Forms
                 var drv = cmbTarget.Items[i] as DataRowView;
                 if (drv == null) continue;
 
-                string id = Convert.ToString(drv.Row["Id"]);
+                string? id = Convert.ToString(drv.Row["Id"]);
                 if (string.IsNullOrWhiteSpace(id)) continue;
 
                 // 区切り・フィルターは飛ばして「制御工程」を初期選択にする
@@ -205,11 +205,11 @@ namespace LotTraceApp.Forms
                 cmbTarget.SelectedIndex = 0;
         }
 
-        private void cmbTarget_SelectedValueChanged(object sender, EventArgs e)
+        private void cmbTarget_SelectedValueChanged(object? sender, EventArgs e)
         {
             if (_loading) return;
 
-            string id = Convert.ToString(cmbTarget.SelectedValue);
+            string? id = Convert.ToString(cmbTarget.SelectedValue);
             if (string.IsNullOrWhiteSpace(id)) return;
 
             // フィルター以外は履歴に記録
@@ -223,7 +223,7 @@ namespace LotTraceApp.Forms
 
         private void RefreshGrid()
         {
-            string id = Convert.ToString(cmbTarget.SelectedValue);
+            string? id = Convert.ToString(cmbTarget.SelectedValue);
             if (string.IsNullOrWhiteSpace(id)) return;
 
 
@@ -460,31 +460,33 @@ namespace LotTraceApp.Forms
         }
 
 
-        private void ResultView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        private void ResultView_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
             if (!ResultView.Columns.Contains("項目")) return;
 
-            string itemName = Convert.ToString(ResultView.Rows[e.RowIndex].Cells["項目"].Value);
+            string? itemName = Convert.ToString(ResultView.Rows[e.RowIndex].Cells["項目"].Value);
 
             if (itemName == "開始日時" || itemName == "終了日時")
             {
                 if (ResultView.Columns[e.ColumnIndex].Name != "項目")
                 {
-                    e.CellStyle.Font = _dateSmallFont;
-                    e.CellStyle.Padding = new Padding(0, 0, 0, 0); // 任意：詰める
-                    e.CellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-                    e.CellStyle.WrapMode = DataGridViewTriState.False;
+                    var cellStyle = e.CellStyle!;
+
+                    cellStyle.Font = _dateSmallFont;
+                    cellStyle.Padding = Padding.Empty;
+                    cellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                    cellStyle.WrapMode = DataGridViewTriState.False;
                 }
             }
         }
-        private void ResultView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        private void ResultView_DataBindingComplete(object? sender, DataGridViewBindingCompleteEventArgs e)
         {
             BeginInvoke(new Action(() =>
             {
                 AdjustItemColumnWidth_NoAuto(); // 項目列は共通
 
-                string id = Convert.ToString(cmbTarget.SelectedValue);
+                string? id = Convert.ToString(cmbTarget.SelectedValue);
                 if (string.Equals(id, ResultService.FilterId, StringComparison.OrdinalIgnoreCase))
                 {
                     // ★Filterは全列を計測して見切れにくくする
@@ -632,7 +634,7 @@ namespace LotTraceApp.Forms
 
             if (!string.IsNullOrWhiteSpace(_initialProcessId))
             {
-                string resolvedId = _service.ResolveProcessIdByMasterKey(
+                string? resolvedId = _service.ResolveProcessIdByMasterKey(
                     _productionOrderNumber, _itemCode, _lotNumber, _initialProcessId);
 
                 if (!string.IsNullOrWhiteSpace(resolvedId) && TrySelectProcessById(resolvedId))
@@ -652,7 +654,7 @@ namespace LotTraceApp.Forms
                 var drv = cmbTarget.Items[i] as DataRowView;
                 if (drv == null) continue;
 
-                string id = Convert.ToString(drv.Row["Id"]);
+                string? id = Convert.ToString(drv.Row["Id"]);
                 if (string.IsNullOrWhiteSpace(id)) continue;
 
                 // フィルタ行は除外

@@ -46,13 +46,13 @@ namespace LotTraceApp.Models
     /// </summary>
     public class TraceSearchParameters
     {
-        public string ProductionOrderNumber { get; set; }
-        public string ItemName { get; set; }
-        public string ItemCode { get; set; }
+        public string? ProductionOrderNumber { get; set; }
+        public string? ItemName { get; set; }
+        public string? ItemCode { get; set; }
 
-        public List<string> ResolvedItemCodes { get; set; }
+        public List<string> ResolvedItemCodes { get; set; } = new List<string>();
 
-        public string LotNumber { get; set; }
+        public string? LotNumber { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
         public TraceDirection Direction { get; set; } = TraceDirection.Forward;
@@ -67,36 +67,36 @@ namespace LotTraceApp.Models
     public class ProductionResultNode
     {
         // 表示用
-        public string ProductionOrderNumber { get; set; }
-        public string LotNumber { get; set; }
-        public string ItemName { get; set; }
-        public string ItemCode { get; set; }
+        public string? ProductionOrderNumber { get; set; }
+        public string? LotNumber { get; set; }
+        public string? ItemName { get; set; }
+        public string? ItemCode { get; set; }
         public DateTime? StartDate { get; set; }
-        public string StartDateLabel { get; set; }
+        public string? StartDateLabel { get; set; }
         public DateTime? EndDate { get; set; }
-        public string ManufacturingProcessName { get; set; }
-        public string ManufacturingTankName { get; set; }
+        public string? ManufacturingProcessName { get; set; }
+        public string? ManufacturingTankName { get; set; }
         public float? Weight { get; set; }
 
         // 識別補助用
-        public string ControlMasterKey { get; set; }
+        public string? ControlMasterKey { get; set; }
 
         /// <summary>
         /// 画面互換のため当面残す
         /// 旧ロジックで使用している親LotNo
         /// </summary>
-        public string ParentKey { get; set; }
+        public string? ParentKey { get; set; }
 
         // 補助情報
         public int Depth { get; set; }
-        public string NodeType { get; set; }
-        public string ParentMasterKey { get; set; }
+        public string? NodeType { get; set; }
+        public string? ParentMasterKey { get; set; }
 
         /// <summary>
         /// 系統情報
         /// "A" / "B"
         /// </summary>
-        public string RouteSystem { get; set; }
+        public string? RouteSystem { get; set; }
 
         /// <summary>
         /// A系統の入力枠番号。
@@ -109,7 +109,7 @@ namespace LotTraceApp.Models
         /// A系統の入力種別。
         /// "Drumcan" / "ManualInput"
         /// </summary>
-        public string InputSourceType { get; set; }
+        public string? InputSourceType { get; set; }
 
         /// <summary>
         /// Lotなし等でそのノードを終端扱いにするための補助フラグ。
@@ -240,12 +240,12 @@ namespace LotTraceApp.Models
         /// <summary>
         /// 親ノード。
         /// </summary>
-        public ProductionResultNode ParentNode { get; set; }
+        public ProductionResultNode? ParentNode { get; set; }
 
         /// <summary>
         /// 子ノード。
         /// </summary>
-        public ProductionResultNode ChildNode { get; set; }
+        public ProductionResultNode? ChildNode { get; set; }
 
         public TraceEdgeDirection EdgeDirection { get; set; }
 
@@ -256,7 +256,7 @@ namespace LotTraceApp.Models
         /// 「どのLotを使ってこの接続が成立したか」を残すための値。
         /// ノード実体識別子ではなく、接続文脈の一部。
         /// </summary>
-        public string ParentLotNumber { get; set; }
+        public string ParentLotNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// トレースグラフ上の辺の方向。
@@ -325,7 +325,7 @@ namespace LotTraceApp.Models
         /// SourceTable / MaterialAInputType / SlotNo / ParentLotNumber など
         /// 接続文脈を含めて構成される想定。
         /// </summary>
-        public string LinkIdentityKey { get; set; }
+        public string? LinkIdentityKey { get; set; }
     }
 
     public enum TraceDisplayColumnKind
@@ -374,7 +374,7 @@ namespace LotTraceApp.Models
         /// ★フォワード専用
         /// このセルが属するLotグループキー。
         /// </summary>
-        public string LotGroupKey { get; set; }
+        public string? LotGroupKey { get; set; }
 
         /// <summary>
         /// このセルが代表枝かどうか。
@@ -384,17 +384,17 @@ namespace LotTraceApp.Models
         /// <summary>
         /// 下流枝署名。
         /// </summary>
-        public string BranchSignature { get; set; }
+        public string? BranchSignature { get; set; }
 
         /// <summary>
         /// 元ノード実体。
         /// </summary>
-        public ProductionResultNode Node { get; set; }
+        public ProductionResultNode? Node { get; set; }
 
         /// <summary>
         /// MasterKey（表示・補助用）。
         /// </summary>
-        public string MasterKey { get; set; }
+        public string MasterKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 表示用ノードキー。
@@ -407,7 +407,7 @@ namespace LotTraceApp.Models
         ///
         /// ノードの一意性はサービス側の GetNodeMergeKey() に依存する。
         /// </summary>
-        public string NodeKey { get; set; }
+        public string NodeKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 中間レベル（Lv）。
@@ -425,12 +425,12 @@ namespace LotTraceApp.Models
 
         // ===== 表示項目 =====
 
-        public string ProductionOrderNumber { get; set; }
-        public string LotNumber { get; set; }
-        public string ItemCode { get; set; }
-        public string ItemName { get; set; }
+        public string? ProductionOrderNumber { get; set; }
+        public string? LotNumber { get; set; }
+        public string? ItemCode { get; set; }
+        public string? ItemName { get; set; }
         public DateTime? StartDate { get; set; }
-        public string StartDateLabel { get; set; }
+        public string? StartDateLabel { get; set; }
         public decimal? Weight { get; set; }
 
         /// <summary>
@@ -441,26 +441,26 @@ namespace LotTraceApp.Models
         /// <summary>
         /// 抑制理由（デバッグ用）。
         /// </summary>
-        public string SuppressReason { get; set; }
+        public string? SuppressReason { get; set; }
 
         /// <summary>
         /// 旧互換用。
         /// </summary>
-        public string ParentMasterKey { get; set; }
+        public string? ParentMasterKey { get; set; }
     }
 
 
     public class TraceDisplayRow
     {
-        public string RouteSystem { get; set; }
+        public string? RouteSystem { get; set; }
         public int DisplayOrder { get; set; }
 
         public bool IsDisplayTarget { get; set; }
-        public string SuppressReason { get; set; }
+        public string? SuppressReason { get; set; }
 
-        public TraceDisplayCell Start { get; set; }
-        public List<TraceDisplayCell> Middles { get; private set; }
-        public TraceDisplayCell End { get; set; }
+        public TraceDisplayCell? Start { get; set; }
+        public List<TraceDisplayCell?> Middles { get; private set; }
+        public TraceDisplayCell? End { get; set; }
 
         /// <summary>
         /// 始点グループ末尾か。
@@ -481,11 +481,11 @@ namespace LotTraceApp.Models
         /// <summary>
         /// 剪定理由。
         /// </summary>
-        public string PruneReason { get; set; }
+        public string PruneReason { get; set; } = string.Empty;
 
         public TraceDisplayRow()
         {
-            Middles = new List<TraceDisplayCell>();
+            Middles = new List<TraceDisplayCell?>();
 
             // ★追加
             LevelLotGroups = new List<TraceLotGroupInfo>();
@@ -507,7 +507,7 @@ namespace LotTraceApp.Models
     /// </summary>
     public class NodeRenderRange
     {
-        public string NodeKey { get; set; }
+        public string? NodeKey { get; set; }
 
         /// <summary>
         /// 自分自身が表示されている行
@@ -566,10 +566,10 @@ namespace LotTraceApp.Models
     /// </summary>
     public class MiddleTreeRenderRange
     {
-        public string GroupKey { get; set; }
+        public string? GroupKey { get; set; }
         public int Level { get; set; }
 
-        public string NodeKey { get; set; }
+        public string? NodeKey { get; set; }
         /// <summary>
         /// このノード自身が最初に現れる行
         /// </summary>
@@ -675,13 +675,13 @@ namespace LotTraceApp.Models
         public int EndRowIndex { get; set; }
         public int FromXLevel { get; set; }
         public int ToXLevel { get; set; }
-        public string LineKind { get; set; }
+        public string? LineKind { get; set; }
     }
 
     public class MiddleVerticalLineDrawInfo
     {
         public int XLevel { get; set; }
-        public string LineKind { get; set; }
+        public string? LineKind { get; set; }
         public bool IncludeHeaderArea { get; set; }
     }
 
@@ -699,7 +699,7 @@ namespace LotTraceApp.Models
     {
         public int StartRowIndex { get; set; }
         public int EndRowIndex { get; set; }
-        public string LineKind { get; set; }
+        public string? LineKind { get; set; }
     }
 
 
@@ -708,8 +708,8 @@ namespace LotTraceApp.Models
     /// </summary>
     public class MaterialPair : IEquatable<MaterialPair>
     {
-        public string ItemCode { get; set; }
-        public string LotNumber { get; set; }
+        public string? ItemCode { get; set; }
+        public string? LotNumber { get; set; }
 
         public MaterialPair() { }
 
@@ -724,7 +724,7 @@ namespace LotTraceApp.Models
             return string.Format("{0}|{1}", ItemCode, LotNumber);
         }
 
-        public bool Equals(MaterialPair other)
+        public bool Equals(MaterialPair? other)
         {
             if (other == null) return false;
 
@@ -732,7 +732,7 @@ namespace LotTraceApp.Models
                 && string.Equals(LotNumber, other.LotNumber, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as MaterialPair);
         }
@@ -809,7 +809,7 @@ namespace LotTraceApp.Models
         /// NodeIdentityKey 由来のNode識別子。
         /// 交点判定、通常グリッドのセル強調に使用する。
         /// </summary>
-        public string NodeKey { get; set; }
+        public string NodeKey { get; set; } = string.Empty;
 
         /// <summary>
         /// 複数の対象タブに存在する場合は 1、それ以外は 0。
@@ -817,10 +817,10 @@ namespace LotTraceApp.Models
         /// </summary>
         public int CrossPointFlag { get; set; }
 
-        public string ProductionOrderNumber { get; set; }
-        public string LotNumber { get; set; }
-        public string ItemName { get; set; }
-        public string StartDateText { get; set; }
+        public string? ProductionOrderNumber { get; set; }
+        public string? LotNumber { get; set; }
+        public string? ItemName { get; set; }
+        public string? StartDateText { get; set; }
         public float? Weight { get; set; }
 
         /// <summary>
@@ -847,33 +847,33 @@ public class ChildCandidate
         /// <summary>
         /// 子ノード実体（Repository内で完成させる）。
         /// </summary>
-        public ProductionResultNode ChildNode { get; set; }
+        public ProductionResultNode? ChildNode { get; set; }
         /// <summary>
         /// 親ノード実体（Repositories内で完成させる
         /// </summary>
-        public ProductionResultNode PearentNode { get; set; }
+        public ProductionResultNode PearentNode { get; set; } = new ProductionResultNode();
         /// <summary>
         /// BFSの再探索キーになる
         /// Repository内での使用
         /// </summary>
-        public string ChildLotNumber { get; set; }
+        public string? ChildLotNumber { get; set; }
 
         /// <summary>
         /// 親子間の接続文脈を表す。
         ///Repository内で完成させる（子Lot+親Lot)
         /// </summary>
-        public string RelationKey { get; set; }
+        public string? RelationKey { get; set; }
         /// <summary>
         /// 念のため。主にダンプ用途
         /// </summary>
-        public string DebugSource { get; set; }
+        public string? DebugSource { get; set; }
     }
 
     public class TracePathRow
     {
-        public ProductionResultNode StartNode { get; set; }
-        public List<ProductionResultNode> MiddleNodes { get; private set; }
-        public ProductionResultNode EndNode { get; set; }
+        public ProductionResultNode? StartNode { get; set; }
+        public List<ProductionResultNode?> MiddleNodes { get; private set; }
+        public ProductionResultNode? EndNode { get; set; }
         public List<ProductionResultLink> PathLinks { get; private set; }
 
         public bool EndIsDuplicate { get; set; }
@@ -887,7 +887,7 @@ public class ChildCandidate
         /// <summary>
         /// StartNodeから見た下流枝署名。
         /// </summary>
-        public string StartBranchSignature { get; set; }
+        public string StartBranchSignature { get; set; } = string.Empty;
 
         /// <summary>
         /// ★フォワード専用
@@ -903,11 +903,11 @@ public class ChildCandidate
         /// <summary>
         /// 剪定理由。
         /// </summary>
-        public string PruneReason { get; set; }
+        public string PruneReason { get; set; } = string.Empty;
 
         public TracePathRow()
         {
-            MiddleNodes = new List<ProductionResultNode>();
+            MiddleNodes = new List<ProductionResultNode?>();
             PathLinks = new List<ProductionResultLink>();
 
             // ★追加
@@ -988,12 +988,12 @@ public class ChildCandidate
         /// 基本構成：
         /// Axis + Level + LotNumber
         /// </summary>
-        public string GroupKey { get; set; }
+        public string GroupKey { get; set; } = string.Empty;
 
         /// <summary>
         /// グループ代表LotNo。
         /// </summary>
-        public string LotNumber { get; set; }
+        public string LotNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// グループ単位の表示順。
@@ -1026,19 +1026,19 @@ public class ChildCandidate
         /// 代表枝の識別キー。
         /// （デバッグ・再現性確保用）
         /// </summary>
-        public string RepresentativeKey { get; set; }
+        public string RepresentativeKey { get; set; } = string.Empty;
 
         /// <summary>
         /// この地点から見た下流枝の署名。
         ///
         /// 同内容枝の比較・剪定に使用する。
         /// </summary>
-        public string DownstreamBranchSignature { get; set; }
+        public string DownstreamBranchSignature { get; set; } = string.Empty;
 
         /// <summary>
         /// 上流からここまでの経路署名。
         /// </summary>
-        public string UpstreamBranchSignature { get; set; }
+        public string UpstreamBranchSignature { get; set; } = string.Empty;
 
         /// <summary>
         /// 剪定対象かどうか。
@@ -1048,7 +1048,7 @@ public class ChildCandidate
         /// <summary>
         /// 剪定理由（デバッグ用）。
         /// </summary>
-        public string PruneReason { get; set; }
+        public string PruneReason { get; set; } = string.Empty;
 
         /// <summary>
         /// 描画用：上境界線を引くか。
@@ -1091,9 +1091,9 @@ public class ChildCandidate
         /// - Depth設定
         /// - 親子Link形成
         /// </summary>
-        public ProductionResultNode Node { get; set; }
+        public ProductionResultNode? Node { get; set; }
 
-        
+
         /// <summary>
         /// この親候補が接続される子Node実体。
         ///
@@ -1104,19 +1104,19 @@ public class ChildCandidate
         /// RelationKey はこの ChildNode と親候補Node の関係性を一意に表すため、
         /// 親Nodeから見た子Node実体情報の参照元として本プロパティを使用する。
         /// </summary>
-        public ProductionResultNode ChildNode { get; set; }
+        public ProductionResultNode? ChildNode { get; set; }
 
         /// <summary>
         /// リポジトリ内で親探索に使用するプロパティ
         /// </summary>
-        public string ParentLotNumber { get; set; }
+        public string? ParentLotNumber { get; set; }
 
         /// <summary>
         /// Repositoriesで確定する１世代の関係文脈キー
         /// 枝の束ね用途だが、あまり依存しないように。
         /// </summary>
-        public string RelationKey { get; set; }
-        
+        public string? RelationKey { get; set; }
+
 
         /// <summary>
         /// デバッグ用の自由記述補助。
@@ -1128,12 +1128,12 @@ public class ChildCandidate
         ///
         /// 本番ロジックの判定には使わないこと。
         /// </summary>
-        public string DebugSource { get; set; }
+        public string DebugSource { get; set; } = string.Empty;
 
-     
-       
-      
-        
+
+
+
+
     }
     #endregion
     /// <summary>
@@ -1141,13 +1141,13 @@ public class ChildCandidate
     /// </summary>
     public class SingleControlHistoryModel
     {
-        public string MasterKey { get; set; }
-        public string ForeignKey { get; set; }
-        public string DataCategory { get; set; }
+        public string? MasterKey { get; set; }
+        public string? ForeignKey { get; set; }
+        public string? DataCategory { get; set; }
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string ManufacturingProcessName { get; set; }
+        public string? ManufacturingProcessName { get; set; }
 
         // 既存項目
         public decimal? PumpDelayTime { get; set; }
@@ -1163,7 +1163,7 @@ public class ChildCandidate
         public decimal? ShowerBallFrequencySettingValue { get; set; }
         public bool? SamplingFlag { get; set; }
         public bool? ShowerBallLineFlag { get; set; }
-        public string FillingMachineValveOpeningAndClosingPattern { get; set; }
+        public string? FillingMachineValveOpeningAndClosingPattern { get; set; }
         public decimal? N2PressTimer1 { get; set; }
         public decimal? N2PressTimer2 { get; set; }
         public decimal? N2PressTimer3 { get; set; }
@@ -1180,7 +1180,7 @@ public class ChildCandidate
         public decimal? MixerOperationTime { get; set; }
         public decimal? MixerStopWeight { get; set; }
 
-        public string SourceTankName { get; set; }
+        public string? SourceTankName { get; set; }
         public decimal? SourceTankPumpStartupSpeed { get; set; }
         public decimal? SourceTankPump1tageFrequency { get; set; }
         public decimal? SourceTankPump2stageFrequency { get; set; }
@@ -1191,7 +1191,7 @@ public class ChildCandidate
         public decimal? ControlCompletionDelayTime { get; set; }
 
         public decimal? CirculationPumpOperationTime { get; set; }
-        public string PressureSelection { get; set; }
+        public string? PressureSelection { get; set; }
         public decimal? CirculationPumpTargetFrequency { get; set; }
         public decimal? CirculationPumpStartupTime { get; set; }
         public decimal? PressureTargetValue { get; set; }
@@ -1227,7 +1227,7 @@ public class ChildCandidate
         public decimal? AmountOfExtrction { get; set; }
         public decimal? TotalDischargePumpStopDelayTime { get; set; }
 
-        public string WasteLiquidTypeFlag { get; set; }
+        public string? WasteLiquidTypeFlag { get; set; }
 
         public decimal? ManholeLockTimer { get; set; }
         public decimal? ManholeAlarmTimer { get; set; }
@@ -1241,58 +1241,55 @@ public class ChildCandidate
         /// </summary>
         public class FilterHistoryModel
         {
-            public string MasterKey { get; set; }
-            public string ForeignKey { get; set; }
-            public string DataCategory { get; set; }
+            public string? MasterKey { get; set; }
+            public string? ForeignKey { get; set; }
+            public string? DataCategory { get; set; }
 
-            public string FilterItemCode1 { get; set; }
+            public string? FilterItemCode1 { get; set; }
             public int? FilterSetNumber1 { get; set; }
-            public string FilterItemCode2 { get; set; }
+            public string? FilterItemCode2 { get; set; }
             public int? FilterSetNumber2 { get; set; }
 
-            public string FilterLotNumber01 { get; set; }
-            public string FilterLotNumber02 { get; set; }
-            public string FilterLotNumber03 { get; set; }
-            public string FilterLotNumber04 { get; set; }
-            public string FilterLotNumber05 { get; set; }
-            public string FilterLotNumber06 { get; set; }
-            public string FilterLotNumber07 { get; set; }
-            public string FilterLotNumber08 { get; set; }
-            public string FilterLotNumber09 { get; set; }
-            public string FilterLotNumber10 { get; set; }
-            public string FilterLotNumber11 { get; set; }
-            public string FilterLotNumber12 { get; set; }
-            public string FilterLotNumber13 { get; set; }
-            public string FilterLotNumber14 { get; set; }
-            public string FilterLotNumber15 { get; set; }
-            public string FilterLotNumber16 { get; set; }
-            public string FilterLotNumber17 { get; set; }
-            public string FilterLotNumber18 { get; set; }
-            public string FilterLotNumber19 { get; set; }
-            public string FilterLotNumber20 { get; set; }
-            public string FilterLotNumber21 { get; set; }
-            public string FilterLotNumber22 { get; set; }
-            public string FilterLotNumber23 { get; set; }
-            public string FilterLotNumber24 { get; set; }
-            public string FilterLotNumber25 { get; set; }
-            public string FilterLotNumber26 { get; set; }
-            public string FilterLotNumber27 { get; set; }
-            public string FilterLotNumber28 { get; set; }
-            public string FilterLotNumber29 { get; set; }
-            public string FilterLotNumber30 { get; set; }
-            public string FilterLotNumber31 { get; set; }
-            public string FilterLotNumber32 { get; set; }
-            public string FilterLotNumber33 { get; set; }
-            public string FilterLotNumber34 { get; set; }
-            public string FilterLotNumber35 { get; set; }
-            public string FilterLotNumber36 { get; set; }
-            public string FilterLotNumber37 { get; set; }
-            public string FilterLotNumber38 { get; set; }
-            public string FilterLotNumber39 { get; set; }
-            public string FilterLotNumber40 { get; set; }
-
-
-
+            public string? FilterLotNumber01 { get; set; }
+            public string? FilterLotNumber02 { get; set; }
+            public string? FilterLotNumber03 { get; set; }
+            public string? FilterLotNumber04 { get; set; }
+            public string? FilterLotNumber05 { get; set; }
+            public string? FilterLotNumber06 { get; set; }
+            public string? FilterLotNumber07 { get; set; }
+            public string? FilterLotNumber08 { get; set; }
+            public string? FilterLotNumber09 { get; set; }
+            public string? FilterLotNumber10 { get; set; }
+            public string? FilterLotNumber11 { get; set; }
+            public string? FilterLotNumber12 { get; set; }
+            public string? FilterLotNumber13 { get; set; }
+            public string? FilterLotNumber14 { get; set; }
+            public string? FilterLotNumber15 { get; set; }
+            public string? FilterLotNumber16 { get; set; }
+            public string? FilterLotNumber17 { get; set; }
+            public string? FilterLotNumber18 { get; set; }
+            public string? FilterLotNumber19 { get; set; }
+            public string? FilterLotNumber20 { get; set; }
+            public string? FilterLotNumber21 { get; set; }
+            public string? FilterLotNumber22 { get; set; }
+            public string? FilterLotNumber23 { get; set; }
+            public string? FilterLotNumber24 { get; set; }
+            public string? FilterLotNumber25 { get; set; }
+            public string? FilterLotNumber26 { get; set; }
+            public string? FilterLotNumber27 { get; set; }
+            public string? FilterLotNumber28 { get; set; }
+            public string? FilterLotNumber29 { get; set; }
+            public string? FilterLotNumber30 { get; set; }
+            public string? FilterLotNumber31 { get; set; }
+            public string? FilterLotNumber32 { get; set; }
+            public string? FilterLotNumber33 { get; set; }
+            public string? FilterLotNumber34 { get; set; }
+            public string? FilterLotNumber35 { get; set; }
+            public string? FilterLotNumber36 { get; set; }
+            public string? FilterLotNumber37 { get; set; }
+            public string? FilterLotNumber38 { get; set; }
+            public string? FilterLotNumber39 { get; set; }
+            public string? FilterLotNumber40 { get; set; }
         }
     }
 }

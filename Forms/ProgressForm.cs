@@ -10,7 +10,7 @@ namespace LotTraceApp.Forms
         private readonly ProgressBar _progressBar;
         private readonly Button _cancelButton;
 
-        public event EventHandler CancelRequested;
+        public event EventHandler? CancelRequested;
         public bool IsCancellationRequested { get; private set; }
 
         public ProgressForm(string title)
@@ -58,7 +58,7 @@ namespace LotTraceApp.Forms
             Controls.Add(_cancelButton);
         }
 
-        private void CancelButton_Click(object sender, EventArgs e)
+        private void CancelButton_Click(object? sender, EventArgs e)
         {
             if (IsCancellationRequested)
                 return;

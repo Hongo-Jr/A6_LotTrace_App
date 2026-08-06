@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Presentation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
@@ -12,26 +11,26 @@ namespace LotTraceApp.Models
     /// </summary>
     public class Bottle_ProductionResultNode
     {
-        public string ProcessType { get; set; }
-        public string OrderNumber { get; set; }              // 指図番号＞＞FillingOrderResultから取れる
-        public string ProductItemName { get; set; }          // 製品名＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
-        public string ProductItemCode { get; set; }          // 製品コード＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
-        public string ProductLotNumber { get; set; }         // 製品ロット＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
-        public string MiddleProductItemCode { get; set; }    // 中間品コード＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
-        public string MiddleProductLotNumber { get; set; }   // 中間品ロット＞＞FillngBottelTable、またはFillngDrumcanTableから取れる
-        public DateTime? StartDate { get; set; }             // 開始日時＞＞FillingOrderResultから取れる
-        public DateTime? EndDate { get; set; }               // 終了日時＞＞FillingOrderResultから取れる
-        public int FillingBottleNum_OK { get; set; }　　　 // 充填本数NG＞＞FillingOrderResultから取れる
-        public int FillingBottleNum_NG { get; set; }　　　 // 充填本数OK＞＞FillingOrderResultから取れる
-        public int FillingBottleNum_Total                   // 充填本数合計>>OKとNGの総数から合成
+        public string? ProcessType { get; set; }
+        public string? OrderNumber { get; set; }
+        public string? ProductItemName { get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? ProductLotNumber { get; set; }
+        public string? MiddleProductItemCode { get; set; }
+        public string? MiddleProductLotNumber { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int FillingBottleNum_OK { get; set; }
+        public int FillingBottleNum_NG { get; set; }
+        public int FillingBottleNum_Total
         {
             get { return FillingBottleNum_OK + FillingBottleNum_NG; }
         }
 
-        public string RouteSystem { get; set; }　　　　　　 // FillngBottelTableからか、FillngDrumcanTableからか
+        public string? RouteSystem { get; set; }
 
         public int Depth { get; set; }
-        public string NodeType { get; set; }
+        public string? NodeType { get; set; }
 
         public string NodeIdentifyKey
         {
@@ -67,10 +66,10 @@ namespace LotTraceApp.Models
     {
         public int NodeType {  get; set; }
 
-        public string DisplayNodeKey { get; set; }
+        public string DisplayNodeKey { get; set; } = string.Empty;
 
-        public ProductionResultNode SourceLiquidNode {  get; set; }
-        public Bottle_ProductionResultNode SourceBottleNode { get; set; }
+        public ProductionResultNode? SourceLiquidNode { get; set; }
+        public Bottle_ProductionResultNode? SourceBottleNode { get; set; }
 
         public int YLane { get; set; }
     }
@@ -117,8 +116,8 @@ namespace LotTraceApp.Models
 
     public class BottleTraceResult
     {
-        public BottleDisplayTables DisplayTables { get; set; }
-        public List<BottleDisplayGroup> DisplayGroups { get; set; }
+        public BottleDisplayTables? DisplayTables { get; set; }
+        public List<BottleDisplayGroup> DisplayGroups { get; set; } = new List<BottleDisplayGroup>();
 
         public BottleTraceResult()
         {
@@ -174,11 +173,11 @@ namespace LotTraceApp.Models
 
     public class BottleNodeInfo
     {
-        public string OrderNumber {  get; set; }
-        public string ProductLotNo {  get; set; }
-        public string ProductItemCode { get; set; }
-        public string ProductItemName { get; set; }
-        public string MasterKey {  get; set; }
+        public string? OrderNumber {  get; set; }
+        public string? ProductLotNo {  get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? ProductItemName { get; set; }
+        public string MasterKey {  get; set; } = string.Empty;
     }
 
     public class BottleResultPage
@@ -193,16 +192,16 @@ namespace LotTraceApp.Models
 
     public class FillingBottleRow
     {
-        public string OrderNumber { get; set; }
-        public string ProcessType { get; set; }
-        public string ProductLotNumber { get; set; }
-        public string ProductItemCode { get; set; }
-        public string MiddleProductLotNumber { get; set; }
-        public string MiddleProductItemCode { get; set; }
+        public string? OrderNumber { get; set; }
+        public string? ProcessType { get; set; }
+        public string? ProductLotNumber { get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? MiddleProductLotNumber { get; set; }
+        public string? MiddleProductItemCode { get; set; }
 
-        public string BottleID { get; set; } = "";
+        public string? BottleID { get; set; }
 
-        public string SamplingGroup { get; set; }
+        public string? SamplingGroup { get; set; }
         public int? BottleINumber { get; set; }
         public int? FillingNozzleNumber { get; set; }
         public int? CapTighteningTorqueValue { get; set; }
@@ -219,12 +218,12 @@ namespace LotTraceApp.Models
 
     public class FillingDrumcanRow
     {
-        public string OrderNumber { get; set; }
-        public string ProcessType { get; set; }
-        public string ProductLotNumber { get; set; }
-        public string ProductItemCode { get; set; }
-        public string MiddleProductLotNumber { get; set; }
-        public string MiddleProductItemCode { get; set; }
+        public string? OrderNumber { get; set; }
+        public string? ProcessType { get; set; }
+        public string? ProductLotNumber { get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? MiddleProductLotNumber { get; set; }
+        public string? MiddleProductItemCode { get; set; }
 
         public int DrumcanNumber { get; set; }
 
@@ -241,6 +240,26 @@ namespace LotTraceApp.Models
         public DateTime? FillingStartDate { get; set; }
         public DateTime? FillingEndDate { get; set; }
     }
+
+    public class BottleTraceGridRow
+    {
+        public string OrderNumber { get; set; } = string.Empty;
+        public string? ProcessType { get; set; }
+        public string? ProductLotNumber { get; set; }
+        public string? ProductItemCode { get; set; }
+        public string? MiddleProductLotNumber { get; set; }
+        public string? MiddleProductItemCode { get; set; }
+        public DateTime? StartDate { get; set; }             
+        public DateTime? EndDate { get; set; }              
+        public int FillingBottleNum_OK { get; set; }
+        public int FillingBottleNum_NG { get; set; }
+        public int FillingBottleNum_Total
+        {
+            get { return FillingBottleNum_OK + FillingBottleNum_NG; }
+        }
+
+    }
+
 
     #endregion
 }

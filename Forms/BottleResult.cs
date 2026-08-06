@@ -106,10 +106,12 @@ namespace LotTraceApp.Forms
             rdo_Result.CheckedChanged += Radio_CheckedChanged;
         }
 
-        private void Radio_CheckedChanged(object sender, EventArgs e)
+        private void Radio_CheckedChanged(object? sender, EventArgs e)
         {
-            if (!((RadioButton)sender).Checked)
+            if (sender is not RadioButton { Checked: true } radioButton)
+            {
                 return;
+            }
 
             SetGridContets();
         }
@@ -165,11 +167,11 @@ namespace LotTraceApp.Forms
             BottleDataGridView.DataSource = dt;
 
             BottleDataGridView.Columns["Item"].Visible = true;
-            BottleDataGridView.Columns["Item"].HeaderText = dt.Columns["Item"].Caption;
+            BottleDataGridView.Columns["Item"].HeaderText = dt.Columns["Item"]!.Caption;
             BottleDataGridView.Columns["Item"].Width = 300;
 
             BottleDataGridView.Columns["order"].Visible = true;
-            BottleDataGridView.Columns["order"].HeaderText = dt.Columns["order"].Caption;
+            BottleDataGridView.Columns["order"].HeaderText = dt.Columns["order"]!.Caption;
             BottleDataGridView.Columns["order"].Width = 300;
 
         }
@@ -366,65 +368,65 @@ namespace LotTraceApp.Forms
             
 
             
-            BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"].Caption;
+            BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"]!.Caption;
             BottleDataGridView.Columns["OrderNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["ProductLotNumber"].HeaderText = dt.Columns["ProductLotNumber"].Caption;
+            BottleDataGridView.Columns["ProductLotNumber"].HeaderText = dt.Columns["ProductLotNumber"]!.Caption;
             BottleDataGridView.Columns["ProductLotNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["ProductItemCode"].HeaderText = dt.Columns["ProductItemCode"].Caption;
+            BottleDataGridView.Columns["ProductItemCode"].HeaderText = dt.Columns["ProductItemCode"]!.Caption;
             BottleDataGridView.Columns["ProductItemCode"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["MiddleProductLotNumber"].HeaderText = dt.Columns["MiddleProductLotNumber"].Caption;
+            BottleDataGridView.Columns["MiddleProductLotNumber"].HeaderText = dt.Columns["MiddleProductLotNumber"]!.Caption;
             BottleDataGridView.Columns["MiddleProductLotNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["MiddleProductItemCode"].HeaderText = dt.Columns["MiddleProductItemCode"].Caption;
+            BottleDataGridView.Columns["MiddleProductItemCode"].HeaderText = dt.Columns["MiddleProductItemCode"]!.Caption;
             BottleDataGridView.Columns["MiddleProductItemCode"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["BottleID"].HeaderText = dt.Columns["BottleID"].Caption;
+            BottleDataGridView.Columns["BottleID"].HeaderText = dt.Columns["BottleID"]!.Caption;
             BottleDataGridView.Columns["BottleID"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["SamplingGroup"].HeaderText = dt.Columns["SamplingGroup"].Caption;
+            BottleDataGridView.Columns["SamplingGroup"].HeaderText = dt.Columns["SamplingGroup"]!.Caption;
             BottleDataGridView.Columns["SamplingGroup"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["BottleINumber"].HeaderText = dt.Columns["BottleINumber"].Caption;
+            BottleDataGridView.Columns["BottleINumber"].HeaderText = dt.Columns["BottleINumber"]!.Caption;
             BottleDataGridView.Columns["BottleINumber"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"].Caption;
+            BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"]!.Caption;
             BottleDataGridView.Columns["FillingNozzleNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["CapTighteningTorqueValue"].HeaderText = dt.Columns["CapTighteningTorqueValue"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueValue"].HeaderText = dt.Columns["CapTighteningTorqueValue"]!.Caption;
             BottleDataGridView.Columns["CapTighteningTorqueValue"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].HeaderText = dt.Columns["CapTighteningTorqueJudgment"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].HeaderText = dt.Columns["CapTighteningTorqueJudgment"]!.Caption;
             BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["CapTiltDetectionJudgment"].HeaderText = dt.Columns["CapTiltDetectionJudgment"].Caption;
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].HeaderText = dt.Columns["CapTiltDetectionJudgment"]!.Caption;
             BottleDataGridView.Columns["CapTiltDetectionJudgment"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["FillingMachineNumber"].HeaderText = dt.Columns["FillingMachineNumber"].Caption;
+            BottleDataGridView.Columns["FillingMachineNumber"].HeaderText = dt.Columns["FillingMachineNumber"]!.Caption;
             BottleDataGridView.Columns["FillingMachineNumber"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["TotalCahckJudgment"].HeaderText = dt.Columns["TotalCahckJudgment"].Caption;
+            BottleDataGridView.Columns["TotalCahckJudgment"].HeaderText = dt.Columns["TotalCahckJudgment"]!.Caption;
             BottleDataGridView.Columns["TotalCahckJudgment"].Width = ColumnSize2;
          
-            BottleDataGridView.Columns["BottleLocation"].HeaderText = dt.Columns["BottleLocation"].Caption;
+            BottleDataGridView.Columns["BottleLocation"].HeaderText = dt.Columns["BottleLocation"]!.Caption;
             BottleDataGridView.Columns["BottleLocation"].Width = ColumnSize1;
             
-            BottleDataGridView.Columns["FillingWeight"].HeaderText = dt.Columns["FillingWeight"].Caption;
+            BottleDataGridView.Columns["FillingWeight"].HeaderText = dt.Columns["FillingWeight"]!.Caption;
             BottleDataGridView.Columns["FillingWeight"].Width = ColumnSize2;
             
-            BottleDataGridView.Columns["FillingTime"].HeaderText = dt.Columns["FillingTime"].Caption;
+            BottleDataGridView.Columns["FillingTime"].HeaderText = dt.Columns["FillingTime"]!.Caption;
             BottleDataGridView.Columns["FillingTime"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["FillingStartDate"].HeaderText = dt.Columns["FillingStartDate"].Caption;
+            BottleDataGridView.Columns["FillingStartDate"].HeaderText = dt.Columns["FillingStartDate"]!.Caption;
             BottleDataGridView.Columns["FillingStartDate"].Width = ColumnSize1;
             
-            BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"].Caption;
+            BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"]!.Caption;
             BottleDataGridView.Columns["FillingEndDate"].Width = ColumnSize1;
 
             BottleDataGridView.Columns["ProcessType"].Visible = false;
-            BottleDataGridView.Columns["ProcessType"].HeaderText = dt.Columns["ProcessType"].Caption;
+            BottleDataGridView.Columns["ProcessType"].HeaderText = dt.Columns["ProcessType"]!.Caption;
             BottleDataGridView.Columns["ProcessType"].Width = 0;
 
         }
@@ -439,62 +441,62 @@ namespace LotTraceApp.Forms
             BottleDataGridView.RowTemplate.Height = 28;
             BottleDataGridView.DataSource = dt;
 
-            BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"].Caption;
+            BottleDataGridView.Columns["OrderNumber"].HeaderText = dt.Columns["OrderNumber"]!.Caption;
             BottleDataGridView.Columns["OrderNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["ProductLotNumber"].HeaderText = dt.Columns["ProductLotNumber"].Caption;
+            BottleDataGridView.Columns["ProductLotNumber"].HeaderText = dt.Columns["ProductLotNumber"]!.Caption;
             BottleDataGridView.Columns["ProductLotNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["ProductItemCode"].HeaderText = dt.Columns["ProductItemCode"].Caption;
+            BottleDataGridView.Columns["ProductItemCode"].HeaderText = dt.Columns["ProductItemCode"]!.Caption;
             BottleDataGridView.Columns["ProductItemCode"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["MiddleProductLotNumber"].HeaderText = dt.Columns["MiddleProductLotNumber"].Caption;
+            BottleDataGridView.Columns["MiddleProductLotNumber"].HeaderText = dt.Columns["MiddleProductLotNumber"]!.Caption;
             BottleDataGridView.Columns["MiddleProductLotNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["MiddleProductItemCode"].HeaderText = dt.Columns["MiddleProductItemCode"].Caption;
+            BottleDataGridView.Columns["MiddleProductItemCode"].HeaderText = dt.Columns["MiddleProductItemCode"]!.Caption;
             BottleDataGridView.Columns["MiddleProductItemCode"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["DrumcanNumber"].HeaderText = dt.Columns["DrumcanNumber"].Caption;
+            BottleDataGridView.Columns["DrumcanNumber"].HeaderText = dt.Columns["DrumcanNumber"]!.Caption;
             BottleDataGridView.Columns["DrumcanNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"].Caption;
+            BottleDataGridView.Columns["FillingNozzleNumber"].HeaderText = dt.Columns["FillingNozzleNumber"]!.Caption;
             BottleDataGridView.Columns["FillingNozzleNumber"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].HeaderText = dt.Columns["CapTighteningTorqueValue_Big"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].HeaderText = dt.Columns["CapTighteningTorqueValue_Big"]!.Caption;
             BottleDataGridView.Columns["CapTighteningTorqueValue_Big"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].HeaderText = dt.Columns["CapTighteningTorqueJudgment"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueJudgment"].HeaderText = dt.Columns["CapTighteningTorqueJudgment"]!.Caption;
             BottleDataGridView.Columns["CapTighteningTorqueJudgment"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["CapTiltDetectionJudgment"].HeaderText = dt.Columns["CapTiltDetectionJudgment"].Caption;
+            BottleDataGridView.Columns["CapTiltDetectionJudgment"].HeaderText = dt.Columns["CapTiltDetectionJudgment"]!.Caption;
             BottleDataGridView.Columns["CapTiltDetectionJudgment"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["TotalCahckJudgment"].HeaderText = dt.Columns["TotalCahckJudgment"].Caption;
+            BottleDataGridView.Columns["TotalCahckJudgment"].HeaderText = dt.Columns["TotalCahckJudgment"]!.Caption;
             BottleDataGridView.Columns["TotalCahckJudgment"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].HeaderText = dt.Columns["CapTighteningTorqueValue_Small"].Caption;
+            BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].HeaderText = dt.Columns["CapTighteningTorqueValue_Small"]!.Caption;
             BottleDataGridView.Columns["CapTighteningTorqueValue_Small"].Width = ColumnSize3;
 
-            BottleDataGridView.Columns["FillingWeightJudgment"].HeaderText = dt.Columns["FillingWeightJudgment"].Caption;
+            BottleDataGridView.Columns["FillingWeightJudgment"].HeaderText = dt.Columns["FillingWeightJudgment"]!.Caption;
             BottleDataGridView.Columns["FillingWeightJudgment"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["BottleLocation"].HeaderText = dt.Columns["BottleLocation"].Caption;
+            BottleDataGridView.Columns["BottleLocation"].HeaderText = dt.Columns["BottleLocation"]!.Caption;
             BottleDataGridView.Columns["BottleLocation"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["FillingWeight"].HeaderText = dt.Columns["FillingWeight"].Caption;
+            BottleDataGridView.Columns["FillingWeight"].HeaderText = dt.Columns["FillingWeight"]!.Caption;
             BottleDataGridView.Columns["FillingWeight"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["FillingTime"].HeaderText = dt.Columns["FillingTime"].Caption;
+            BottleDataGridView.Columns["FillingTime"].HeaderText = dt.Columns["FillingTime"]!.Caption;
             BottleDataGridView.Columns["FillingTime"].Width = ColumnSize2;
 
-            BottleDataGridView.Columns["FillingStartDate"].HeaderText = dt.Columns["FillingStartDate"].Caption;
+            BottleDataGridView.Columns["FillingStartDate"].HeaderText = dt.Columns["FillingStartDate"]!.Caption;
             BottleDataGridView.Columns["FillingStartDate"].Width = ColumnSize1;
 
-            BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"].Caption;
+            BottleDataGridView.Columns["FillingEndDate"].HeaderText = dt.Columns["FillingEndDate"]!.Caption;
             BottleDataGridView.Columns["FillingEndDate"].Width = ColumnSize1;
 
             BottleDataGridView.Columns["ProcessType"].Visible = false;
-            BottleDataGridView.Columns["ProcessType"].HeaderText = dt.Columns["ProcessType"].Caption;
+            BottleDataGridView.Columns["ProcessType"].HeaderText = dt.Columns["ProcessType"]!.Caption;
             BottleDataGridView.Columns["ProcessType"].Width = 0;
         }
 

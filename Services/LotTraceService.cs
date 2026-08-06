@@ -1,17 +1,17 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Data;
-using System.Collections.Generic;
-using System.Linq;
-using LotTraceApp.Models;
+﻿using LotTraceApp.Models;
 using LotTraceApp.Repositories;
-
-using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
-using System.Threading;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 
 namespace LotTraceApp.Services
@@ -38,10 +38,10 @@ namespace LotTraceApp.Services
         // BuildDisplayResult では枝構造を直接持てないため、
         // フォワード構造確定直後の occupied 情報を一時保持して
         // UI契約プロパティ(IsFirst/IsLastRowOfStartGroup)の設定にのみ使用する。
-        private ForwardDisplayLaneBuildResult _currentForwardLaneBuildResult;
-        private Dictionary<string, List<BackwardParentCandidate>> _currentBackwardCandidatesByChildNodeKey;
-        private List<BackwardParentSetCandidateGroup> _currentBackwardCandidateGroups;
-        private Dictionary<string, List<ChildCandidate>> _currentForwardCandidatesByParentNodeKey;
+        private ForwardDisplayLaneBuildResult? _currentForwardLaneBuildResult;
+        private Dictionary<string, List<BackwardParentCandidate>> _currentBackwardCandidatesByChildNodeKey = new();
+        private List<BackwardParentSetCandidateGroup> _currentBackwardCandidateGroups = new();
+        private Dictionary<string, List<ChildCandidate>> _currentForwardCandidatesByParentNodeKey = new();
         public LotTraceService(LotTraceRepository repo, ICustomerItemMasterRepository customerItemMasterRepository)
         {
             if (repo == null) throw new ArgumentNullException("repo");
@@ -51,7 +51,7 @@ namespace LotTraceApp.Services
 
         public TraceResult ExecuteTrace(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             if (p == null) throw new ArgumentNullException("p");
@@ -85,7 +85,7 @@ namespace LotTraceApp.Services
             p.ResolvedItemCodes =
                 _customerItemMasterRepository.GetItemCodeByName(p.ItemName);
 
-            p.ItemCode = null; // ItemName優先
+            p.ItemCode = null; 
             p.ItemName = null;
 
             return p.ResolvedItemCodes != null &&
@@ -94,7 +94,7 @@ namespace LotTraceApp.Services
 
         public DataTable BuildDisplayTable(
             TraceDisplayResult displayResult,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             ReportProgress(progress, "グリッド列を準備しています...", 80);
@@ -102,22 +102,33 @@ namespace LotTraceApp.Services
         }
 
         public TraceDisplayResult BuildDisplayResult(
-            TraceResult traceResult,
-            TraceDisplayBuildOptions options = null,
-            IProgress<TraceProgressState> progress = null,
+            TraceResult? traceResult,
+            TraceDisplayBuildOptions? options = null,
+            IProgress<TraceProgressState>? progress = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var displayResult = new TraceDisplayResult();
-            displayResult.Options = options ?? new TraceDisplayBuildOptions();
+            var displayResult = new TraceDisplayResult
+            {
+                Options = options ?? new TraceDisplayBuildOptions()
+            };
 
-            if (traceResult == null || traceResult.PathRows == null || traceResult.PathRows.Count == 0)
+            if (traceResult is not { } validTraceResult)
+            {
                 return displayResult;
+            }
+
+            var pathRows = validTraceResult.PathRows;
+
+            if (pathRows == null || pathRows.Count == 0)
+            {
+                return displayResult;
+            }
 
             ReportProgress(progress, "表示行を変換しています...", 68);
 
-            for (int rowIndex = 0; rowIndex < traceResult.PathRows.Count; rowIndex++)
+            for (int rowIndex = 0; rowIndex < pathRows.Count; rowIndex++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -148,6 +159,7 @@ namespace LotTraceApp.Services
                 {
                     for (int i = 0; i < pathRow.MiddleNodes.Count; i++)
                     {
+
                         row.Middles.Add(CreateDisplayCell(
                             pathRow,
                             pathRow.MiddleNodes[i],
@@ -189,11 +201,13 @@ namespace LotTraceApp.Services
                 ? 0
                 : displayResult.Rows.Max(r => r == null ? 0 : r.Middles.Count);
 
-            bool hasMiddleLineRange = traceResult != null &&
-                traceResult.TraceLineRanges != null &&
-                traceResult.TraceLineRanges.Any(x =>
+            bool hasMiddleLineRange =
+                validTraceResult.TraceLineRanges.Any(x =>
                     x != null &&
-                    string.Equals(x.GridKind, "Middle", StringComparison.OrdinalIgnoreCase));
+                    string.Equals(
+                        x.GridKind,
+                        "Middle",
+                        StringComparison.OrdinalIgnoreCase));
 
             displayResult.MaxMiddleDepth = hasMiddleLineRange
                 ? Math.Max(1, maxMiddleDepthFromRows)
@@ -202,20 +216,22 @@ namespace LotTraceApp.Services
             ReportProgress(progress, "グリッド罫線情報を整えています...", 74);
 
             MarkStartGroupBoundariesFromOccupiedRanges(
-                displayResult.Rows,
-                _currentForwardLaneBuildResult == null
-                    ? null
-                    : _currentForwardLaneBuildResult.OccupiedLotGroupRanges);
-
-            PopulateLineRanges(displayResult, traceResult.TraceLineRanges);
+                displayResult.Rows,_currentForwardLaneBuildResult?.OccupiedLotGroupRanges);
 
 
+
+            if (validTraceResult.TraceLineRanges.Count > 0)
+            {
+                PopulateLineRanges(
+                    displayResult,
+                    validTraceResult.TraceLineRanges);
+            }
 
             return displayResult;
 
         }
 
-        private static void ReportProgress(IProgress<TraceProgressState> progress, string message, int? percent = null)
+        private static void ReportProgress(IProgress<TraceProgressState>? progress, string message, int? percent = null)
         {
             if (progress == null || string.IsNullOrWhiteSpace(message))
                 return;
@@ -227,7 +243,7 @@ namespace LotTraceApp.Services
 
         private TraceResult TraceForward(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -236,7 +252,7 @@ namespace LotTraceApp.Services
 
             // 今回は Lv1 の枝構造確認用。
             // Candidate はここで確定し、この先では変更しない。
-            _currentForwardLaneBuildResult = null;
+            _currentForwardLaneBuildResult = new();
             _currentForwardCandidatesByParentNodeKey =
                 new Dictionary<string, List<ChildCandidate>>(StringComparer.OrdinalIgnoreCase);
 
@@ -294,7 +310,7 @@ namespace LotTraceApp.Services
         /// <returns></returns>
         private TraceResult TraceBackward(
             TraceSearchParameters p,
-            IProgress<TraceProgressState> progress,
+            IProgress<TraceProgressState>? progress,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -585,24 +601,24 @@ namespace LotTraceApp.Services
 
         private sealed class DisplayLaneNode
         {
-            public string DisplayNodeKey { get; set; }
-            public string MergeKey { get; set; }
-            public string ParentDisplayNodeKey { get; set; }
+            public string? DisplayNodeKey { get; set; }
+            public string? MergeKey { get; set; }
+            public string? ParentDisplayNodeKey { get; set; }
 
-            public ProductionResultNode SourceNode { get; set; }
+            public ProductionResultNode? SourceNode { get; set; }
 
             // 論理座標
-            public int XLevel { get; set; }
+            public int XLevel { get; set; } = 0;
             public int YLane { get; set; }
             public int ChildIndex { get; set; }
 
-            public int OccupiedFirstY { get; set; }      // このNode起点の占有開始Y
+            public int OccupiedFirstY { get; set; }     // このNode起点の占有開始Y
             public int OccupiedLastY { get; set; }       // このNode起点の占有終了Y
 
             public bool IsLotGroupRepresentative { get; set; }
 
-            public string LotGroupKey { get; set; }
-            public string RepresentativeNodeKey { get; set; }
+            public string? LotGroupKey { get; set; }
+            public string? RepresentativeNodeKey { get; set; }
 
 
             public DisplayLaneNode()
@@ -779,17 +795,17 @@ namespace LotTraceApp.Services
             SetValue(row, "PruneReason", displayRow.PruneReason);
         }
 
-        private void FillDisplayTableStartColumns(DataRow row, TraceDisplayCell cell)
+        private void FillDisplayTableStartColumns(DataRow row, TraceDisplayCell? cell)
         {
             FillDisplayTableCell(row, "Start_", cell);
         }
 
-        private void FillDisplayTableMiddleColumns(DataRow row, int level, TraceDisplayCell cell)
+        private void FillDisplayTableMiddleColumns(DataRow row, int level, TraceDisplayCell? cell)
         {
             FillDisplayTableCell(row, "Lv" + level + "_", cell);
         }
 
-        private void FillDisplayTableEndColumns(DataRow row, TraceDisplayCell cell)
+        private void FillDisplayTableEndColumns(DataRow row, TraceDisplayCell? cell)
         {
             FillDisplayTableCell(row, "End_", cell);
 
@@ -800,7 +816,7 @@ namespace LotTraceApp.Services
             SetValue(row, "End_DuplicateDisplayGroupIndex", cell.EndDuplicateDisplayGroupIndex);
         }
 
-        private void FillDisplayTableCell(DataRow row, string prefix, TraceDisplayCell cell)
+        private void FillDisplayTableCell(DataRow? row, string? prefix, TraceDisplayCell? cell)
         {
             if (row == null || string.IsNullOrWhiteSpace(prefix))
                 return;
@@ -808,7 +824,7 @@ namespace LotTraceApp.Services
             bool exists = cell != null;
             row[prefix + "Exists"] = exists;
 
-            if (!exists)
+            if (cell == null)
             {
                 return;
             }
@@ -841,7 +857,7 @@ namespace LotTraceApp.Services
             SetValue(row, prefix + "BranchSignature", cell.BranchSignature);
         }
 
-        private void SetValue(DataRow row, string columnName, object value)
+        private static  void SetValue(DataRow row, string columnName, object? value)
         {
             if (row == null || row.Table == null)
                 return;
@@ -852,11 +868,17 @@ namespace LotTraceApp.Services
             if (!row.Table.Columns.Contains(columnName))
                 return;
 
-            row[columnName] = value ?? DBNull.Value;
+            if (value == null)
+            {
+                row[columnName] = DBNull.Value;
+                return;
+            }
+
+            row[columnName] = value;
         }
 
 
-        private TraceDisplayCell GetMiddleCell(TraceDisplayRow row, int level)
+        private TraceDisplayCell? GetMiddleCell(TraceDisplayRow? row, int level)
         {
             if (row == null)
                 return null;
@@ -875,9 +897,9 @@ namespace LotTraceApp.Services
         }
 
 
-        private TraceDisplayCell CreateDisplayCell(
-    TracePathRow pathRow,
-    ProductionResultNode node,
+        private TraceDisplayCell? CreateDisplayCell(
+    TracePathRow? pathRow,
+    ProductionResultNode? node,
     TraceDisplayColumnKind columnKind,
     int level,
     int nodeIndexInPath)
@@ -893,7 +915,7 @@ namespace LotTraceApp.Services
                 Node = node,
 
                 // 表示キー
-                MasterKey = node.ControlMasterKey,
+                MasterKey = node.ControlMasterKey ?? string.Empty,
                 NodeKey = node.NodeIdentityKey,
 
                 ParentMasterKey = node.ParentMasterKey,
@@ -934,7 +956,7 @@ namespace LotTraceApp.Services
         }
 
         
-        private TraceLotGroupInfo FindLotGroupInfo(TracePathRow pathRow, TraceDisplayColumnKind columnKind, int level)
+        private TraceLotGroupInfo? FindLotGroupInfo(TracePathRow? pathRow, TraceDisplayColumnKind columnKind, int level)
         {
             if (pathRow == null || pathRow.LevelLotGroups == null || pathRow.LevelLotGroups.Count == 0)
                 return null;
@@ -1018,7 +1040,7 @@ namespace LotTraceApp.Services
         
         private void BuildPathRowsRecursiveCore(
     List<TracePathRow> pathRows,
-    ProductionResultNode node,
+    ProductionResultNode? node,
     string rootGroupKey,
     List<ProductionResultNode> currentPathNodes,
     List<ProductionResultLink> currentPathLinks,
@@ -1080,7 +1102,7 @@ namespace LotTraceApp.Services
 
         private void BuildPathRowsRecursive(
     TraceResult result,
-    ProductionResultNode node,
+    ProductionResultNode? node,
     string rootGroupKey,
     List<ProductionResultNode> currentPathNodes,
     List<ProductionResultLink> currentPathLinks,
@@ -1205,7 +1227,7 @@ namespace LotTraceApp.Services
         /// <param name="node"></param>
         /// <param name="candidate"></param>
         /// <returns></returns>
-        private string ResolveStartDateLabel(ProductionResultNode node, ChildCandidate candidate)
+        private string? ResolveStartDateLabel(ProductionResultNode node, ChildCandidate? candidate)
         {
             if (node == null)
                 return null;
@@ -1311,13 +1333,16 @@ namespace LotTraceApp.Services
 
         #region 経路メタ情報
 
-        private string GetPathLinkKey(ProductionResultLink link)
+        private string GetPathLinkKey(ProductionResultLink? link)
         {
             if (link == null)
                 return string.Empty;
 
             if (!string.IsNullOrWhiteSpace(link.LinkIdentityKey))
                 return link.LinkIdentityKey;
+
+            if (link.ParentNode == null || link.ChildNode == null)
+                return string.Empty;
 
             string parentKey = link.ParentNode.NodeIdentityKey;
             string childKey = link.ChildNode.NodeIdentityKey;
@@ -1335,7 +1360,7 @@ namespace LotTraceApp.Services
                 + (string.IsNullOrWhiteSpace(link.ParentLotNumber) ? string.Empty : link.ParentLotNumber.Trim().ToUpperInvariant());
         }
 
-        private string ResolveRouteSystem(TracePathRow pathRow)
+        private string? ResolveRouteSystem(TracePathRow? pathRow)
         {
             if (pathRow == null)
                 return null;
@@ -1398,7 +1423,7 @@ namespace LotTraceApp.Services
                     if (!seenNodeKeysInTab.Add(nodeKey))
                         continue;
 
-                    CrossPointBuildEntry entry;
+                    CrossPointBuildEntry? entry;
                     if (!dict.TryGetValue(nodeKey, out entry))
                     {
                         entry = new CrossPointBuildEntry
@@ -1479,8 +1504,8 @@ namespace LotTraceApp.Services
 
         private sealed class CrossPointBuildEntry
         {
-            public string NodeKey { get; set; }
-            public ProductionResultNode RepresentativeNode { get; set; }
+            public string NodeKey { get; set; } = string.Empty;
+            public ProductionResultNode? RepresentativeNode { get; set; }
             public HashSet<int> Tabs { get; private set; }
 
             public CrossPointBuildEntry()
@@ -1489,7 +1514,7 @@ namespace LotTraceApp.Services
             }
         }
 
-        private string ResolveCrossPointStartDateText(ProductionResultNode node)
+        private string? ResolveCrossPointStartDateText(ProductionResultNode node)
         {
             if (node == null)
                 return null;
@@ -1517,23 +1542,22 @@ namespace LotTraceApp.Services
 
             ResolveItemNamesForNodes(targets);
         }
-        private void ResolveItemNamesForNodes(IEnumerable<ProductionResultNode> nodes)
+        private void ResolveItemNamesForNodes(IEnumerable<ProductionResultNode?>? nodes)
         {
             if (nodes == null)
                 return;
 
-            var nodeList = nodes
-                .Where(n => n != null)
-                .ToList();
+            var nodeList = nodes.OfType<ProductionResultNode>().ToList();
 
             if (nodeList.Count == 0)
                 return;
 
             var itemCodes = nodeList
-                .Where(n => !string.IsNullOrWhiteSpace(n.ItemCode))
-                .Select(n => n.ItemCode.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
+                 .Select(n => n.ItemCode)
+                 .Where(code => !string.IsNullOrWhiteSpace(code))
+                 .Select(code => code!.Trim())
+                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                 .ToList();
 
             if (itemCodes.Count == 0)
                 return;
@@ -1555,7 +1579,7 @@ namespace LotTraceApp.Services
                 if (string.IsNullOrWhiteSpace(node.ItemCode))
                     continue;
 
-                string itemName;
+                string? itemName;
                 if (itemNameMap.TryGetValue(node.ItemCode.Trim(), out itemName))
                 {
                     node.ItemName = itemName;
@@ -1575,7 +1599,11 @@ namespace LotTraceApp.Services
             result.PathRows.Clear();
 
             var endInfoByDisplayNodeKey = laneBuildResult.EndInfos
-                .ToDictionary(x => x.DisplayNodeKey, StringComparer.OrdinalIgnoreCase);
+    .ToDictionary(
+        x => x.DisplayNodeKey
+            ?? throw new InvalidOperationException(
+                "EndInfo.DisplayNodeKey is null."),
+        StringComparer.OrdinalIgnoreCase);
 
             var displayNodes = laneBuildResult.DisplayNodes
                 .OrderBy(x => x.YLane)
@@ -1604,13 +1632,18 @@ namespace LotTraceApp.Services
 
                 foreach (var displayNode in laneNodes)
                 {
-                    EndDisplayNodeInfo endInfo;
 
-                    if (endInfoByDisplayNodeKey.TryGetValue(displayNode.DisplayNodeKey, out endInfo))
+
+                    if (!string.IsNullOrWhiteSpace(displayNode.DisplayNodeKey) &&
+                endInfoByDisplayNodeKey.TryGetValue(
+                    displayNode.DisplayNodeKey,
+                    out var endInfo))
                     {
                         row.EndNode = displayNode.SourceNode;
                         row.EndIsDuplicate = endInfo.IsDuplicate;
-                        row.EndDuplicateDisplayGroupIndex = endInfo.DuplicateDisplayIndex;
+                        row.EndDuplicateDisplayGroupIndex =
+                            endInfo.DuplicateDisplayIndex;
+
                         continue;
                     }
 
@@ -1661,7 +1694,7 @@ namespace LotTraceApp.Services
 
         private sealed class EndDisplayNodeInfo
         {
-            public string DisplayNodeKey { get; set; }
+            public string? DisplayNodeKey { get; set; }
 
             public bool IsDuplicate { get; set; }
 
@@ -1697,7 +1730,7 @@ namespace LotTraceApp.Services
                 node.NodeIdentityKey);
         }
 
-        private string NormalizeDisplayLaneLot(string lotNumber)
+        private string? NormalizeDisplayLaneLot(string? lotNumber)
         {
             if (string.IsNullOrWhiteSpace(lotNumber))
                 return null;
@@ -1725,8 +1758,8 @@ namespace LotTraceApp.Services
                 if (string.IsNullOrWhiteSpace(node.ParentDisplayNodeKey))
                     continue;
 
-                List<DisplayLaneNode> list;
-                if (!childrenMap.TryGetValue(node.ParentDisplayNodeKey, out list))
+                
+                if (!childrenMap.TryGetValue(node.ParentDisplayNodeKey, out var list))
                 {
                     list = new List<DisplayLaneNode>();
                     childrenMap[node.ParentDisplayNodeKey] = list;
@@ -1743,8 +1776,11 @@ namespace LotTraceApp.Services
 
             foreach (var node in ordered)
             {
-                List<DisplayLaneNode> children;
-                if (!childrenMap.TryGetValue(node.DisplayNodeKey, out children) || children.Count == 0)
+
+                var displayNodeKey = node.DisplayNodeKey ?? throw new InvalidOperationException("DisplayNodeKeyが設定されていません。");
+
+                if (!childrenMap.TryGetValue(displayNodeKey, out var children)
+                    || children.Count == 0)
                 {
                     node.OccupiedFirstY = node.YLane;
                     node.OccupiedLastY = node.YLane;
@@ -1774,8 +1810,8 @@ namespace LotTraceApp.Services
         private sealed class OccupiedLotGroupRange
         {
             public int Level { get; set; }
-            public string ParentDisplayNodeKey { get; set; }
-            public string LotGroupKey { get; set; }
+            public string? ParentDisplayNodeKey { get; set; }
+            public string? LotGroupKey { get; set; }
             public int OccupiedFirstY { get; set; }
             public int OccupiedLastY { get; set; }
         }
@@ -1859,7 +1895,7 @@ namespace LotTraceApp.Services
 
         private void MarkStartGroupBoundariesFromOccupiedRanges(
     List<TraceDisplayRow> rows,
-    IList<OccupiedLotGroupRange> occupiedRanges)
+    IList<OccupiedLotGroupRange>? occupiedRanges)
         {
             if (rows == null || rows.Count == 0)
                 return;
@@ -1932,10 +1968,8 @@ namespace LotTraceApp.Services
             if (endInfos.Count == 0)
                 return;
 
-            var nodeByKey = displayNodes
-                .Where(x => !string.IsNullOrWhiteSpace(x.DisplayNodeKey))
-                .GroupBy(x => x.DisplayNodeKey, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+            var nodeByKey = displayNodes.Where(x => !string.IsNullOrWhiteSpace(x.DisplayNodeKey)).GroupBy(
+                x => x.DisplayNodeKey!, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
             int syntheticMiddleToXLevel =
                 ResolveSyntheticMiddleToXLevelFromDisplayNodes(lineRanges, displayNodes);
@@ -1955,8 +1989,8 @@ namespace LotTraceApp.Services
                 if (string.IsNullOrWhiteSpace(endInfo.DisplayNodeKey))
                     continue;
 
-                DisplayLaneNode endNode;
-                if (!nodeByKey.TryGetValue(endInfo.DisplayNodeKey, out endNode) || endNode == null)
+                
+                if (!nodeByKey.TryGetValue(endInfo.DisplayNodeKey, out var endNode) || endNode == null)
                     continue;
 
                 // 終端Node自身の occupied は無視し、
@@ -2118,12 +2152,12 @@ namespace LotTraceApp.Services
 
             foreach (var node in validNodes)
             {
-                string nodeKey = node.SourceNode.NodeIdentityKey;
+                string nodeKey = GetRequiredSourceNode(node).NodeIdentityKey;
                 if (string.IsNullOrWhiteSpace(nodeKey))
                     continue;
 
-                List<DisplayLaneNode> list;
-                if (!displayNodesByNodeKey.TryGetValue(nodeKey, out list))
+                
+                if (!displayNodesByNodeKey.TryGetValue(nodeKey, out var list))
                 {
                     list = new List<DisplayLaneNode>();
                     displayNodesByNodeKey[nodeKey] = list;
@@ -2180,8 +2214,8 @@ namespace LotTraceApp.Services
                         continue;
                     }
 
-                    List<DisplayLaneNode> childDisplayNodes;
-                    if (!displayNodesByNodeKey.TryGetValue(childNodeKey, out childDisplayNodes) ||
+                    
+                    if (!displayNodesByNodeKey.TryGetValue(childNodeKey, out var childDisplayNodes) ||
                         childDisplayNodes == null ||
                         childDisplayNodes.Count == 0)
                     {
@@ -2193,8 +2227,16 @@ namespace LotTraceApp.Services
                         if (childDisplayNode == null)
                             continue;
 
-                        List<DisplayLaneNode> directChildren;
-                        if (!childrenMap.TryGetValue(childDisplayNode.DisplayNodeKey, out directChildren) ||
+
+                        if (string.IsNullOrWhiteSpace(childDisplayNode.DisplayNodeKey))
+                        {
+                            throw new InvalidOperationException(
+                                "DisplayNodeKeyが設定されていません。");
+                        }
+
+                        var displayNodeKey = childDisplayNode.DisplayNodeKey;
+
+                        if (!childrenMap.TryGetValue(displayNodeKey, out var directChildren) ||
                             directChildren == null ||
                             directChildren.Count == 0)
                         {
@@ -2241,7 +2283,16 @@ namespace LotTraceApp.Services
                                     continue;
                                 }
 
-                                if (!seenBranchStartDisplayNodeKeys.Add(parentDisplayNode.DisplayNodeKey))
+                                if (string.IsNullOrWhiteSpace(parentDisplayNode.DisplayNodeKey))
+                                {
+                                    throw new InvalidOperationException(
+                                        "DisplayNodeKeyが設定されていません。");
+                                }
+
+                                var parentDisplayNodeKey = parentDisplayNode.DisplayNodeKey;
+
+
+                                if (!seenBranchStartDisplayNodeKeys.Add(parentDisplayNodeKey))
                                     continue;
 
                                 result.Add(new OccupiedLotGroupRange
@@ -2316,8 +2367,16 @@ namespace LotTraceApp.Services
                 }
                 else
                 {
-                    List<DisplayLaneNode> children;
-                    if (!childrenMap.TryGetValue(node.DisplayNodeKey, out children) ||
+                    if (string.IsNullOrWhiteSpace(node.DisplayNodeKey))
+                    {
+                        throw new InvalidOperationException(
+                            "DisplayNodeKeyが設定されていません。");
+                    }
+
+                    var displayNodeKey = node.DisplayNodeKey;
+
+
+                    if (!childrenMap.TryGetValue(displayNodeKey, out var children) ||
                         children == null ||
                         children.Count == 0)
                     {
@@ -2358,7 +2417,7 @@ namespace LotTraceApp.Services
                 return false;
             }
 
-            string nodeKey = node.SourceNode == null ? null : node.SourceNode.NodeIdentityKey;
+            string? nodeKey = node.SourceNode == null ? null : node.SourceNode.NodeIdentityKey;
             if (string.IsNullOrWhiteSpace(nodeKey) ||
                 _currentBackwardCandidateGroups == null ||
                 _currentBackwardCandidateGroups.Count == 0)
@@ -2519,8 +2578,8 @@ namespace LotTraceApp.Services
 
         public sealed class TraceLineRange
         {
-            public string GridKind { get; set; }   // Start / Middle / End
-            public string LineKind { get; set; }   // Trunk / Branch
+            public string? GridKind { get; set; }   // Start / Middle / End
+            public string? LineKind { get; set; }   // Trunk / Branch
 
             public int Level { get; set; }
 
@@ -2555,7 +2614,7 @@ namespace LotTraceApp.Services
                 if (node == null)
                     continue;
 
-                string lot = NormalizeDisplayLaneLot(
+                string? lot = NormalizeDisplayLaneLot(
                     node.SourceNode == null ? null : node.SourceNode.LotNumber);
 
                 if (!string.IsNullOrWhiteSpace(lot))
@@ -2594,8 +2653,8 @@ namespace LotTraceApp.Services
 
                 string groupKey = node.LotGroupKey ?? string.Empty;
 
-                List<DisplayLaneNode> bucket;
-                if (!groupMap.TryGetValue(groupKey, out bucket))
+                
+                if (!groupMap.TryGetValue(groupKey, out var bucket))
                 {
                     bucket = new List<DisplayLaneNode>();
                     groupMap[groupKey] = bucket;
@@ -2617,7 +2676,7 @@ namespace LotTraceApp.Services
                     .ThenBy(x => x.DisplayNodeKey, StringComparer.OrdinalIgnoreCase)
                     .FirstOrDefault();
 
-                string repKey = representative == null
+                string? repKey = representative == null
                     ? null
                     : representative.DisplayNodeKey;
 
@@ -2804,10 +2863,14 @@ namespace LotTraceApp.Services
         }
 
         private List<DisplayLaneNode> GetForwardTerminalDisplayNodes(
-    List<DisplayLaneNode> displayNodes)
+     List<DisplayLaneNode> displayNodes)
         {
             return displayNodes
-                .Where(x => x.SourceNode.IsTraceTerminal)
+                .Where(x =>
+                    (x.SourceNode
+                        ?? throw new InvalidOperationException(
+                            "DisplayLaneNode.SourceNodeが設定されていません。"))
+                    .IsTraceTerminal)
                 .OrderBy(x => x.YLane)
                 .ThenBy(x => x.XLevel)
                 .ToList();
@@ -2817,7 +2880,11 @@ namespace LotTraceApp.Services
     List<DisplayLaneNode> displayNodes)
         {
             int maxNonTerminalX = displayNodes
-                .Where(x => !x.SourceNode.IsTraceTerminal)
+                .Where(x =>
+                    !(x.SourceNode
+                        ?? throw new InvalidOperationException(
+                            "DisplayLaneNode.SourceNodeが設定されていません。"))
+                    .IsTraceTerminal)
                 .Select(x => x.XLevel)
                 .DefaultIfEmpty(0)
                 .Max();
@@ -2833,8 +2900,12 @@ namespace LotTraceApp.Services
             {
                 node.XLevel = endXLevel;
 
+                var sourceNode = node.SourceNode
+    ?? throw new InvalidOperationException(
+        "DisplayLaneNode.SourceNodeが設定されていません。");
+
                 node.DisplayNodeKey = BuildDisplayLaneNodeKey(
-                    node.SourceNode,
+                    sourceNode,
                     node.XLevel,
                     node.YLane);
             }
@@ -2847,7 +2918,7 @@ namespace LotTraceApp.Services
             var output = new List<EndDisplayNodeInfo>();
 
             var grouped = terminalNodes
-                .GroupBy(x => x.SourceNode.NodeIdentityKey)
+                .GroupBy(x => GetRequiredSourceNode(x).NodeIdentityKey)
                 .OrderBy(g => g.Min(n => n.YLane))
                 .ThenBy(g => g.Key ?? string.Empty)
                 .ToList();
@@ -2869,9 +2940,17 @@ namespace LotTraceApp.Services
                 {
                     var node = nodes[i];
 
+                    if (string.IsNullOrWhiteSpace(node.DisplayNodeKey))
+                    {
+                        throw new InvalidOperationException(
+                            "DisplayNodeKeyが設定されていません。");
+                    }
+
+                    var displayNodeKey = node.DisplayNodeKey;
+
                     output.Add(new EndDisplayNodeInfo
                     {
-                        DisplayNodeKey = node.DisplayNodeKey,
+                        DisplayNodeKey = displayNodeKey,
                         IsDuplicate = (i > 0),
                         DuplicateDisplayIndex = (i > 0) ? duplicateDisplayIndex : null
                     });
@@ -2954,7 +3033,7 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private string BuildForwardRelationGroupLotKey(ChildCandidate candidate)
+        private string? BuildForwardRelationGroupLotKey(ChildCandidate candidate)
         {
             if (candidate == null || candidate.PearentNode == null)
                 return null;
@@ -3012,7 +3091,7 @@ namespace LotTraceApp.Services
             if (relationGroup.XLevel >= MaxDepth)
                 return 0;
 
-            string groupKey = BuildForwardRelationGroupLoopKey(relationGroup);
+            string? groupKey = BuildForwardRelationGroupLoopKey(relationGroup);
 
             if (!string.IsNullOrWhiteSpace(groupKey) &&
                 !pathGroupKeys.Add(groupKey))
@@ -3082,7 +3161,7 @@ namespace LotTraceApp.Services
             }
         }
 
-        private string BuildForwardRelationGroupLoopKey(
+        private string? BuildForwardRelationGroupLoopKey(
     ForwardRelationGroup group)
         {
             if (group == null)
@@ -3237,7 +3316,7 @@ namespace LotTraceApp.Services
         }
 
         
-        private ProductionResultNode SelectAnchorParent(List<ProductionResultNode> parentSet)
+        private ProductionResultNode? SelectAnchorParent(List<ProductionResultNode> parentSet)
         {
             if (parentSet == null || parentSet.Count == 0)
                 return null;
@@ -3253,7 +3332,7 @@ namespace LotTraceApp.Services
         private sealed class ForwardRelationGroup
         {
             public int XLevel { get; set; }
-            public string RelationKey { get; set; }
+            public string? RelationKey { get; set; }
 
             public int OccupiedFirstY { get; set; }
             public int OccupiedLastY { get; set; }
@@ -3290,7 +3369,7 @@ namespace LotTraceApp.Services
             var queue = new Queue<BackwardCandidateGroupTraversalItem>();
             var seenGroupKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            Action<List<BackwardParentCandidate>, int, HashSet<string>> appendGroups = (candidates, level, expandedPathNodeKeys) =>
+            Action<List<BackwardParentCandidate>, int, HashSet<string>?> appendGroups = (candidates, level, expandedPathNodeKeys) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -3329,7 +3408,12 @@ namespace LotTraceApp.Services
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var item = queue.Dequeue();
-                var currentGroup = item == null ? null : item.Group;
+
+                if (item == null)
+                    continue;
+
+                var currentGroup = item.Group;
+
 
                 if (currentGroup == null || currentGroup.Level >= MaxDepth)
                     continue;
@@ -3347,7 +3431,7 @@ namespace LotTraceApp.Services
 
         private bool ContainsExpandedBackwardParentNode(
     BackwardParentSetCandidateGroup group,
-    HashSet<string> expandedPathNodeKeys)
+    HashSet<string>? expandedPathNodeKeys)
         {
             if (group == null ||
                 group.ParentNodes == null ||
@@ -3364,7 +3448,7 @@ namespace LotTraceApp.Services
         }
 
         private HashSet<string> BuildNextExpandedBackwardPathNodeKeys(
-            HashSet<string> source,
+            HashSet<string>? source,
             BackwardParentSetCandidateGroup group)
         {
             var next = source == null
@@ -3387,8 +3471,8 @@ namespace LotTraceApp.Services
 
         private sealed class BackwardCandidateGroupTraversalItem
         {
-            public BackwardParentSetCandidateGroup Group { get; set; }
-            public HashSet<string> ExpandedPathNodeKeys { get; set; }
+            public BackwardParentSetCandidateGroup? Group { get; set; }
+            public HashSet<string>? ExpandedPathNodeKeys { get; set; }
         }
 
         private string BuildBackwardCandidateGroupIdentityKey(BackwardParentSetCandidateGroup group)
@@ -3496,12 +3580,12 @@ namespace LotTraceApp.Services
 
 
         private int PlaceBackwardNextTargetsRecursive(
-    List<BackwardDisplayNodeGroup> displayNodeGroups,
-    List<DisplayLaneNode> currentNodes,
+    List<BackwardDisplayNodeGroup>? displayNodeGroups,
+    List<DisplayLaneNode>? currentNodes,
     int x,
     int y,
     List<DisplayLaneNode> placedeNodes,
-    string parentDisplayNodeKey)
+    string? parentDisplayNodeKey)
         {
             return PlaceBackwardNextTargetsRecursive(
                 displayNodeGroups,
@@ -3514,12 +3598,12 @@ namespace LotTraceApp.Services
         }
 
         private int PlaceBackwardNextTargetsRecursive(
-    List<BackwardDisplayNodeGroup> displayNodeGroups,
-    List<DisplayLaneNode> currentNodes,
+    List<BackwardDisplayNodeGroup>? displayNodeGroups,
+    List<DisplayLaneNode>? currentNodes,
     int x,
     int y,
     List<DisplayLaneNode> placedeNodes,
-    string parentDisplayNodeKey,
+    string? parentDisplayNodeKey,
     HashSet<string> currentPathNodeKeys)
         {
             if (displayNodeGroups == null || currentNodes == null || placedeNodes == null)
@@ -3568,6 +3652,11 @@ namespace LotTraceApp.Services
                     }
 
                     var placedCurrent = BackwardPlaceNode(Current, x, currentY, parentDisplayNodeKey);
+
+                    if (placedCurrent == null)
+                    {
+                        continue;
+                    }
                     placedeNodes.Add(placedCurrent);
                     currentY++;
 
@@ -3611,12 +3700,14 @@ namespace LotTraceApp.Services
                 if (group == null || group.Level != nextLevel)
                     continue;
 
+                var currentSourceNode = GetRequiredSourceNode(current);
+
                 bool matched = group.ChildNodes != null &&
                     group.ChildNodes.Any(c =>
                         c?.SourceNode != null &&
                         string.Equals(
                             c.SourceNode.NodeIdentityKey,
-                            current.SourceNode.NodeIdentityKey,
+                            currentSourceNode.NodeIdentityKey,
                             StringComparison.OrdinalIgnoreCase));
 
                 if (!matched)
@@ -3669,11 +3760,11 @@ namespace LotTraceApp.Services
             return result;
         }
 
-        private DisplayLaneNode BackwardPlaceNode(
-            DisplayLaneNode current,
+        private DisplayLaneNode? BackwardPlaceNode(
+            DisplayLaneNode? current,
             int x,
             int y,
-            string parentDisplayNodeKey)
+            string? parentDisplayNodeKey)
         {
             if (current == null)
                 return null;
@@ -3701,7 +3792,7 @@ namespace LotTraceApp.Services
         }
 
 
-        private string ResolveBackwardStartDateLabel(ProductionResultNode node)
+        private string? ResolveBackwardStartDateLabel(ProductionResultNode node)
         {
             if (node == null)
                 return null;
@@ -3769,17 +3860,24 @@ namespace LotTraceApp.Services
                 
 
             var parentSetGroups = validCandidates
-                .GroupBy(candidate =>
-                    BuildBackwardParentSetKey(
-                        validCandidates
-                            .Where(x =>
-                                x.ChildNode != null &&
-                                string.Equals(
-                                    x.ChildNode.NodeIdentityKey,
-                                    candidate.ChildNode.NodeIdentityKey,
-                                    StringComparison.OrdinalIgnoreCase))
-                            .Select(x => x.Node)),
-                    StringComparer.OrdinalIgnoreCase);
+                    .GroupBy(
+                        candidate =>
+                        {
+                            var childNode = candidate.ChildNode
+                                ?? throw new InvalidOperationException(
+                                    "ChildNodeが設定されていません。");
+
+                            return BuildBackwardParentSetKey(
+                                validCandidates
+                                    .Where(x =>
+                                        x.ChildNode != null &&
+                                        string.Equals(
+                                            x.ChildNode.NodeIdentityKey,
+                                            childNode.NodeIdentityKey,
+                                            StringComparison.OrdinalIgnoreCase))
+                                    .Select(x => x.Node));
+                        },
+                        StringComparer.OrdinalIgnoreCase);
 
             foreach (var parentSetGroup in parentSetGroups)
             {
@@ -3790,10 +3888,12 @@ namespace LotTraceApp.Services
                 var group = new BackwardParentSetCandidateGroup
                 {
                     ParentSetKey = string.IsNullOrWhiteSpace(parentSetGroup.Key)
-        ? "TERMINAL|" + string.Join("|",
+        ? "TERMINAL|" + string.Join(
+            "|",
             groupCandidates
-                .Where(x => x != null && x.ChildNode != null)
-                .Select(x => x.ChildNode.NodeIdentityKey)
+                .Select(x => x.ChildNode)
+                .OfType<ProductionResultNode>()
+                .Select(x => x.NodeIdentityKey)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
         : parentSetGroup.Key
@@ -3802,16 +3902,20 @@ namespace LotTraceApp.Services
                 group.ChildNodes.AddRange(
                     groupCandidates
                         .Select(x => x.ChildNode)
-                        .Where(x => x != null)
-                        .GroupBy(x => x.NodeIdentityKey, StringComparer.OrdinalIgnoreCase)
-                        .Select(x => x.First()));
+                        .OfType<ProductionResultNode>()
+                        .GroupBy(
+                            x => x.NodeIdentityKey,
+                            StringComparer.OrdinalIgnoreCase)
+                        .Select(g => g.First()));
 
                 group.ParentNodes.AddRange(
                     groupCandidates
                         .Select(x => x.Node)
-                        .Where(x => x != null)
-                        .GroupBy(BuildBackwardParentNodeSetMemberKey, StringComparer.OrdinalIgnoreCase)
-                        .Select(x => x.First()));
+                        .OfType<ProductionResultNode>()
+                        .GroupBy(
+                            BuildBackwardParentNodeSetMemberKey,
+                            StringComparer.OrdinalIgnoreCase)
+                        .Select(g => g.First()));
 
                 group.Candidates.AddRange(groupCandidates);
 
@@ -3869,7 +3973,7 @@ namespace LotTraceApp.Services
 
         
 
-        private string BuildBackwardParentNodeSetMemberKey(ProductionResultNode node)
+        private string? BuildBackwardParentNodeSetMemberKey(ProductionResultNode? node)
         {
             if (node == null || string.IsNullOrWhiteSpace(node.NodeIdentityKey))
                 return null;
@@ -3877,7 +3981,7 @@ namespace LotTraceApp.Services
             return node.NodeIdentityKey.Trim().ToUpperInvariant();
         }
 
-        private string BuildBackwardParentSetKey(IEnumerable<ProductionResultNode> parentNodes)
+        private string? BuildBackwardParentSetKey(IEnumerable<ProductionResultNode?> parentNodes)
         {
             if (parentNodes == null)
                 return null;
@@ -3904,7 +4008,7 @@ namespace LotTraceApp.Services
             public List<DisplayLaneNode> ChildNodes { get; set; }
             public List<DisplayLaneNode> ParentNodes { get; set; }
 
-            public BackwardParentSetCandidateGroup Group { get; set; }
+            public BackwardParentSetCandidateGroup? Group { get; set; }
 
             public BackwardDisplayNodeGroup()
             {
@@ -3919,7 +4023,7 @@ namespace LotTraceApp.Services
         private sealed class BackwardParentSetCandidateGroup
         {
             public int Level { get; set; }
-            public string ParentSetKey { get; set; }
+            public string? ParentSetKey { get; set; }
             public List<ProductionResultNode> ChildNodes { get; set; }
         
             public List<ProductionResultNode> ParentNodes { get; set; }
@@ -3935,14 +4039,6 @@ namespace LotTraceApp.Services
             }
         }
 
-        
-
-        
-
-        
-
-        
-
       
         private void RegisterBackwardParentCandidateForDisplay(
     Dictionary<string, List<BackwardParentCandidate>> backwardCandidatesByChildNodeKey,BackwardParentCandidate candidate)
@@ -3954,8 +4050,8 @@ namespace LotTraceApp.Services
             if (string.IsNullOrWhiteSpace(childNodeKey))
                 return;
 
-            List<BackwardParentCandidate> list;
-            if (!backwardCandidatesByChildNodeKey.TryGetValue(childNodeKey, out list) || list == null)
+            
+            if (!backwardCandidatesByChildNodeKey.TryGetValue(childNodeKey, out var list) || list == null)
             {
                 list = new List<BackwardParentCandidate>();
                 backwardCandidatesByChildNodeKey[childNodeKey] = list;
@@ -3993,9 +4089,17 @@ namespace LotTraceApp.Services
             var endInfos = laneBuildResult.EndInfos ?? new List<EndDisplayNodeInfo>();
 
             var endInfoByDisplayNodeKey = endInfos
-                .Where(x => x != null && !string.IsNullOrWhiteSpace(x.DisplayNodeKey))
-                .GroupBy(x => x.DisplayNodeKey, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+                .Where(x => x != null)
+                .GroupBy(
+                    x => string.IsNullOrWhiteSpace(x.DisplayNodeKey)
+                        ? throw new InvalidOperationException(
+                            "EndInfo.DisplayNodeKeyが設定されていません。")
+                        : x.DisplayNodeKey,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First(),
+                    StringComparer.OrdinalIgnoreCase);
 
             var laneGroups = displayNodes
                 .GroupBy(x => x.YLane)
@@ -4068,8 +4172,8 @@ namespace LotTraceApp.Services
                     if (string.IsNullOrWhiteSpace(displayNode.DisplayNodeKey))
                         continue;
 
-                    EndDisplayNodeInfo endInfo;
-                    if (!endInfoByDisplayNodeKey.TryGetValue(displayNode.DisplayNodeKey, out endInfo) ||
+                    
+                    if (!endInfoByDisplayNodeKey.TryGetValue(displayNode.DisplayNodeKey, out var endInfo) ||
                         endInfo == null)
                     {
                         continue;
@@ -4166,11 +4270,17 @@ namespace LotTraceApp.Services
                     if (node == null)
                         continue;
 
-                    string oldDisplayNodeKey = node.DisplayNodeKey;
+
+
+                    string oldDisplayNodeKey = node.DisplayNodeKey ?? throw new InvalidOperationException( "DisplayNodeKeyが設定されていません。");
 
                     node.XLevel = endXLevel;
+                    var sourceNode = node.SourceNode
+    ?? throw new InvalidOperationException(
+        "DisplayLaneNode.SourceNodeが設定されていません。");
+
                     node.DisplayNodeKey = BuildDisplayLaneNodeKey(
-                        node.SourceNode,
+                        sourceNode,
                         node.XLevel,
                         node.YLane);
 
@@ -4200,10 +4310,10 @@ namespace LotTraceApp.Services
             if (_currentBackwardCandidatesByChildNodeKey == null)
                 return true;
 
-            List<BackwardParentCandidate> candidates;
+            
             if (!_currentBackwardCandidatesByChildNodeKey.TryGetValue(
                     node.SourceNode.NodeIdentityKey,
-                    out candidates) ||
+                    out var candidates) ||
                 candidates == null ||
                 candidates.Count == 0)
             {
@@ -4246,7 +4356,7 @@ namespace LotTraceApp.Services
             if (node == null || node.SourceNode == null)
                 return string.Empty;
 
-            string masterKey = node.SourceNode.ControlMasterKey;
+            string? masterKey = node.SourceNode.ControlMasterKey;
 
             if (string.IsNullOrWhiteSpace(masterKey))
                 return string.Empty;
@@ -4265,7 +4375,7 @@ namespace LotTraceApp.Services
         private sealed class BackwardPruneGroup
         {
             public int XLevel { get; set; }
-            public string RelationKey { get; set; }
+            public string? RelationKey { get; set; }
             public List<BackwardPruneTarget> Members { get; private set; }
 
             public BackwardPruneGroup()
@@ -4276,8 +4386,8 @@ namespace LotTraceApp.Services
 
         private sealed class BackwardPruneTarget
         {
-            public DisplayLaneNode StartDisplayNode { get; set; }
-            public BackwardParentCandidate Candidate { get; set; }
+            public DisplayLaneNode? StartDisplayNode { get; set; }
+            public BackwardParentCandidate? Candidate { get; set; }
         }
 
         private List<BackwardParentCandidate> GetBackwardParentCandidatesForDisplayNode(
@@ -4291,10 +4401,10 @@ namespace LotTraceApp.Services
             if (_currentBackwardCandidatesByChildNodeKey == null)
                 return result;
 
-            List<BackwardParentCandidate> candidates;
+            
             if (!_currentBackwardCandidatesByChildNodeKey.TryGetValue(
                     node.SourceNode.NodeIdentityKey,
-                    out candidates) ||
+                    out var candidates) ||
                 candidates == null ||
                 candidates.Count == 0)
             {
@@ -4338,14 +4448,14 @@ namespace LotTraceApp.Services
                     if (candidate == null)
                         continue;
 
-                    string relationKey = candidate.RelationKey;
+                    string? relationKey = candidate.RelationKey;
                     if (string.IsNullOrWhiteSpace(relationKey))
                         continue;
 
                     string pruneGroupKey = xLevel.ToString() + "|" + relationKey;
 
-                    BackwardPruneGroup pruneGroup;
-                    if (!groupMap.TryGetValue(pruneGroupKey, out pruneGroup))
+                    
+                    if (!groupMap.TryGetValue(pruneGroupKey, out var pruneGroup))
                     {
                         pruneGroup = new BackwardPruneGroup
                         {
@@ -4395,7 +4505,9 @@ namespace LotTraceApp.Services
                 if (!string.Equals(sourceNode.RouteSystem, "A", StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                string displayNodeKey = member.StartDisplayNode.DisplayNodeKey;
+
+
+                string displayNodeKey = member.StartDisplayNode.DisplayNodeKey ?? throw new InvalidOperationException("DisplayNodeKeyが設定されていません。");
                 if (!string.IsNullOrWhiteSpace(displayNodeKey) &&
                     !seenDisplayNodeKeys.Add(displayNodeKey))
                 {
@@ -4470,12 +4582,12 @@ namespace LotTraceApp.Services
                 if (node == null)
                     continue;
 
-                string parentDisplayNodeKey = node.ParentDisplayNodeKey;
+                string? parentDisplayNodeKey = node.ParentDisplayNodeKey;
                 if (string.IsNullOrWhiteSpace(parentDisplayNodeKey))
                     continue;
 
-                List<DisplayLaneNode> children;
-                if (!result.TryGetValue(parentDisplayNodeKey, out children))
+                
+                if (!result.TryGetValue(parentDisplayNodeKey, out var children))
                 {
                     children = new List<DisplayLaneNode>();
                     result[parentDisplayNodeKey] = children;
@@ -4510,7 +4622,7 @@ namespace LotTraceApp.Services
                 if (current == null)
                     continue;
 
-                string currentDisplayNodeKey = current.DisplayNodeKey;
+                string currentDisplayNodeKey = current.DisplayNodeKey ?? throw new InvalidOperationException("DisplayNodeKeyが設定されていません。") ;
                 if (string.IsNullOrWhiteSpace(currentDisplayNodeKey))
                     continue;
 
@@ -4518,8 +4630,8 @@ namespace LotTraceApp.Services
                 if (!prunedDisplayNodeKeys.Add(currentDisplayNodeKey))
                     continue;
 
-                List<DisplayLaneNode> children;
-                if (!childrenMap.TryGetValue(currentDisplayNodeKey, out children) ||
+                
+                if (!childrenMap.TryGetValue(currentDisplayNodeKey, out var children) ||
                     children == null ||
                     children.Count == 0)
                 {
@@ -4536,187 +4648,17 @@ namespace LotTraceApp.Services
             }
         }
 
-        private void DumpBackwardPrunedDisplayNodeKeys(
-            ISet<string> prunedDisplayNodeKeys,
-            string fileName)
-        {
-            try
-            {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string debugDir = Path.Combine(baseDir, "Debug");
-                Directory.CreateDirectory(debugDir);
-
-                string safeFileName = string.IsNullOrWhiteSpace(fileName)
-                    ? "LotTrace_Debug_BackwardPrunedDisplayNodeKeys.csv"
-                    : fileName;
-
-                string outputPath = Path.Combine(debugDir, safeFileName);
-
-                using (var sw = new StreamWriter(outputPath, false, new UTF8Encoding(true)))
-                {
-                    sw.WriteLine(
-                        "DisplayNodeKey,ParentDisplayNodeKey,XLevel,YLane,NodeIdentityKey,RouteSystem,LotNumber,ControlMasterKey");
-
-                    if (prunedDisplayNodeKeys == null || prunedDisplayNodeKeys.Count == 0)
-                        return;
-
-                    // ダンプ見やすさのため、キー→Node を一旦引けるようにしておく
-                    var allDisplayNodes = new List<DisplayLaneNode>();
-
-                    if (_currentForwardLaneBuildResult != null &&
-                        _currentForwardLaneBuildResult.DisplayNodes != null)
-                    {
-                        allDisplayNodes.AddRange(_currentForwardLaneBuildResult.DisplayNodes);
-                    }
-
-                    var nodeMap = allDisplayNodes
-                        .Where(x => x != null && !string.IsNullOrWhiteSpace(x.DisplayNodeKey))
-                        .GroupBy(x => x.DisplayNodeKey, StringComparer.OrdinalIgnoreCase)
-                        .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var key in prunedDisplayNodeKeys
-                        .Where(x => !string.IsNullOrWhiteSpace(x))
-                        .OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
-                    {
-                        DisplayLaneNode node;
-                        nodeMap.TryGetValue(key, out node);
-
-                        var sourceNode = node == null ? null : node.SourceNode;
-
-                        sw.WriteLine(string.Join(",",
-                            EscapeCsv(key),
-                            EscapeCsv(node == null ? null : node.ParentDisplayNodeKey),
-                            EscapeCsv(node == null ? null : node.XLevel.ToString()),
-                            EscapeCsv(node == null ? null : node.YLane.ToString()),
-                            EscapeCsv(sourceNode == null ? null : sourceNode.NodeIdentityKey),
-                            EscapeCsv(sourceNode == null ? null : sourceNode.RouteSystem),
-                            EscapeCsv(sourceNode == null ? null : sourceNode.LotNumber),
-                            EscapeCsv(sourceNode == null ? null : sourceNode.ControlMasterKey)
-                        ));
-                    }
-                }
-            }
-            catch
-            {
-                // Debug dump failure must not break trace flow.
-            }
-        }
-
-        #endregion
-
-        #region デバッグCSV出力
-
-        
-
-       
-
-        private void DumpTraceDisplayLaneNodes(
-            TraceDirection direction,
-            ForwardDisplayLaneBuildResult laneBuildResult,
-            string phase)
-        {
-            try
-            {
-                DumpDisplayLaneNodesToFile(
-                    direction,
-                    laneBuildResult == null ? null : laneBuildResult.DisplayNodes,
-                    phase);
-            }
-            catch
-            {
-                // デバッグ出力失敗は本処理を止めない
-            }
-        }
-
-        
-        private string EnsureTraceDebugFolderExists()
-        {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string debugDir = Path.Combine(baseDir, "Debug", "Trace");
-
-            if (!Directory.Exists(debugDir))
-            {
-                Directory.CreateDirectory(debugDir);
-            }
-
-            return debugDir;
-        }
-
-        private void DumpDisplayLaneNodesToFile(
-            TraceDirection direction,
-            List<DisplayLaneNode> nodes,
-            string phase)
-        {
-            if (nodes == null || nodes.Count == 0)
-                return;
-
-            try
-            {
-                string folder = EnsureTraceDebugFolderExists();
-                string safeDirection = direction.ToString();
-                string path = Path.Combine(
-                    folder,
-                    "LotTrace_Debug_" + safeDirection + "_DisplayLaneNodes.csv");
-
-                var sb = new StringBuilder();
-
-                sb.AppendLine(
-                    "Direction,Phase,DisplayNodeKey,ParentDisplayNodeKey,MergeKey,XLevel,YLane,ChildIndex,LotGroupKey,RepresentativeNodeKey,OccupiedFirstY,OccupiedLastY,ProductionOrderNumber,ItemCode,ItemName,LotNumber,ControlMasterKey,RouteSystem,InputSlotNo,InputSourceType,Depth,NodeType");
-
-                foreach (var node in nodes
-                    .Where(x => x != null)
-                    .OrderBy(x => x.XLevel)
-                    .ThenBy(x => x.YLane)
-                    .ThenBy(x => x.ChildIndex))
-                {
-                    var src = node.SourceNode;
-
-                    sb.Append(EscapeCsv(safeDirection)).Append(",");
-                    sb.Append(EscapeCsv(phase)).Append(",");
-                    sb.Append(EscapeCsv(node.DisplayNodeKey)).Append(",");
-                    sb.Append(EscapeCsv(node.ParentDisplayNodeKey)).Append(",");
-                    sb.Append(EscapeCsv(node.MergeKey)).Append(",");
-                    sb.Append(node.XLevel.ToString()).Append(",");
-                    sb.Append(node.YLane.ToString()).Append(",");
-                    sb.Append(node.ChildIndex.ToString()).Append(",");
-                    sb.Append(EscapeCsv(node.LotGroupKey)).Append(",");
-                    sb.Append(EscapeCsv(node.RepresentativeNodeKey)).Append(",");
-                    sb.Append(node.OccupiedFirstY.ToString()).Append(",");
-                    sb.Append(node.OccupiedLastY.ToString()).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.ProductionOrderNumber)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.ItemCode)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.ItemName)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.LotNumber)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.ControlMasterKey)).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.RouteSystem)).Append(",");
-                    sb.Append(EscapeCsv(src == null || !src.InputSlotNo.HasValue
-                        ? null
-                        : src.InputSlotNo.Value.ToString())).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.InputSourceType)).Append(",");
-                    sb.Append(src == null ? "" : src.Depth.ToString()).Append(",");
-                    sb.Append(EscapeCsv(src == null ? null : src.NodeType));
-                    sb.AppendLine();
-                }
-
-                File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
-            }
-            catch
-            {
-                // ダンプ失敗は本処理を止めない
-            }
-        }
-
-        
-        private string EscapeCsv(string value)
-        {
-            if (value == null)
-                return "\"\"";
-
-            string s = value.Replace("\"", "\"\"");
-            return "\"" + s + "\"";
-        }
 
 
         #endregion
+
+        private static ProductionResultNode GetRequiredSourceNode(
+    DisplayLaneNode displayNode)
+        {
+            return displayNode.SourceNode
+                ?? throw new InvalidOperationException(
+                    "DisplayLaneNode.SourceNodeが設定されていません。");
+        }
+
     }
 }

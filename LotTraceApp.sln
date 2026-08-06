@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12009.203
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LotTraceApp", "LotTraceApp.csproj", "{8D80A746-BE3B-462A-A22B-A896F53AF1F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LotTraceApp", "LotTraceApp.csproj", "{58969638-FE2E-858F-8AB8-044F35FF78E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8D80A746-BE3B-462A-A22B-A896F53AF1F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D80A746-BE3B-462A-A22B-A896F53AF1F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D80A746-BE3B-462A-A22B-A896F53AF1F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D80A746-BE3B-462A-A22B-A896F53AF1F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58969638-FE2E-858F-8AB8-044F35FF78E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58969638-FE2E-858F-8AB8-044F35FF78E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58969638-FE2E-858F-8AB8-044F35FF78E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58969638-FE2E-858F-8AB8-044F35FF78E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

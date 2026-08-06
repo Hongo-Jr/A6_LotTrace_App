@@ -28,7 +28,7 @@ namespace LotTraceApp.Utils
 
         private void Load(string path)
         {
-            string currentSection = null;
+            string? currentSection = null;
 
             string[] lines = File.ReadAllLines(path);
             foreach (string raw in lines)
@@ -63,8 +63,8 @@ namespace LotTraceApp.Utils
                     continue;
                 }
 
-                Dictionary<string, string> section;
-                if (!_data.TryGetValue(currentSection, out section))
+                
+                if (!_data.TryGetValue(currentSection, out var section))
                 {
                     section = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     _data[currentSection] = section;
@@ -77,19 +77,19 @@ namespace LotTraceApp.Utils
         /// <summary>
         /// section/key の値を取得（見つからなければ null）
         /// </summary>
-        public string GetValue(string section, string key)
+        public string? GetValue(string? section, string? key)
         {
             if (section == null) throw new ArgumentNullException("section");
             if (key == null) throw new ArgumentNullException("key");
 
-            Dictionary<string, string> sec;
-            if (!_data.TryGetValue(section, out sec))
+            
+            if (!_data.TryGetValue(section, out var sec))
             {
                 return null;
             }
 
-            string value;
-            if (!sec.TryGetValue(key, out value))
+            
+            if (!sec.TryGetValue(key, out var value))
             {
                 return null;
             }
@@ -97,15 +97,15 @@ namespace LotTraceApp.Utils
             return value;
         }
 
-        public string GetString(string section, string key, string defaultValue)
+        public string? GetString(string section, string key, string? defaultValue)
         {
-            string value = GetValue(section, key);
+            string? value = GetValue(section, key);
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
         }
 
         public bool GetBool(string section, string key, bool defaultValue)
         {
-            string value = GetValue(section, key);
+            string? value = GetValue(section, key);
             if (string.IsNullOrWhiteSpace(value))
             {
                 return defaultValue;
@@ -125,7 +125,7 @@ namespace LotTraceApp.Utils
 
         public int GetInt(string section, string key, int defaultValue)
         {
-            string value = GetValue(section, key);
+            string? value = GetValue(section, key);
             if (string.IsNullOrWhiteSpace(value))
             {
                 return defaultValue;

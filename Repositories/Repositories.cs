@@ -1,10 +1,10 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿
 using LotTraceApp.Forms;
 using LotTraceApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -270,9 +270,9 @@ namespace LotTraceApp.Repositories
 
         private void AppendStartNodeSearchConditions(TraceSearchParameters p,SqlCommand cmd,StringBuilder sql,string alias,bool includeStartDate)
         {
-            AppendSearchParameterCondition(p == null ? null : p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
+            AppendSearchParameterCondition(p.ProductionOrderNumber, cmd, sql, alias, "ForeignKey", "@Order");
 
-            AppendSearchParameterCondition(p == null ? null : p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
+            AppendSearchParameterCondition(p.LotNumber, cmd, sql, alias, "LotNumber", "@Lot");
 
             AppendItemCodeCondition( p, cmd, sql, alias, "ItemCode", "@ItemCode");
 
@@ -296,7 +296,7 @@ namespace LotTraceApp.Repositories
         }
 
 
-        private void AppendSearchParameterCondition(string rawValue, SqlCommand cmd, StringBuilder sql, string alias, string columnName,string parameterName)
+        private void AppendSearchParameterCondition(string? rawValue, SqlCommand cmd, StringBuilder sql, string alias, string columnName,string parameterName)
         {
             if (string.IsNullOrWhiteSpace(rawValue))
                 return;
@@ -386,16 +386,13 @@ namespace LotTraceApp.Repositories
             cmd.Parameters.AddWithValue(parameterName, value);
         }
 
-        public bool ContainsUserWildcard(string value)
+        public bool ContainsUserWildcard(string? value)
         {
             return !string.IsNullOrWhiteSpace(value) && value.IndexOf('*') >= 0;
         }
 
         public string BuildSqlLikePatternFromUserWildcard(string value)
         {
-            if (value == null)
-                return null;
-
             var pattern = new StringBuilder();
             string trimmed = value.Trim();
 
@@ -406,14 +403,17 @@ namespace LotTraceApp.Repositories
                     case '*':
                         pattern.Append('%');
                         break;
+
                     case '%':
                     case '_':
                     case '\\':
                         pattern.Append('\\').Append(ch);
                         break;
+
                     case '[':
                         pattern.Append("[[]");
                         break;
+
                     default:
                         pattern.Append(ch);
                         break;
@@ -423,10 +423,10 @@ namespace LotTraceApp.Repositories
             return pattern.ToString();
         }
 
-        
+
 
         private void AppendSingleControlProcessStartDateConditions(
-    TraceSearchParameters p,
+    TraceSearchParameters? p,
     SqlCommand cmd,
     StringBuilder sql,
     string alias)
@@ -451,7 +451,7 @@ namespace LotTraceApp.Repositories
 
         private void AppendForwardDToBChildSearchConditions(TraceSearchParameters p,SqlCommand cmd, StringBuilder sql, string alias)
         {
-            AppendSearchParameterCondition( p == null ? null : p.ProductionOrderNumber, cmd, sql, alias,"ForeignKey", "@Order");
+            AppendSearchParameterCondition( p.ProductionOrderNumber, cmd, sql, alias,"ForeignKey", "@Order");
 
             AppendSingleControlProcessStartDateConditions( p, cmd, sql, alias);
         }
@@ -510,10 +510,10 @@ namespace LotTraceApp.Repositories
                         node.Weight =
                             reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
 
-                        string sourceType =
+                        string? sourceType =
                             reader.IsDBNull(5) ? null : reader.GetString(5);
 
-                        string slotNoText =
+                        string? slotNoText =
                             reader.IsDBNull(6) ? null : reader.GetString(6);
 
                         int slotNo = 0;
@@ -648,7 +648,10 @@ namespace LotTraceApp.Repositories
                 startA = new List<ProductionResultNode>();
             }
 
-            AppendForwardStartNodes(result, addedStartNodeKeys, startB);
+            if (startB != null)
+            {
+                AppendForwardStartNodes(result, addedStartNodeKeys, startB);
+            }
             AppendForwardStartNodes(result, addedStartNodeKeys, startA);
 
             return result;
@@ -754,23 +757,11 @@ namespace LotTraceApp.Repositories
             return result;
         }
 
-        private string BuildCandidateNodePairKey(
+        private static string BuildCandidateNodePairKey(
     ProductionResultNode parentNode,
     ProductionResultNode childNode)
         {
-            if (parentNode == null || childNode == null)
-                return null;
-
-            string parentKey = parentNode.NodeIdentityKey;
-            string childKey = childNode.NodeIdentityKey;
-
-            if (string.IsNullOrWhiteSpace(parentKey) ||
-                string.IsNullOrWhiteSpace(childKey))
-            {
-                return null;
-            }
-
-            return parentKey + "=>" + childKey;
+            return $"{parentNode.NodeIdentityKey}=>{childNode.NodeIdentityKey}";
         }
 
         private void AppendForwardStartNodes(
@@ -915,6 +906,9 @@ namespace LotTraceApp.Repositories
                     while (reader.Read())
                     {
                         var childNode = BuildForwardStartDChildMaNode(reader);
+
+                        if ( childNode == null) { continue; }
+
                         var parentNode = BuildForwardStartDParentDrumNode(reader, childNode);
 
                         var candidate = BuildForwardChildCandidate(
@@ -952,6 +946,7 @@ namespace LotTraceApp.Repositories
                     while (reader.Read())
                     {
                         var childNode = BuildForwardStartDChildMaNode(reader);
+                        if (childNode == null) { continue; }    
                         var parentNode = BuildForwardStartDParentDrumNode(reader, childNode);
 
                         var candidate = BuildForwardChildCandidate(
@@ -991,7 +986,7 @@ namespace LotTraceApp.Repositories
                     {
                         var childNode = BuildForwardStartDChildBNode(reader);
                         var parentNode = BuildForwardStartDParentDrumNodeFromBHit(reader);
-
+                        if (childNode == null || parentNode == null) { continue; }
                         var candidate = BuildForwardChildCandidate(
                             parentNode,
                             childNode,
@@ -1119,8 +1114,8 @@ namespace LotTraceApp.Repositories
             return result;
         }
 
-        private ProductionResultNode ResolveForwardStartDChildToBNode(
-    string childLotNumber,
+        private ProductionResultNode? ResolveForwardStartDChildToBNode(
+    string? childLotNumber,
     int depth,
     TraceSearchParameters p)
         {
@@ -1323,7 +1318,7 @@ namespace LotTraceApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        string childLotNumber =
+                        string? childLotNumber =
                             reader.IsDBNull(0) ? null : reader.GetString(0);
 
                         var candidate = BuildForwardStep1Candidate(
@@ -1367,7 +1362,7 @@ namespace LotTraceApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        string childLotNumber =
+                        string? childLotNumber =
                             reader.IsDBNull(0) ? null : reader.GetString(0);
 
                         var candidate = BuildForwardStep1Candidate(
@@ -1429,7 +1424,7 @@ namespace LotTraceApp.Repositories
                         continue;
 
                     // 将来の分岐用フック
-                    string parentRouteSystem = step1Candidate.PearentNode.RouteSystem;
+                    string? parentRouteSystem = step1Candidate.PearentNode.RouteSystem;
 
                     using (var cmd = conn.CreateCommand())
                     {
@@ -1458,10 +1453,10 @@ namespace LotTraceApp.Repositories
                                 childNode.Weight =
                                     reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
 
-                                string sourceType =
+                                string? sourceType =
                                     reader.IsDBNull(5) ? null : reader.GetString(5);
 
-                                string slotNoText =
+                                string? slotNoText =
                                     reader.IsDBNull(6) ? null : reader.GetString(6);
 
                                 int slotNo = 0;
@@ -1542,7 +1537,7 @@ namespace LotTraceApp.Repositories
                         continue;
 
                     // 将来の分岐用フック
-                    string parentRouteSystem = step1Candidate.PearentNode.RouteSystem;
+                    string? parentRouteSystem = step1Candidate.PearentNode.RouteSystem;
 
                     using (var cmd = conn.CreateCommand())
                     {
@@ -1605,7 +1600,7 @@ namespace LotTraceApp.Repositories
             return result;
         }
 
-        private ProductionResultNode BuildForwardStartDChildMaNode(SqlDataReader reader)
+        private ProductionResultNode? BuildForwardStartDChildMaNode(SqlDataReader reader)
         {
             if (reader == null)
                 return null;
@@ -1647,21 +1642,21 @@ namespace LotTraceApp.Repositories
             return node;
         }
 
-        private ProductionResultNode BuildForwardStartDParentDrumNode(SqlDataReader reader, ProductionResultNode childNode)
+        private ProductionResultNode? BuildForwardStartDParentDrumNode(SqlDataReader reader, ProductionResultNode childNode)
         {
             if (reader == null)
                 return null;
 
-            string drumLotNumber =
+            string? drumLotNumber =
                 reader.IsDBNull(4) ? null : reader.GetString(4);
 
-            string drumItemCode =
+            string? drumItemCode =
                 reader.IsDBNull(5) ? null : reader.GetString(5);
 
             float? drumWeight =
                 reader.IsDBNull(6) ? (float?)null : Convert.ToSingle(reader.GetValue(6));
 
-            string slotNoText =
+            string? slotNoText =
                 reader.IsDBNull(7) ? null : reader.GetString(7);
 
             int slotNo = 0;
@@ -1700,7 +1695,7 @@ namespace LotTraceApp.Repositories
             return node;
         }
 
-        private ProductionResultNode BuildForwardStartDChildBNode(SqlDataReader reader)
+        private ProductionResultNode? BuildForwardStartDChildBNode(SqlDataReader reader)
         {
             if (reader == null)
                 return null;
@@ -1745,21 +1740,21 @@ namespace LotTraceApp.Repositories
             return node;
         }
 
-        private ProductionResultNode BuildForwardStartDParentDrumNodeFromBHit(SqlDataReader reader)
+        private ProductionResultNode? BuildForwardStartDParentDrumNodeFromBHit(SqlDataReader reader)
         {
             if (reader == null)
                 return null;
 
-            string drumLotNumber =
+            string? drumLotNumber =
                 reader.IsDBNull(6) ? null : reader.GetString(6);
 
-            string drumItemCode =
+            string? drumItemCode =
                 reader.IsDBNull(7) ? null : reader.GetString(7);
 
             float? drumWeight =
                 reader.IsDBNull(8) ? (float?)null : Convert.ToSingle(reader.GetValue(8));
 
-            string slotNoText =
+            string? slotNoText =
                 reader.IsDBNull(9) ? null : reader.GetString(9);
 
             int slotNo = 0;
@@ -1934,7 +1929,7 @@ namespace LotTraceApp.Repositories
                 if (candidate == null)
                     continue;
 
-                string key = BuildForwardStartDDedupeKey(candidate);
+                string? key = BuildForwardStartDDedupeKey(candidate);
                 if (string.IsNullOrWhiteSpace(key))
                     continue;
 
@@ -1959,8 +1954,8 @@ namespace LotTraceApp.Repositories
             return parentNode.LotNumber + "|" + childNode.LotNumber;
         }
 
-        private ChildCandidate BuildForwardChildCandidate(
-    ProductionResultNode parentNode,
+        private ChildCandidate? BuildForwardChildCandidate(
+    ProductionResultNode? parentNode,
     ProductionResultNode childNode,
     string debugSource)
         {
@@ -1982,9 +1977,9 @@ namespace LotTraceApp.Repositories
         /// current と childLotNumber から、未完成の ChildCandidate を作る。
         /// STEP1 では ChildNode / RelationKey はまだ作らない。
         /// </summary>
-        private ChildCandidate BuildForwardStep1Candidate(
+        private ChildCandidate? BuildForwardStep1Candidate(
             ProductionResultNode current,
-            string childLotNumber,
+            string? childLotNumber,
             string debugSource)
         {
             if (current == null)
@@ -2003,7 +1998,7 @@ namespace LotTraceApp.Repositories
             };
         }
 
-        private string BuildForwardStartDDedupeKey(ChildCandidate candidate)
+        private static string? BuildForwardStartDDedupeKey(ChildCandidate candidate)
         {
             if (candidate == null ||
                 candidate.PearentNode == null ||
@@ -2023,10 +2018,10 @@ namespace LotTraceApp.Repositories
 
         private sealed class BackwardParentLotCandidate
         {
-            public string ParentLotNumber { get; set; }
+            public string? ParentLotNumber { get; set; }
 
             // Step1(A) で拾える補完用情報
-            public string ItemCode { get; set; }
+            public string? ItemCode { get; set; }
             public float? Weight { get; set; }
             public MaterialAInputType MaterialAInputType { get; set; }
             public int SlotNo { get; set; }
@@ -2037,11 +2032,11 @@ namespace LotTraceApp.Repositories
 
         private sealed class BackwardStep1DrumcanRow
         {
-            public string ChildMasterKey { get; set; }
-            public string ParentLotNumber { get; set; }
-            public string ItemCode { get; set; }
+            public string? ChildMasterKey { get; set; }
+            public string? ParentLotNumber { get; set; }
+            public string? ItemCode { get; set; }
             public float? Weight { get; set; }
-            public string SourceType { get; set; }
+            public string? SourceType { get; set; }
             public int SlotNo { get; set; }
         }
 
@@ -2098,25 +2093,25 @@ namespace LotTraceApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        string childMasterKey =
+                        string? childMasterKey =
                             reader.IsDBNull(0) ? null : reader.GetString(0);
 
-                        string parentLotNumber =
+                        string? parentLotNumber =
                             reader.IsDBNull(1) ? null : reader.GetString(1);
 
                         if (string.IsNullOrWhiteSpace(parentLotNumber))
                             continue;
 
-                        string itemCode =
+                        string? itemCode =
                             reader.IsDBNull(2) ? null : reader.GetString(2);
 
                         float? weight =
                             reader.IsDBNull(3) ? (float?)null : Convert.ToSingle(reader.GetValue(3));
 
-                        string sourceType =
+                        string? sourceType =
                             reader.IsDBNull(4) ? null : reader.GetString(4);
 
-                        string slotNoText =
+                        string? slotNoText =
                             reader.IsDBNull(5) ? null : reader.GetString(5);
 
                         int slotNo = 0;
@@ -2226,10 +2221,10 @@ namespace LotTraceApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        string childMasterKey =
+                        string? childMasterKey =
                             reader.IsDBNull(0) ? null : reader.GetString(0);
 
-                        string parentLotNumber =
+                        string? parentLotNumber =
                             reader.IsDBNull(1) ? null : reader.GetString(1);
 
                         if (string.IsNullOrWhiteSpace(parentLotNumber))
@@ -2299,7 +2294,7 @@ namespace LotTraceApp.Repositories
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         private string BuildBackwardStep1MaterialTableASql(
-    string childSourceType,
+    string? childSourceType,
     int childSlotNo)
         {
             if (string.IsNullOrWhiteSpace(childSourceType))
@@ -2394,25 +2389,25 @@ WHERE mb.LotNumber = @ChildLotNumber
                 {
                     while (reader.Read())
                     {
-                        string childMasterKey =
+                        string? childMasterKey =
                             reader.IsDBNull(0) ? null : reader.GetString(0);
 
-                        string drumcanParentLotNumber =
+                        string? drumcanParentLotNumber =
                             reader.IsDBNull(1) ? null : reader.GetString(1);
 
                         if (string.IsNullOrWhiteSpace(drumcanParentLotNumber))
                             continue;
 
-                        string drumcanItemCode =
+                        string?  drumcanItemCode =
                             reader.IsDBNull(2) ? null : reader.GetString(2);
 
                         float? drumcanWeight =
                             reader.IsDBNull(3) ? (float?)null : Convert.ToSingle(reader.GetValue(3));
 
-                        string sourceType =
+                        string? sourceType =
                             reader.IsDBNull(4) ? null : reader.GetString(4);
 
-                        string slotNoText =
+                        string? slotNoText =
                             reader.IsDBNull(5) ? null : reader.GetString(5);
 
                         int slotNo = 0;
@@ -2422,7 +2417,7 @@ WHERE mb.LotNumber = @ChildLotNumber
                         {
                             var bCandidate = BuildBackwardStep1DrumcanCandidateForB(
                                 current,
-                                childMasterKey,
+                                
                                 drumcanParentLotNumber,
                                 drumcanItemCode,
                                 drumcanWeight,
@@ -2565,13 +2560,13 @@ WHERE mb.LotNumber = @ChildLotNumber
             }
         }
 
-        private BackwardParentCandidate BuildBackwardStep1DrumcanCandidateForB(
+        private BackwardParentCandidate? BuildBackwardStep1DrumcanCandidateForB(
     ProductionResultNode current,
-    string childMasterKey,
-    string drumcanParentLotNumber,
-    string drumcanItemCode,
+    
+    string? drumcanParentLotNumber,
+    string? drumcanItemCode,
     float? drumcanWeight,
-    string sourceType,
+    string? sourceType,
     int slotNo,
     int depth)
         {
@@ -2796,22 +2791,22 @@ WHERE scp.LotNumber = @ParentLotNumber
                             {
                               
 
-                                string foreignKey =
+                                string? foreignKey =
                                     reader.IsDBNull(0) ? null : reader.GetString(0);
 
-                                string lotNumber =
+                                string? lotNumber =
                                     reader.IsDBNull(1) ? null : reader.GetString(1);
 
-                                string masterKey =
+                                string? masterKey =
                                     reader.IsDBNull(2) ? null : reader.GetString(2);
 
                                 float? amountWeight =
                                     reader.IsDBNull(3) ? (float?)null : Convert.ToSingle(reader.GetValue(3));
 
-                                string sourceType =
+                                string? sourceType =
                                     reader.IsDBNull(4) ? null : reader.GetString(4);
 
-                                string slotNoText =
+                                string? slotNoText =
                                     reader.IsDBNull(5) ? null : reader.GetString(5);
 
                                 int slotNo = 0;
@@ -3074,7 +3069,7 @@ WHERE scp.LotNumber = @ParentLotNumber
         }
 
 
-        private BackwardParentCandidate BuildBackwardStep2AFallbackCandidate(
+        private BackwardParentCandidate? BuildBackwardStep2AFallbackCandidate(
     BackwardParentCandidate parentCandidate,
     int depth)
         {
@@ -3228,16 +3223,16 @@ WHERE scp.LotNumber = @ParentLotNumber
                         childNode.Weight =
                             reader.IsDBNull(4) ? (float?)null : Convert.ToSingle(reader.GetValue(4));
 
-                        string sourceType =
+                        string? sourceType =
                             reader.IsDBNull(5) ? null : reader.GetString(5);
 
-                        string slotNoText =
+                        string? slotNoText =
                             reader.IsDBNull(6) ? null : reader.GetString(6);
 
-                        string parentLotNumber =
+                        string? parentLotNumber =
                             reader.IsDBNull(7) ? null : reader.GetString(7);
 
-                        string parentItemCode =
+                        string? parentItemCode =
                             reader.IsDBNull(8) ? null : reader.GetString(8);
 
                         float? parentWeight =
@@ -3380,7 +3375,7 @@ WHERE scp.LotNumber = @ParentLotNumber
 
                 ApplyBackwardStartNodeContext(node, routeSystem);
 
-                string dedupeKey = BuildBackwardStartDedupKey(node);
+                string? dedupeKey = BuildBackwardStartDedupKey(node);
                 if (string.IsNullOrWhiteSpace(dedupeKey))
                 {
                     target.Add(node);
@@ -3429,7 +3424,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                 node.IsTraceTerminal = string.IsNullOrWhiteSpace(node.LotNumber);
         }
 
-        private string BuildBackwardStartDedupKey(ProductionResultNode node)
+        private string? BuildBackwardStartDedupKey(ProductionResultNode node)
         {
             if (node == null)
                 return null;
@@ -3469,11 +3464,11 @@ WHERE scp.LotNumber = @ParentLotNumber
 
         private string BuildDeterministicSpecialNodeMasterKey(
     string specialNodeType,
-    string parentBaseKey,
-    string itemCode,
-    string lotNumber,
+    string? parentBaseKey,
+    string? itemCode,
+    string? lotNumber,
     float? weight,
-    string inputSourceType,
+    string? inputSourceType,
     int? inputSlotNo,
     params string[] extraContexts)
         {
@@ -3506,8 +3501,8 @@ WHERE scp.LotNumber = @ParentLotNumber
         }
 
         private string BuildDrumcanSpecialNodeMasterKey(
-    string itemCode,
-    string lotNumber,
+    string? itemCode,
+    string? lotNumber,
     float? weight,
     int? inputSlotNo)
         {
@@ -3524,7 +3519,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                 inputSlotNo.HasValue ? inputSlotNo.Value.ToString() : "");
         }
 
-        private string NormalizeKeyPart(string value)
+        private string NormalizeKeyPart(string? value)
         {
             return string.IsNullOrWhiteSpace(value)
                 ? ""
@@ -3552,7 +3547,7 @@ WHERE scp.LotNumber = @ParentLotNumber
 
         #region Node補完用共通メソッド（サービスから移管）
 
-        private BackwardParentCandidate FinalizeBackwardParentCandidate(
+        private BackwardParentCandidate? FinalizeBackwardParentCandidate(
     BackwardParentCandidate candidate)
         {
             if (candidate == null)
@@ -3612,7 +3607,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = BuildMaterialTableAForwardSql_New();
-                    cmd.Parameters.AddWithValue("@ItemCode", (object)material.ItemCode ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ItemCode", (object?)material.ItemCode ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@LotNumber", material.LotNumber);
 
                     using (var reader = cmd.ExecuteReader())
@@ -3628,7 +3623,7 @@ WHERE scp.LotNumber = @ParentLotNumber
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = BuildMaterialTableBForwardSql_New();
-                    cmd.Parameters.AddWithValue("@ItemCode", (object)material.ItemCode ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ItemCode", (object?)material.ItemCode ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@LotNumber", material.LotNumber);
 
                     using (var reader = cmd.ExecuteReader())
@@ -3872,8 +3867,8 @@ WHERE  mb.SourceTankLotNumber01 = @LotNumber
                 string columnItem = "DrumcanItemCode" + idx;
                 string columnLot = "DrumcanLotNumber" + idx;
 
-                string itemCode = reader[columnItem] as string;
-                string lot = reader[columnLot] as string;
+                string? itemCode = reader[columnItem] as string;
+                string? lot = reader[columnLot] as string;
 
                 if (!string.IsNullOrWhiteSpace(itemCode) && !string.IsNullOrWhiteSpace(lot))
                 {
@@ -3888,8 +3883,8 @@ WHERE  mb.SourceTankLotNumber01 = @LotNumber
                 string columnItem = "ManualInputItemCode" + idx;
                 string columnLot = "ManualInputLotNumber" + idx;
 
-                string itemCode = reader[columnItem] as string;
-                string lot = reader[columnLot] as string;
+                string? itemCode = reader[columnItem] as string;
+                string? lot = reader[columnLot] as string;
 
                 if (!string.IsNullOrWhiteSpace(itemCode) && !string.IsNullOrWhiteSpace(lot))
                 {
@@ -3907,8 +3902,8 @@ WHERE  mb.SourceTankLotNumber01 = @LotNumber
                 string columnItem = "SourceTankItemCode_Solvent" + idx;
                 string columnLot = "SourceTankLotNumber_Solvent" + idx;
 
-                string itemCode = reader[columnItem] as string;
-                string lot = reader[columnLot] as string;
+                string? itemCode = reader[columnItem] as string;
+                string? lot = reader[columnLot] as string;
 
                 if (!string.IsNullOrWhiteSpace(itemCode) && !string.IsNullOrWhiteSpace(lot))
                 {
@@ -3923,8 +3918,8 @@ WHERE  mb.SourceTankLotNumber01 = @LotNumber
                 string columnItem = "SourceTankItemCode" + idx;
                 string columnLot = "SourceTankLotNumber" + idx;
 
-                string itemCode = reader[columnItem] as string;
-                string lot = reader[columnLot] as string;
+                string? itemCode = reader[columnItem] as string;
+                string? lot = reader[columnLot] as string;
 
                 if (!string.IsNullOrWhiteSpace(itemCode) && !string.IsNullOrWhiteSpace(lot))
                 {
