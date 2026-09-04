@@ -2788,8 +2788,6 @@ namespace LotTraceApp
         private TabPage BottleIntersectionTab;
         private DataGridView dataGridIntersection;
         private TabPage tabBottlePage2;
-        //private DataGridView dgvStartBottle_2;
-        //private DataGridView dgvEndBottle_2;
         private DataGridView bottleGrid2;
         private RadioButton rdoBackwardBottle_2;
         private RadioButton rdoForwardBottle_2;
@@ -2814,9 +2812,7 @@ namespace LotTraceApp
         private TabControl swichBottleTab;
         private TabPage tabBottlePage1;
         private Panel panelStartBottle;
-        //private DataGridView dgvStartBottle;
         private Panel panelEndBottle;
-        //private DataGridView dgvEndBottle;
         private DataGridView bottleGrid1;
         private RadioButton rdoBackwardBottle;
         private RadioButton rdoForwardBottle;
@@ -2838,9 +2834,7 @@ namespace LotTraceApp
         private Button btnBottleTraceSearch;
         private TabPage tabBottlePage3;
         private Panel panelStartBottle_3;
-        //private DataGridView dgvStartBottle_3;
         private Panel panelEndBottle_3;
-        //private DataGridView dgvEndBottle_3;
         private DataGridView bottleGrid3;
         private RadioButton rdoBackwardBottle_3;
         private RadioButton rdoForwardBottle_3;
@@ -2862,9 +2856,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_3;
         private TabPage tabBottlePage4;
         private Panel panelStartBottle_4;
-        //private DataGridView dgvStartBottle_4;
         private Panel panelEndBottle_4;
-        //private DataGridView dgvEndBottle_4;
         private DataGridView bottleGrid4;
         private RadioButton rdoBackwardBottle_4;
         private RadioButton rdoForwardBottle_4;
@@ -2886,9 +2878,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_4;
         private TabPage tabBottlePage5;
         private Panel panelStartBottle_5;
-        //private DataGridView dgvStartBottle_5;
         private Panel panelEndBottle_5;
-        //private DataGridView dgvEndBottle_5;
         private DataGridView bottleGrid5;
         private RadioButton rdoBackwardBottle_5;
         private RadioButton rdoForwardBottle_5;
@@ -2910,9 +2900,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_5;
         private TabPage tabBottlePage6;
         private Panel panelStartBottle_6;
-        //private DataGridView dgvStartBottle_6;
         private Panel panelEndBottle_6;
-        //private DataGridView dgvEndBottle_6;
         private DataGridView bottleGrid6;
         private RadioButton rdoBackwardBottle_6;
         private RadioButton rdoForwardBottle_6;
@@ -2934,9 +2922,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_6;
         private TabPage tabBottlePage7;
         private Panel panelStartBottle_7;
-        //private DataGridView dgvStartBottle_7;
         private Panel panelEndBottle_7;
-        //private DataGridView dgvEndBottle_7;
         private DataGridView bottleGrid7;
         private RadioButton rdoBackwardBottle_7;
         private RadioButton rdoForwardBottle_7;
@@ -2958,9 +2944,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_7;
         private TabPage tabBottlePage8;
         private Panel panelStartBottle_8;
-        //private DataGridView dgvStartBottle_8;
         private Panel panelEndBottle_8;
-        //private DataGridView dgvEndBottle_8;
         private DataGridView bottleGrid8;
         private RadioButton rdoBackwardBottle_8;
         private RadioButton rdoForwardBottle_8;
@@ -2982,9 +2966,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_8;
         private TabPage tabBottlePage9;
         private Panel panelStartBottle_9;
-        //private DataGridView dgvStartBottle_9;
         private Panel panelEndBottle_9;
-        //private DataGridView dgvEndBottle_9;
         private DataGridView bottleGrid9;
         private RadioButton rdoBackwardBottle_9;
         private RadioButton rdoForwardBottle_9;
@@ -3006,9 +2988,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_9;
         private TabPage tabBottlePage10;
         private Panel panelStartBottle_10;
-        //private DataGridView dgvStartBottle_10;
         private Panel panelEndBottle_10;
-        //private DataGridView dgvEndBottle_10;
         private DataGridView bottleGrid10;
         private RadioButton radioButton5;
         private RadioButton rdoForwardBottle_10;

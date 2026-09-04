@@ -135,15 +135,6 @@ namespace LotTraceApp
             public BottleDisplayTables? DisplayTables { get; set; }
         }
 
-        //private readonly HeaderVisualStyle _startHeaderStyle = new HeaderVisualStyle
-        //{
-        //    GroupBackColor = Color.FromArgb(235, 242, 250),
-        //    GroupForeColor = Color.FromArgb(40, 40, 40),
-        //    BorderColor = Color.FromArgb(180, 180, 180),
-        //    GroupFont = new Font("Segoe UI", 9F, FontStyle.Bold),
-        //    ColumnFont = new Font("Segoe UI", 9F, FontStyle.Bold)
-        //};
-
         private readonly HeaderVisualStyle _middleHeaderStyle = new HeaderVisualStyle
         {
             GroupBackColor = Color.FromArgb(232, 245, 236),
@@ -152,15 +143,6 @@ namespace LotTraceApp
             GroupFont = new Font("Segoe UI", 9F, FontStyle.Bold),
             ColumnFont = new Font("Segoe UI", 9F, FontStyle.Bold)
         };
-
-        //private readonly HeaderVisualStyle _endHeaderStyle = new HeaderVisualStyle
-        //{
-        //    GroupBackColor = Color.FromArgb(250, 238, 238),
-        //    GroupForeColor = Color.FromArgb(40, 40, 40),
-        //    BorderColor = Color.FromArgb(180, 180, 180),
-        //    GroupFont = new Font("Segoe UI", 9F, FontStyle.Bold),
-        //    ColumnFont = new Font("Segoe UI", 9F, FontStyle.Bold)
-        //};
 
         private readonly HeaderVisualStyle _bottleHeaderStyle = new HeaderVisualStyle
         {
@@ -273,18 +255,10 @@ namespace LotTraceApp
                 var tab = GetTabContext(tabNo);
                 if (tab == null) continue;
 
-                //InitializeGrid(tab.GridStart);
-                //InitializeGrid(tab.GridEnd);
                 InitializeGrid(tab.BottleGrid);
                 SetGrid();
-                //ApplyGridColumnHeaderStyle(tab.GridStart, _startHeaderStyle);
-                //ApplyGridColumnHeaderStyle(tab.GridEnd, _endHeaderStyle);
                 ApplyGridColumnHeaderStyle(tab.BottleGrid, _bottleHeaderStyle);
-                //tab.GridStart.ScrollBars = ScrollBars.None;
-                //tab.GridEnd.ScrollBars = ScrollBars.Vertical;
                 tab.BottleGrid.ScrollBars = ScrollBars.None;
-                //InitializeBottleHeaderPanel(tab.GridStart, "検索始点", _startHeaderStyle);
-                //InitializeBottleHeaderPanel(tab.GridEnd, "検索終点", _endHeaderStyle);
                 InitializeBottleHeaderPanel(tab.BottleGrid, "検索", _bottleHeaderStyle);
 
                 RegisterTraceGridEvents(tab);
@@ -508,8 +482,6 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            //UnregisterTraceGridBorderPaint(tab.GridStart);
-            //UnregisterTraceGridBorderPaint(tab.GridEnd);
             UnregisterTraceGridBorderPaint(tab.BottleGrid);
 
             
@@ -960,12 +932,6 @@ namespace LotTraceApp
             
             if (!_tabDisplayTables.TryGetValue(tabNo, out var tables) || tables == null)
             {
-                //_gridForeColorCaches.Remove(tab.GridStart);
-                //_gridForeColorCaches.Remove(tab.GridEnd);
-                //_gridBackColorCaches.Remove(tab.GridStart);
-                //_gridBackColorCaches.Remove(tab.GridEnd);
-                //tab.GridStart.DataSource = null;
-                //tab.GridEnd.DataSource = null;
                 _gridForeColorCaches.Remove(tab.BottleGrid);
                 _gridBackColorCaches.Remove(tab.BottleGrid);
                 tab.BottleGrid.DataSource = null;
@@ -973,12 +939,7 @@ namespace LotTraceApp
                 return;
             }
 
-            //tab.GridStart.DataSource = null;
-            //tab.GridEnd.DataSource = null;
             tab.BottleGrid.DataSource = null;
-
-            //tab.GridStart.DataSource = tables.LiquidTable;
-            //tab.GridEnd.DataSource = tables.BottleTable;
             tab.BottleGrid.DataSource = tables.BottleTable;
 
 
@@ -990,10 +951,8 @@ namespace LotTraceApp
             //if (p.Direction == TraceDirection.Backward) { SetBackwardGrid(tab, tables); }
 
             BuildBottleGridForeColorCaches(tab);
-            //BuildBottleGridBackColorCache(tab, tab.GridStart);
-            //BuildBottleGridBackColorCache(tab, tab.GridEnd);
             BuildBottleGridBackColorCache(tab, tab.BottleGrid);
-            RegisterTraceGridEvents(tab);
+            //RegisterTraceGridEvents(tab);
             RefreshBottleHeaderPanels(tab);
         }
 
@@ -1080,8 +1039,6 @@ namespace LotTraceApp
                         BtnSearch = btnBottleTraceSearch,
                         BtnClear = btnClearBottle,
                         BtnCsv = btnCsvOutputBottle,
-                        //GridStart = dgvStartBottle,
-                        //GridEnd = dgvEndBottle
                         BottleGrid = bottleGrid1
                     };
 
@@ -1101,8 +1058,6 @@ namespace LotTraceApp
                         BtnSearch = btnBottleTraceSearch_2,
                         BtnClear = btnClearBottle_2,
                         BtnCsv = btnCsvOutputBottle_2,
-                        //GridStart = dgvStartBottle_2,
-                        //GridEnd = dgvEndBottle_2
                         BottleGrid = bottleGrid2
                     };
 
@@ -1122,8 +1077,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_3,
                         BtnClear = btnClearBottle_3,
                         BtnCsv = btnCsvOutputBottle_3,
-                        //GridStart = dgvStartBottle_3,
-                        //GridEnd = dgvEndBottle_3
                         BottleGrid = bottleGrid3
                     };
 
@@ -1143,8 +1096,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_4,
                         BtnClear = btnClearBottle_4,
                         BtnCsv = btnCsvOutputBottle_4,
-                        //GridStart = dgvStartBottle_4,
-                        //GridEnd = dgvEndBottle_4
                         BottleGrid = bottleGrid4
                     };
 
@@ -1164,8 +1115,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_5,
                         BtnClear = btnClearBottle_5,
                         BtnCsv = btnCsvOutputBottle_5,
-                        //GridStart = dgvStartBottle_5,
-                        //GridEnd = dgvEndBottle_5
                         BottleGrid = bottleGrid5
                     };
 
@@ -1185,8 +1134,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_6,
                         BtnClear = btnClearBottle_6,
                         BtnCsv = btnCsvOutputBottle_6,
-                        //GridStart = dgvStartBottle_6,
-                        //GridEnd = dgvEndBottle_6
                         BottleGrid = bottleGrid6
                     };
 
@@ -1206,8 +1153,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_7,
                         BtnClear = btnClearBottle_7,
                         BtnCsv = btnCsvOutputBottle_7,
-                        //GridStart = dgvStartBottle_7,
-                        //GridEnd = dgvEndBottle_7
                         BottleGrid = bottleGrid7
                     };
 
@@ -1227,8 +1172,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_8,
                         BtnClear = btnClearBottle_8,
                         BtnCsv = btnCsvOutputBottle_8,
-                        //GridStart = dgvStartBottle_8,
-                        //GridEnd = dgvEndBottle_8
                         BottleGrid = bottleGrid8
                     };
 
@@ -1248,8 +1191,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_9,
                         BtnClear = btnClearBottle_9,
                         BtnCsv = btnCsvOutputBottle_9,
-                        //GridStart = dgvStartBottle_9,
-                        //GridEnd = dgvEndBottle_9
                         BottleGrid = bottleGrid9
                     };
 
@@ -1269,8 +1210,6 @@ namespace LotTraceApp
                         BtnSearch = btnTraceSearch_10,
                         BtnClear = btnClearBottle_10,
                         BtnCsv = btnCsvOutputBottle_10,
-                        //GridStart = dgvStartBottle_10,
-                        //GridEnd = dgvEndBottle_10
                         BottleGrid = bottleGrid10
                     };
 
@@ -1356,162 +1295,6 @@ namespace LotTraceApp
 
         #region 画面描画系
 
-
-        //private void SetForwardGrid(BottleTraceTabContext tab, BottleDisplayTables tables)
-        //{
-        //    //液
-
-        //    tab.GridStart.DataSource = tables.LiquidTable;
-
-        //    tab.GridStart.Columns["OrderNumber"].Visible = true;
-        //    tab.GridStart.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"]!.Caption;
-        //    tab.GridStart.Columns["OrderNumber"].Width = 120;
-
-        //    tab.GridStart.Columns["Lot"].Visible = true;
-        //    tab.GridStart.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"]!.Caption;
-        //    tab.GridStart.Columns["Lot"].Width = 120;
-
-        //    tab.GridStart.Columns["ItemName"].Visible = true;
-        //    tab.GridStart.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"]!.Caption;
-        //    tab.GridStart.Columns["ItemName"].Width = 120;
-
-        //    tab.GridStart.Columns["StartDate"].Visible = true;
-        //    tab.GridStart.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"]!.Caption;
-        //    tab.GridStart.Columns["StartDate"].Width = 150;
-
-        //    tab.GridStart.Columns["Weight"].Visible = true;
-        //    tab.GridStart.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"]!.Caption;
-        //    tab.GridStart.Columns["Weight"].Width = 120;
-
-        //    tab.GridStart.Columns["NodeKey"].Visible = false;
-        //    tab.GridStart.Columns["DisplayKey"].Visible = false;
-        //    tab.GridStart.Columns["ItemCode"].Visible = false;
-        //    tab.GridStart.Columns["MasterKey"].Visible = false;
-        //    //瓶
-
-        //    tab.GridEnd.DataSource = tables.BottleTable;
-
-        //    tab.GridEnd.Columns["OrderNumber"].Visible = true;
-        //    tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"]!.Caption;
-        //    tab.GridEnd.Columns["OrderNumber"].Width = 120;
-
-        //    tab.GridEnd.Columns["Lot"].Visible = true;
-        //    tab.GridEnd.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"]!.Caption;
-        //    tab.GridEnd.Columns["Lot"].Width = 120;
-
-        //    tab.GridEnd.Columns["ItemName"].Visible = true;
-        //    tab.GridEnd.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"]!.Caption;
-        //    tab.GridEnd.Columns["ItemName"].Width = 120;
-
-        //    tab.GridEnd.Columns["StartDate"].Visible = true;
-        //    tab.GridEnd.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"]!.Caption;
-        //    tab.GridEnd.Columns["StartDate"].Width = 150;
-
-        //    tab.GridEnd.Columns["OK_Num"].Visible = true;
-        //    tab.GridEnd.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"]!.Caption;
-        //    tab.GridEnd.Columns["OK_Num"].Width = 120;
-
-        //    tab.GridEnd.Columns["NG_Num"].Visible = true;
-        //    tab.GridEnd.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"]!.Caption;
-        //    tab.GridEnd.Columns["NG_Num"].Width = 120;
-
-        //    tab.GridEnd.Columns["Total_Num"].Visible = true;
-        //    tab.GridEnd.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"]!.Caption;
-        //    tab.GridEnd.Columns["Total_Num"].Width = 120;
-
-
-
-        //    tab.GridEnd.Columns["NodeKey"].Visible = false;
-        //    tab.GridEnd.Columns["DisplayKey"].Visible = false;
-        //    tab.GridEnd.Columns["ItemCode"].Visible = false;
-        //    tab.GridEnd.Columns["MasterKey"].Visible = false;
-
-
-        //    HideBottleInternalColumns(tab.GridStart);
-        //    HideBottleInternalColumns(tab.GridEnd);
-        //    ApplyTraceGridSortMode(tab.GridStart);
-        //    ApplyTraceGridSortMode(tab.GridEnd);
-        //    ApplyBottleGridWidthsFromColumns(tab);
-        //    RefreshBottleHeaderPanels(tab);
-        //}
-
-        //private void SetBackwardGrid(BottleTraceTabContext tab, BottleDisplayTables tables)
-        //{
-        //    //液
-
-        //    tab.GridEnd.DataSource = tables.LiquidTable;
-
-        //    tab.GridEnd.Columns["OrderNumber"].Visible = true;
-        //    tab.GridEnd.Columns["OrderNumber"].HeaderText = tables.LiquidTable.Columns["OrderNumber"]!.Caption;
-        //    tab.GridEnd.Columns["OrderNumber"].Width = 120;
-
-        //    tab.GridEnd.Columns["Lot"].Visible = true;
-        //    tab.GridEnd.Columns["Lot"].HeaderText = tables.LiquidTable.Columns["Lot"]!.Caption;
-        //    tab.GridEnd.Columns["Lot"].Width = 120;
-
-        //    tab.GridEnd.Columns["ItemName"].Visible = true;
-        //    tab.GridEnd.Columns["ItemName"].HeaderText = tables.LiquidTable.Columns["ItemName"]!.Caption;
-        //    tab.GridEnd.Columns["ItemName"].Width = 120;
-
-        //    tab.GridEnd.Columns["StartDate"].Visible = true;
-        //    tab.GridEnd.Columns["StartDate"].HeaderText = tables.LiquidTable.Columns["StartDate"]!.Caption;
-        //    tab.GridEnd.Columns["StartDate"].Width = 150;
-
-        //    tab.GridEnd.Columns["Weight"].Visible = true;
-        //    tab.GridEnd.Columns["Weight"].HeaderText = tables.LiquidTable.Columns["Weight"]!.Caption;
-        //    tab.GridEnd.Columns["Weight"].Width = 120;
-
-        //    tab.GridEnd.Columns["NodeKey"].Visible = false;
-        //    tab.GridEnd.Columns["DisplayKey"].Visible = false;
-        //    tab.GridEnd.Columns["ItemCode"].Visible = false;
-
-        //    //瓶
-
-        //    tab.GridStart.DataSource = tables.BottleTable;
-
-        //    tab.GridStart.Columns["OrderNumber"].Visible = true;
-        //    tab.GridStart.Columns["OrderNumber"].HeaderText = tables.BottleTable.Columns["OrderNumber"]!.Caption;
-        //    tab.GridStart.Columns["OrderNumber"].Width = 120;
-
-        //    tab.GridStart.Columns["Lot"].Visible = true;
-        //    tab.GridStart.Columns["Lot"].HeaderText = tables.BottleTable.Columns["Lot"]!.Caption;
-        //    tab.GridStart.Columns["Lot"].Width = 120;
-
-        //    tab.GridStart.Columns["ItemName"].Visible = true;
-        //    tab.GridStart.Columns["ItemName"].HeaderText = tables.BottleTable.Columns["ItemName"]!.Caption;
-        //    tab.GridStart.Columns["ItemName"].Width = 120;
-
-        //    tab.GridStart.Columns["StartDate"].Visible = true;
-        //    tab.GridStart.Columns["StartDate"].HeaderText = tables.BottleTable.Columns["StartDate"]!.Caption;
-        //    tab.GridStart.Columns["StartDate"].Width = 150;
-
-        //    tab.GridStart.Columns["OK_Num"].Visible = true;
-        //    tab.GridStart.Columns["OK_Num"].HeaderText = tables.BottleTable.Columns["OK_Num"]!.Caption;
-        //    tab.GridStart.Columns["OK_Num"].Width = 120;
-
-        //    tab.GridStart.Columns["NG_Num"].Visible = true;
-        //    tab.GridStart.Columns["NG_Num"].HeaderText = tables.BottleTable.Columns["NG_Num"]!.Caption;
-        //    tab.GridStart.Columns["NG_Num"].Width = 120;
-
-        //    tab.GridStart.Columns["Total_Num"].Visible = true;
-        //    tab.GridStart.Columns["Total_Num"].HeaderText = tables.BottleTable.Columns["Total_Num"]!.Caption;
-        //    tab.GridStart.Columns["Total_Num"].Width = 120;
-
-
-
-        //    tab.GridStart.Columns["NodeKey"].Visible = false;
-        //    tab.GridStart.Columns["DisplayKey"].Visible = false;
-        //    tab.GridStart.Columns["ItemCode"].Visible = false;
-
-
-        //HideBottleInternalColumns(tab.GridStart);
-        //HideBottleInternalColumns(tab.GridEnd);
-        //ApplyTraceGridSortMode(tab.GridStart);
-        //ApplyTraceGridSortMode(tab.GridEnd);
-        //ApplyBottleGridWidthsFromColumns(tab);
-        //RefreshBottleHeaderPanels(tab);
-        //}
-
         private void SetGrid()
         {
             bottleGrid1.Columns.Clear();
@@ -1563,39 +1346,6 @@ namespace LotTraceApp
             bottleGrid8.Columns.Add(column);
             bottleGrid9.Columns.Add(column);
             bottleGrid10.Columns.Add(column);
-        }
-
-        //private void ApplyTraceGridSortMode(DataGridView grid)
-        //{
-        //    if (grid == null)
-        //        return;
-
-        //    foreach (DataGridViewColumn column in grid.Columns)
-        //    {
-        //        if (column != null)
-        //            column.SortMode = DataGridViewColumnSortMode.NotSortable;
-        //    }
-        //}
-
-        //private void HideBottleInternalColumns(DataGridView grid)
-        //{
-        //    if (grid == null)
-        //        return;
-
-        //    HideGridColumnIfExists(grid, "NodeKey");
-        //    HideGridColumnIfExists(grid, "DisplayKey");
-        //    HideGridColumnIfExists(grid, "ItemCode");
-        //    HideGridColumnIfExists(grid, "MasterKey");
-        //    HideGridColumnIfExists(grid, "StartDateLabel");
-        //    HideGridColumnIfExists(grid, "InputSourceType");
-        //}
-
-        private void HideGridColumnIfExists(DataGridView grid, string columnName)
-        {
-            if (grid == null || string.IsNullOrEmpty(columnName) || !grid.Columns.Contains(columnName))
-                return;
-
-            grid.Columns[columnName].Visible = false;
         }
 
         private void RefreshBottleHeaderPanels(BottleTraceTabContext tab)
@@ -1686,92 +1436,6 @@ namespace LotTraceApp
             }
 
             return count;
-        }
-
-        //private void ApplyBottleGridWidthsFromColumns(BottleTraceTabContext tab)
-        //{
-        //    if (tab == null)
-        //        return;
-
-        //    FitGridAndHeaderToColumns(tab.GridStart, false);
-        //    AlignEndGridToStartGrid(tab, 50);
-        //    FitGridAndHeaderToColumns(tab.GridEnd, true);
-        //}
-
-        //private void AlignEndGridToStartGrid(BottleTraceTabContext tab, int gap)
-        //{
-        //    if (tab == null || tab.GridStart == null || tab.GridEnd == null)
-        //        return;
-
-        //    int left = tab.GridStart.Right + gap;
-        //    Panel? endHeaderPanel = FindHeaderPanelForGrid(tab.GridEnd);
-
-        //    tab.GridEnd.Left = left;
-
-        //    if (endHeaderPanel != null)
-        //    {
-        //        endHeaderPanel.Left = left;
-        //        endHeaderPanel.Invalidate();
-        //    }
-        //}
-
-        //private void FitGridAndHeaderToColumns(DataGridView grid, bool includeVerticalScrollBarWhenNeeded, int pad = 4)
-        //{
-        //    if (grid == null)
-        //        return;
-
-        //    int columnsWidth = GetVisibleColumnsWidth(grid);
-        //    if (columnsWidth <= 0)
-        //        return;
-
-        //    int targetWidth = columnsWidth + pad;
-        //    if (includeVerticalScrollBarWhenNeeded && NeedsVerticalScrollBar(grid))
-        //        targetWidth += SystemInformation.VerticalScrollBarWidth;
-
-        //    if (targetWidth < 10)
-        //        targetWidth = 10;
-
-        //    grid.Width = targetWidth;
-
-        //    Panel? panel = FindHeaderPanelForGrid(grid);
-        //    if (panel != null)
-        //    {
-        //        panel.Left = grid.Left;
-        //        panel.Width = targetWidth;
-        //        panel.Invalidate();
-        //    }
-
-        //    grid.Invalidate();
-        //}
-
-        private int GetVisibleColumnsWidth(DataGridView grid)
-        {
-            if (grid == null)
-                return 0;
-
-            int width = 0;
-
-            foreach (DataGridViewColumn col in grid.Columns)
-            {
-                if (col == null || !col.Visible)
-                    continue;
-
-                width += col.Width;
-            }
-
-            return width;
-        }
-
-        private bool NeedsVerticalScrollBar(DataGridView grid)
-        {
-            if (grid == null)
-                return false;
-
-            int rowsHeight = grid.Rows.GetRowsHeight(DataGridViewElementStates.Visible);
-            int headerHeight = grid.ColumnHeadersVisible ? grid.ColumnHeadersHeight : 0;
-            int availableHeight = grid.ClientSize.Height;
-
-            return rowsHeight + headerHeight > availableHeight;
         }
 
         #endregion
