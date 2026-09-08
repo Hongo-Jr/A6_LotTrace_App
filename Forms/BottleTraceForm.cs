@@ -173,8 +173,8 @@ namespace LotTraceApp
             public Button BtnClear { get; set; } = new();
             public Button BtnCsv { get; set; } = new();
 
-            public DataGridView GridStart { get; set; } = new();
-            public DataGridView GridEnd { get; set; } = new();
+            //public DataGridView GridStart { get; set; } = new();
+            //public DataGridView GridEnd { get; set; } = new();
 
             public DataGridView BottleGrid { get; set; } = new();
         }
@@ -189,7 +189,7 @@ namespace LotTraceApp
         private int _hoverColumnIndex = -1;
         private readonly Dictionary<DataGridView, int> _selectedRowIndexByGrid =
             new Dictionary<DataGridView, int>();
-        private bool _syncingBottleGridSelection;
+        //private bool _syncingBottleGridSelection;
         private readonly BottleResultService _bottleResultService;
 
 
@@ -488,16 +488,18 @@ namespace LotTraceApp
             if (!_tabSearchParameters.TryGetValue(tab.TabNo, out var p))
                 return;
 
-            if (p.Direction == TraceDirection.Forward)
-            {
-                RegisterTraceGridEvents(tab.GridStart, LiquidTableBorderPaint);
-                RegisterTraceGridEvents(tab.GridEnd, BottleTableBorderPaint);
-            }
-            if (p.Direction == TraceDirection.Backward)
-            {
-                RegisterTraceGridEvents(tab.GridEnd, LiquidTableBorderPaint);
-                RegisterTraceGridEvents(tab.GridStart, BottleTableBorderPaint);
-            }
+            //if (p.Direction == TraceDirection.Forward)
+            //{
+            //    RegisterTraceGridEvents(tab.GridStart, LiquidTableBorderPaint);
+            //    RegisterTraceGridEvents(tab.GridEnd, BottleTableBorderPaint);
+            //}
+            //if (p.Direction == TraceDirection.Backward)
+            //{
+            //    RegisterTraceGridEvents(tab.GridEnd, LiquidTableBorderPaint);
+            //    RegisterTraceGridEvents(tab.GridStart, BottleTableBorderPaint);
+            //}
+
+            RegisterTraceGridEvents(tab.BottleGrid, BottleTableBorderPaint);
 
         }
 
@@ -669,8 +671,8 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            if (!_syncingBottleGridSelection)
-                SyncBottleGridSelection(grid);
+            //if (!_syncingBottleGridSelection)
+            //    SyncBottleGridSelection(grid);
 
             UpdateSelectionVisual(grid);
         }
@@ -691,77 +693,77 @@ namespace LotTraceApp
             InvalidateDisplayedRow(grid, currentRowIndex);
         }
 
-        private void SyncBottleGridSelection(DataGridView sourceGrid)
-        {
+        //private void SyncBottleGridSelection(DataGridView sourceGrid)
+        //{
             
-            if (!TryGetBottleSelectionPeerGrid(sourceGrid, out var targetGrid))
-                return;
+        //    if (!TryGetBottleSelectionPeerGrid(sourceGrid, out var targetGrid))
+        //        return;
 
-            _syncingBottleGridSelection = true;
-            try
-            {
-                int rowIndex = GetSelectedRowIndex(sourceGrid);
-                if (rowIndex < 0 || rowIndex >= targetGrid!.Rows.Count)
-                {
-                    targetGrid!.ClearSelection();
-                    return;
-                }
+        //    _syncingBottleGridSelection = true;
+        //    try
+        //    {
+        //        int rowIndex = GetSelectedRowIndex(sourceGrid);
+        //        if (rowIndex < 0 || rowIndex >= targetGrid!.Rows.Count)
+        //        {
+        //            targetGrid!.ClearSelection();
+        //            return;
+        //        }
 
-                DataGridViewCell? targetCell = GetFirstVisibleCell(targetGrid!, rowIndex);
-                if (targetCell == null)
-                    return;
+        //        DataGridViewCell? targetCell = GetFirstVisibleCell(targetGrid!, rowIndex);
+        //        if (targetCell == null)
+        //            return;
 
-                targetGrid!.ClearSelection();
-                targetGrid!.CurrentCell = targetCell;
-                targetGrid.Rows[rowIndex].Selected = true;
-            }
-            finally
-            {
-                _syncingBottleGridSelection = false;
-            }
-        }
+        //        targetGrid!.ClearSelection();
+        //        targetGrid!.CurrentCell = targetCell;
+        //        targetGrid.Rows[rowIndex].Selected = true;
+        //    }
+        //    finally
+        //    {
+        //        _syncingBottleGridSelection = false;
+        //    }
+        //}
 
-        private bool TryGetBottleSelectionPeerGrid(DataGridView? sourceGrid, out DataGridView? targetGrid)
-        {
-            targetGrid = null;
-            if (sourceGrid == null)
-                return false;
+        //private bool TryGetBottleSelectionPeerGrid(DataGridView? sourceGrid, out DataGridView? targetGrid)
+        //{
+        //    targetGrid = null;
+        //    if (sourceGrid == null)
+        //        return false;
 
-            foreach (var pair in _bottleTraceTabContexts)
-            {
-                var tab = pair.Value;
-                if (tab == null)
-                    continue;
+        //    foreach (var pair in _bottleTraceTabContexts)
+        //    {
+        //        var tab = pair.Value;
+        //        if (tab == null)
+        //            continue;
 
-                if (ReferenceEquals(sourceGrid, tab.GridStart))
-                {
-                    targetGrid = tab.GridEnd;
-                    return targetGrid != null;
-                }
+        //        if (ReferenceEquals(sourceGrid, tab.GridStart))
+        //        {
+        //            targetGrid = tab.GridEnd;
+        //            return targetGrid != null;
+        //        }
 
-                if (ReferenceEquals(sourceGrid, tab.GridEnd))
-                {
-                    targetGrid = tab.GridStart;
-                    return targetGrid != null;
-                }
-            }
+        //        if (ReferenceEquals(sourceGrid, tab.GridEnd))
+        //        {
+        //            targetGrid = tab.GridStart;
+        //            return targetGrid != null;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        private DataGridViewCell? GetFirstVisibleCell(DataGridView grid, int rowIndex)
-        {
-            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
-                return null;
+        //private DataGridViewCell? GetFirstVisibleCell(DataGridView grid, int rowIndex)
+        //{
+        //    if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count)
+        //        return null;
 
-            foreach (DataGridViewColumn column in grid.Columns)
-            {
-                if (column != null && column.Visible)
-                    return grid.Rows[rowIndex].Cells[column.Index];
-            }
+        //    foreach (DataGridViewColumn column in grid.Columns)
+        //    {
+        //        if (column != null && column.Visible)
+        //            return grid.Rows[rowIndex].Cells[column.Index];
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         private int GetSelectedRowIndex(DataGridView grid)
         {
@@ -1353,8 +1355,9 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            RefreshBottleHeaderPanel(tab.GridStart, "検索始点");
-            RefreshBottleHeaderPanel(tab.GridEnd, "検索終点");
+            //RefreshBottleHeaderPanel(tab.GridStart, "検索始点");
+            //RefreshBottleHeaderPanel(tab.GridEnd, "検索終点");
+            RefreshBottleHeaderPanel(tab.BottleGrid, "検索");
         }
 
         private void RefreshBottleHeaderPanel(DataGridView grid, string title)
@@ -1910,8 +1913,9 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            BuildBottleGridForeColorCache(tab.GridStart);
-            BuildBottleGridForeColorCache(tab.GridEnd);
+            //BuildBottleGridForeColorCache(tab.GridStart);
+            //BuildBottleGridForeColorCache(tab.GridEnd);
+            BuildBottleGridForeColorCache(tab.BottleGrid);
         }
 
         private void BuildBottleGridForeColorCache(DataGridView grid)
@@ -2172,8 +2176,9 @@ namespace LotTraceApp
                 var tab = GetTabContext(tabNo);
                 if (tab == null) continue;
 
-                BuildBottleGridBackColorCache(tab, tab.GridStart);
-                BuildBottleGridBackColorCache(tab, tab.GridEnd);
+                //BuildBottleGridBackColorCache(tab, tab.GridStart);
+                //BuildBottleGridBackColorCache(tab, tab.GridEnd);
+                BuildBottleGridBackColorCache(tab, tab.BottleGrid);
             }
         }
 
@@ -2592,11 +2597,17 @@ namespace LotTraceApp
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
 
+                //CsvExportHelper.ExportCurrentGridsToCsv(
+                //    dlg.FileName,
+                //    tab.GridStart,
+                //    null,
+                //    tab.GridEnd);
+
                 CsvExportHelper.ExportCurrentGridsToCsv(
                     dlg.FileName,
-                    tab.GridStart,
+                    tab.BottleGrid,
                     null,
-                    tab.GridEnd);
+                    null);
             }
 
             MessageBox.Show("CSV 出力が完了しました。", "瓶設備ロットトレース",
@@ -2610,51 +2621,51 @@ namespace LotTraceApp
             return "BottleTrace_Tab" + tabNo + "_" + suffix + ".csv";
         }
 
-        private DataTable MergeBottleDisplayTables(BottleDisplayTables tables)
-        {
-            var result = new DataTable();
-            result.Columns.Add("Type", typeof(string));
+        //private DataTable MergeBottleDisplayTables(BottleDisplayTables tables)
+        //{
+        //    var result = new DataTable();
+        //    result.Columns.Add("Type", typeof(string));
 
-            AddColumns(result, tables.LiquidTable);
-            AddColumns(result, tables.BottleTable);
+        //    AddColumns(result, tables.LiquidTable);
+        //    AddColumns(result, tables.BottleTable);
 
-            AddRows(result, "Liquid", tables.LiquidTable);
-            AddRows(result, "Bottle", tables.BottleTable);
+        //    AddRows(result, "Liquid", tables.LiquidTable);
+        //    AddRows(result, "Bottle", tables.BottleTable);
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        private void AddColumns(DataTable target, DataTable source)
-        {
-            if (target == null || source == null)
-                return;
+        //private void AddColumns(DataTable target, DataTable source)
+        //{
+        //    if (target == null || source == null)
+        //        return;
 
-            foreach (DataColumn sourceColumn in source.Columns)
-            {
-                if (!target.Columns.Contains(sourceColumn.ColumnName))
-                    target.Columns.Add(sourceColumn.ColumnName, typeof(string));
-            }
-        }
+        //    foreach (DataColumn sourceColumn in source.Columns)
+        //    {
+        //        if (!target.Columns.Contains(sourceColumn.ColumnName))
+        //            target.Columns.Add(sourceColumn.ColumnName, typeof(string));
+        //    }
+        //}
 
-        private void AddRows(DataTable target, string type, DataTable source)
-        {
-            if (target == null || source == null)
-                return;
+        //private void AddRows(DataTable target, string type, DataTable source)
+        //{
+        //    if (target == null || source == null)
+        //        return;
 
-            foreach (DataRow sourceRow in source.Rows)
-            {
-                var row = target.NewRow();
-                row["Type"] = type;
+        //    foreach (DataRow sourceRow in source.Rows)
+        //    {
+        //        var row = target.NewRow();
+        //        row["Type"] = type;
 
-                foreach (DataColumn sourceColumn in source.Columns)
-                {
-                    object value = sourceRow[sourceColumn];
-                    row[sourceColumn.ColumnName] = value == DBNull.Value ? "" : Convert.ToString(value);
-                }
+        //        foreach (DataColumn sourceColumn in source.Columns)
+        //        {
+        //            object value = sourceRow[sourceColumn];
+        //            row[sourceColumn.ColumnName] = value == DBNull.Value ? "" : Convert.ToString(value);
+        //        }
 
-                target.Rows.Add(row);
-            }
-        }
+        //        target.Rows.Add(row);
+        //    }
+        //}
 
         #endregion
 
@@ -2740,8 +2751,9 @@ namespace LotTraceApp
                 requests.Add(new ExcelExportHelper.BottleTraceGridExcelExportRequest
                 {
                     WorksheetName = BuildBottleTraceTabName(tab),
-                    LeftGrid = tab.GridStart,
-                    RightGrid = tab.GridEnd,
+                    //LeftGrid = tab.GridStart,
+                    //RightGrid = tab.GridEnd,
+                    Grid = tab.BottleGrid,
                     LineRanges = tables.LineRanges,
                     CrossPointNodeKeys = crossPointNodeKeys
                 });
@@ -2755,8 +2767,9 @@ namespace LotTraceApp
             if (tab == null)
                 return false;
 
-            return HasAnyVisibleData(tab.GridStart)
-                || HasAnyVisibleData(tab.GridEnd);
+            //return HasAnyVisibleData(tab.GridStart)
+            //    || HasAnyVisibleData(tab.GridEnd);
+            return HasAnyVisibleData(tab.BottleGrid);
         }
 
         private string BuildBottleExcelExportFileName()
@@ -2855,8 +2868,9 @@ namespace LotTraceApp
             _tabDisplayTables.Remove(tab.TabNo);
             _tabBottleTraceResults.Remove(tab.TabNo);
             _lineCache.Remove(tab.TabNo);
-            _gridForeColorCaches.Remove(tab.GridStart);
-            _gridForeColorCaches.Remove(tab.GridEnd);
+            //_gridForeColorCaches.Remove(tab.GridStart);
+            //_gridForeColorCaches.Remove(tab.GridEnd);
+            _gridForeColorCaches.Remove(tab.BottleGrid);
             ClearBottleCrossPointNodeKeysForTab(tab.TabNo);
             ClearBottleGridBackColorCachesForTab(tab.TabNo);
             ClearBottleTraceTabGrids(tab);
@@ -2867,8 +2881,9 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            ClearTraceGrid(tab.GridStart);
-            ClearTraceGrid(tab.GridEnd);
+            //ClearTraceGrid(tab.GridStart);
+            //ClearTraceGrid(tab.GridEnd);
+            ClearTraceGrid(tab.BottleGrid);
             RefreshBottleHeaderPanels(tab);
         }
 
@@ -2899,8 +2914,9 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            if (tab.GridStart != null) _gridBackColorCaches.Remove(tab.GridStart);
-            if (tab.GridEnd != null) _gridBackColorCaches.Remove(tab.GridEnd);
+            //if (tab.GridStart != null) _gridBackColorCaches.Remove(tab.GridStart);
+            //if (tab.GridEnd != null) _gridBackColorCaches.Remove(tab.GridEnd);
+            if (tab.BottleGrid != null) _gridBackColorCaches.Remove(tab.BottleGrid);
         }
 
         #endregion
@@ -3198,8 +3214,9 @@ namespace LotTraceApp
                 if (tab == null)
                     continue;
 
-                if (tab.GridStart != null) tab.GridStart.Invalidate();
-                if (tab.GridEnd != null) tab.GridEnd.Invalidate();
+                //if (tab.GridStart != null) tab.GridStart.Invalidate();
+                //if (tab.GridEnd != null) tab.GridEnd.Invalidate();
+                if (tab.BottleGrid != null) tab.BottleGrid.Invalidate();
             }
         }
 
@@ -3603,62 +3620,64 @@ namespace LotTraceApp
         {
             var grid = sender as DataGridView;
 
-            if (grid == null) {return; }    
+            if (grid == null) {return; }
 
-            if (grid.Columns.Contains("Weight") && grid.Columns["Weight"].Visible)
-            {
-                dataGridLiquid_CellMouseClick(grid, e);
-            }
+            //if (grid.Columns.Contains("Weight") && grid.Columns["Weight"].Visible)
+            //{
+            //    dataGridLiquid_CellMouseClick(grid, e);
+            //}
 
-            else if (grid.Columns.Contains("Total_Num") && grid.Columns["Total_Num"].Visible)
-            {
-                DataGridBottle_CellMouseClick(grid, e);
-            }
-            else
-            {
-                return;
-            }
+            //else if (grid.Columns.Contains("Total_Num") && grid.Columns["Total_Num"].Visible)
+            //{
+            //    DataGridBottle_CellMouseClick(grid, e);
+            //}
+            //else
+            //{
+            //    return;
+            //}
+
+            DataGridBottle_CellMouseClick(grid, e);
         }
 
-        private void dataGridLiquid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            // ヘッダ等は無視
-            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+        //private void dataGridLiquid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        //{
+        //    // ヘッダ等は無視
+        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
 
-            // ★右クリック以外は開かない
-            if (e.Button != MouseButtons.Right) return;
+        //    // ★右クリック以外は開かない
+        //    if (e.Button != MouseButtons.Right) return;
 
-            // 右クリックした行を選択
+        //    // 右クリックした行を選択
 
-            var grid = sender as DataGridView;
-            if (grid == null)
-            {
-                return;
-            }
+        //    var grid = sender as DataGridView;
+        //    if (grid == null)
+        //    {
+        //        return;
+        //    }
 
-            grid.ClearSelection();
-            grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            grid.Rows[e.RowIndex].Selected = true;            
+        //    grid.ClearSelection();
+        //    grid.CurrentCell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+        //    grid.Rows[e.RowIndex].Selected = true;            
 
-            var drv = grid.Rows[e.RowIndex].DataBoundItem as DataRowView;
-            if (drv == null) return;
+        //    var drv = grid.Rows[e.RowIndex].DataBoundItem as DataRowView;
+        //    if (drv == null) return;
 
-            DataRow r = drv.Row;
-            string Get(string col) => r.Table.Columns.Contains(col) ? Convert.ToString(r[col]) ?? string.Empty : string.Empty;
+        //    DataRow r = drv.Row;
+        //    string Get(string col) => r.Table.Columns.Contains(col) ? Convert.ToString(r[col]) ?? string.Empty : string.Empty;
 
 
-            string productionOrderNumber = Get("OrderNumber");
-            string itemCode = Get("ItemCode");
-            string itemName = Get("ItemName");
-            string lotNumber = Get("Lot");
-            string preferredProcessId = Get("MasterKey");
+        //    string productionOrderNumber = Get("OrderNumber");
+        //    string itemCode = Get("ItemCode");
+        //    string itemName = Get("ItemName");
+        //    string lotNumber = Get("Lot");
+        //    string preferredProcessId = Get("MasterKey");
 
-            using (var f = new LotTraceApp.Forms.Result(
-                _resultService, productionOrderNumber, itemCode, itemName, lotNumber, preferredProcessId))
-            {
-                f.ShowDialog(this);
-            }
-        }
+        //    using (var f = new LotTraceApp.Forms.Result(
+        //        _resultService, productionOrderNumber, itemCode, itemName, lotNumber, preferredProcessId))
+        //    {
+        //        f.ShowDialog(this);
+        //    }
+        //}
 
 
 

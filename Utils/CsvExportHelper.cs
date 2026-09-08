@@ -11,7 +11,7 @@ namespace LotTraceApp.Utils
             string filePath,
             DataGridView dgvLeft,
             DataGridView? dgvMiddle,
-            DataGridView dgvRight)
+            DataGridView? dgvRight)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("filePath is null or empty.", "filePath");
@@ -42,7 +42,7 @@ namespace LotTraceApp.Utils
         private static List<CsvColumnPlan> BuildExportColumnPlans(
             DataGridView dgvLeft,
             DataGridView? dgvMiddle,
-            DataGridView dgvRight)
+            DataGridView? dgvRight)
         {
             var result = new List<CsvColumnPlan>();
 
@@ -78,7 +78,7 @@ namespace LotTraceApp.Utils
         private static CsvVisibleRowMaps BuildVisibleRowMaps(
             DataGridView dgvLeft,
             DataGridView? dgvMiddle,
-            DataGridView dgvRight)
+            DataGridView? dgvRight)
         {
             var maps = new CsvVisibleRowMaps();
             maps.LeftRows = GetVisibleRows(dgvLeft);
