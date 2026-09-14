@@ -557,7 +557,6 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            grid.Paint -= LiquidTableBorderPaint;
             grid.Paint -= BottleTableBorderPaint;
         }
 
@@ -2370,57 +2369,57 @@ namespace LotTraceApp
         }
 
 
-        private void LiquidTableBorderPaint(object? sender, PaintEventArgs e)
-        {
-            var grid = sender as DataGridView;
-            if (grid == null || e == null)
-                return;
+        //private void LiquidTableBorderPaint(object? sender, PaintEventArgs e)
+        //{
+        //    var grid = sender as DataGridView;
+        //    if (grid == null || e == null)
+        //        return;
 
-            int firstRowIndex = grid.FirstDisplayedScrollingRowIndex;
-            if (firstRowIndex < 0)
-                return;
+        //    int firstRowIndex = grid.FirstDisplayedScrollingRowIndex;
+        //    if (firstRowIndex < 0)
+        //        return;
 
-            int displayedRowCount = grid.DisplayedRowCount(true);
-            if (displayedRowCount <= 0)
-                return;
+        //    int displayedRowCount = grid.DisplayedRowCount(true);
+        //    if (displayedRowCount <= 0)
+        //        return;
 
-            int lastRowIndex = firstRowIndex + displayedRowCount - 1;
-            if (lastRowIndex >= grid.Rows.Count)
-                lastRowIndex = grid.Rows.Count - 1;
+        //    int lastRowIndex = firstRowIndex + displayedRowCount - 1;
+        //    if (lastRowIndex >= grid.Rows.Count)
+        //        lastRowIndex = grid.Rows.Count - 1;
 
-            var caches = GetCurrentLineCache();
-            if (caches == null) return;
+        //    var caches = GetCurrentLineCache();
+        //    if (caches == null) return;
 
-            foreach (var cache in caches)
-            {
-                if (cache == null)
-                    continue;
+        //    foreach (var cache in caches)
+        //    {
+        //        if (cache == null)
+        //            continue;
 
-                int rowIndex = cache.RowIndex - 1;
-                if (rowIndex < firstRowIndex || rowIndex > lastRowIndex)
-                    continue;
+        //        int rowIndex = cache.RowIndex - 1;
+        //        if (rowIndex < firstRowIndex || rowIndex > lastRowIndex)
+        //            continue;
 
-                Rectangle rect = grid.GetRowDisplayRectangle(rowIndex, true);
-                if (rect.Height <= 0)
-                    continue;
+        //        Rectangle rect = grid.GetRowDisplayRectangle(rowIndex, true);
+        //        if (rect.Height <= 0)
+        //            continue;
 
 
-                int y = rect.Bottom - 1;
-                int left = grid.DisplayRectangle.Left;
-                int right = grid.DisplayRectangle.Right;
+        //        int y = rect.Bottom - 1;
+        //        int left = grid.DisplayRectangle.Left;
+        //        int right = grid.DisplayRectangle.Right;
 
-                using (var pen = new Pen(cache.Color, 2))
-                {
-                    e.Graphics.DrawLine(
-                        pen,
-                        left,
-                        y,
-                        right,
-                        y);
-                }
-            }
+        //        using (var pen = new Pen(cache.Color, 2))
+        //        {
+        //            e.Graphics.DrawLine(
+        //                pen,
+        //                left,
+        //                y,
+        //                right,
+        //                y);
+        //        }
+        //    }
 
-        }
+        //}
 
         private void BottleTableBorderPaint(object? sender, PaintEventArgs e)
         {
@@ -3281,28 +3280,37 @@ namespace LotTraceApp
                     case "交点":
                         col.Width = 60;
                         break;
-                    case "製造指図番号":
-                    case "ロットNo.":
+                    case "指図番号":
+                    case "製品ロットNo":
                         col.Width = 150;
                         break;
-                    case "品目名":
+                    case "製品品目名":
                         itemNameColumn = col;
                         col.Width = 400;
                         break;
+                    case "中間品ロットNo":
+                        col.Width = 150;
+                        break; 
                     case "開始日時":
-                        col.Width = 180;
-                        break;
-                    case "重量":
-                        col.Width = 100;
-                        break;
-                    case "充填本数":
-                        col.Width = 100;
-                        break;
-                    default:
-                        if (col.Name.StartsWith("タブ", StringComparison.OrdinalIgnoreCase))
-                            col.Width = 70;
-                        break;
-                }
+                            col.Width = 180;
+                            break;
+                        //case "重量":
+                        //    col.Width = 100;
+                        //    break;
+                        case "充填本数(OK)":
+                            col.Width = 100;
+                            break;
+                        case "充填本数(NG)":
+                            col.Width = 100;
+                            break;
+                        case "充填本数":
+                            col.Width = 100;
+                            break;
+                        default:
+                            if (col.Name.StartsWith("タブ", StringComparison.OrdinalIgnoreCase))
+                                col.Width = 70;
+                            break;
+                        }
 
                 col.MinimumWidth = col.Width;
                 B_ApplyCrossPointGridSortMode(col);
