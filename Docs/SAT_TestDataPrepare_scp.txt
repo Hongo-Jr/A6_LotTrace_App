@@ -1,0 +1,245 @@
+CASE:TEST_B01
+
+
+LOT：SA01
+設備：SA01
+工程：液上
+種別：制御実績
+実行回次:1
+親：None
+
+LOT：SC01
+設備：SA01
+工程：液上
+種別：制御実績
+実行回次:1
+親：None
+
+LOT：SB01
+設備：SB01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SA01
+
+LOT：SB01
+設備：SB01
+工程：仕込
+種別：制御実績
+実行回次:2
+親：SC01
+
+LOT：RA01
+設備：RA01
+工程：液上
+種別：制御実績
+実行回次:1
+親：None
+
+LOT：CA01
+設備：CA01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：RA01
+
+LOT：MA01
+設備：MA01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SA01
+
+LOT：MA01
+設備：MA01
+工程：仕込
+種別：制御実績
+実行回次:2
+親：SB01
+
+LOT：MA01
+設備：MA01
+工程：仕込
+種別：制御実績
+実行回次:3
+親：CA01
+
+SA01>>SB01>>MA01
+SC01>>SB01>>MA01
+RA01>>CA01>>MA01
+
+
+
+CASE:TEST_F01
+
+LOT：SE01
+設備：SE01
+工程：液上
+種別：制御実績
+実行回次:1
+親：None
+
+LOT：SB02
+設備：SB02
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SE01
+
+LOT：SD01
+設備：SD01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SE01
+
+LOT：MB01
+設備：MB01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SB02
+
+LOT：MB01A1
+設備：MB01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：MB01
+
+LOT：MB01B1
+設備：MB01
+工程：仕込
+種別：制御実績
+実行回次:1
+親：MB01
+
+
+LOT：MB02
+設備：MB02
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SB02
+
+LOT：MB03
+設備：MB03
+工程：仕込
+種別：制御実績
+実行回次:1
+親：SD01
+
+SE01>>SB02>>MB01>>MB01A1
+                >>MB01B1
+          >>MB02
+    >>SD01>>MB03
+
+
+CASE: TEST_SA01
+
+対象LOT：SA01
+設備：SA01
+種別：MaterialA
+
+投入：
+- 種別：Drumcan
+  SLOT：1
+  LOT：SA_DRUM01
+  ITEM：A_ITEMD01
+  量：11.123
+
+  - 種別：Drumcan
+  SLOT：2
+  LOT：SA_DRUM02
+  ITEM：A_ITEMD02
+  量：12.123
+
+  - 種別：Drumcan
+  SLOT：3
+  LOT：SA_DRUM03
+  ITEM：A_ITEMD03
+  量：13.123
+
+
+CASE: TEST_SC01
+
+対象LOT：SC01
+設備：SC01
+種別：MaterialA
+
+投入：
+- 種別：Drumcan
+  SLOT：1
+  LOT：SC_DRUM01
+  ITEM：C_ITEMD01
+  量：21.123
+
+  - 種別：Drumcan
+  SLOT：2
+  LOT：SC_DRUM02
+  ITEM：C_ITEMD02
+  量：22.123
+
+CASE: TEST_SE01
+
+対象LOT：SE01
+設備：SE01
+種別：MaterialA
+
+投入：
+- 種別：Drumcan
+  SLOT：1
+  LOT：SE_DRUM01
+  ITEM：E_ITEMD01
+  量：31.123
+
+CASE: TEST_MA01
+
+対象LOT：MA01
+設備：MA01
+種別：MaterialA
+
+投入：
+- 種別：ManualInput
+  SLOT：1
+  LOT：SA01
+  ITEM：SA01
+  量：1.123
+
+- 種別：ManualInput
+  SLOT：2
+  LOT：SC01
+  ITEM：SC01
+  量：2.123
+
+- 種別：ManualInput
+  SLOT：3
+  LOT：RAW01
+  ITEM：AUX01
+  量：3.123
+
+CASE:Bottle
+
+FillingOrderResult
+
+  OrderNumber：TEST_TYPE01
+  実行回次:1
+
+  OrderNumber：TEST_TYPED
+  実行回次:1
+
+FillingBottle
+ 
+OrderNumber：TEST_TYPE01 
+ProductLotNumber：TEST_TYPE01
+MiddleProductLotNumber：TEST_MA01
+BottleID：TEST_TYPE01_B01
+
+FillingDrum
+
+OrderNumber：TEST_TYPED 
+ProductLotNumber：TEST_TYPED
+MiddleProductLotNumber：TEST_MB02
+DrumcanNumber：1
+
+

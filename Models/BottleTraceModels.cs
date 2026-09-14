@@ -11,6 +11,7 @@ namespace LotTraceApp.Models
     /// </summary>
     public class Bottle_ProductionResultNode
     {
+        public string MasterKey { get; set; } = string.Empty;
         public string? ProcessType { get; set; }
         public string? OrderNumber { get; set; }
         public string? ProductItemName { get; set; }
@@ -27,24 +28,14 @@ namespace LotTraceApp.Models
             get { return FillingBottleNum_OK + FillingBottleNum_NG; }
         }
 
+        /// <summary>
+        /// 不要。後で削除
+        /// </summary>
         public string? RouteSystem { get; set; }
 
-        public int Depth { get; set; }
-        public string? NodeType { get; set; }
-
-        public string NodeIdentifyKey
-        {
-            get
-            {
-                string orderNumber = string.IsNullOrWhiteSpace(OrderNumber) ? "" : OrderNumber.Trim().ToUpperInvariant();
-                string lotNumber = string.IsNullOrWhiteSpace(ProductLotNumber) ? "" : ProductLotNumber.Trim().ToUpperInvariant();
-                string itemcode = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
-                string routeSystem = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
-                string processType = string.IsNullOrWhiteSpace(ProcessType) ? "" : ProcessType.Trim().ToUpperInvariant();
-
-                return string.Join("|", routeSystem, orderNumber);
-            }
-        }
+        //public int Depth { get; set; }
+        //public string? NodeType { get; set; }
+        public string NodeIdentifyKey => MasterKey;
     }
 
 
@@ -117,6 +108,10 @@ namespace LotTraceApp.Models
     public class BottleTraceResult
     {
         public BottleDisplayTables? DisplayTables { get; set; }
+        public List<Bottle_ProductionResultNode> Bottle_ProductionResultNodes { get; set; } = new();
+
+
+        //使用しない。後で削除
         public List<BottleDisplayGroup> DisplayGroups { get; set; } = new List<BottleDisplayGroup>();
 
         public BottleTraceResult()

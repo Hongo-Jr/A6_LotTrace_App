@@ -90,12 +90,16 @@ namespace LotTraceApp.Services
 
         }
 
+        
+
+
+
 
         #endregion
 
         #region バック
 
-        
+
         public BottleTraceResult B_TraceBackwardResult(
             TraceSearchParameters? p,
             IProgress<TraceProgressState>? progress = null,
@@ -588,5 +592,109 @@ namespace LotTraceApp.Services
 
 
         #endregion
+
+
+        
+
+        public BottleTraceResult BuildBottleTraceResult(TraceSearchParameters p,
+            IProgress<TraceProgressState>? progress = null,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "品目名条件を解決しています...", 12);
+
+            if (!ResolveItemNameCondition(p))
+            {
+                return new BottleTraceResult();
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "トレース結果を取得しています...", 25);
+
+            //暫定処理（ここでリポジトリを呼ぶ）
+            var nodes = new List<Bottle_ProductionResultNode>();
+            //
+
+
+            //var nodes = p.Direction switch
+            //{
+            //    TraceDirection.Forward =>
+            //        _repository.B_FindForwardNodes(p),
+
+            //    TraceDirection.Backward =>
+            //        _repository.B_FindBackwardNodes(p),
+
+            //    _ => new List<Bottle_ProductionResultNode>()
+            //};
+
+
+            if (nodes == null || nodes.Count == 0)
+            {
+                return new BottleTraceResult();
+            }
+
+
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "グリッド用データを作成しています...", 78);
+
+            var table = BuildBottleTable(nodes);
+
+            var result = new BottleTraceResult
+            {
+                DisplayTables = new BottleDisplayTables(new DataTable(), table),
+                Bottle_ProductionResultNodes = nodes
+            };
+
+            return result;
+        }
+
+        private DataTable BuildBottleTable(
+    IEnumerable<Bottle_ProductionResultNode> nodes)
+        {
+            var table = new DataTable();
+
+            // 表示列
+            table.Columns.Add("OrderNumber", typeof(string));
+            table.Columns.Add("Lot", typeof(string));
+            table.Columns.Add("ItemName", typeof(string));
+            table.Columns.Add("Mid_Lot", typeof(string));
+            table.Columns.Add("StartDate", typeof(string));
+            table.Columns.Add("OK_Num", typeof(int));
+            table.Columns.Add("NG_Num", typeof(int));
+            table.Columns.Add("Total_Num", typeof(int));
+
+            // Form内部処理用の非表示列
+            table.Columns.Add("NodeKey", typeof(string));
+            table.Columns.Add("DisplayKey", typeof(string));
+            table.Columns.Add("ItemCode", typeof(string));
+            table.Columns.Add("MasterKey", typeof(string));
+
+            foreach (var node in nodes)
+            {
+                table.Rows.Add(
+                    node.OrderNumber,
+                    node.ProductLotNumber,
+                    node.ProductItemName,
+                    node.MiddleProductLotNumber,
+                    node.StartDate?.ToString(),
+                    node.FillingBottleNum_OK,
+                    node.FillingBottleNum_NG,
+                    node.FillingBottleNum_Total,
+
+                    // NodeKeyは現状Formの文字色・交点描画でも使う
+                    node.NodeIdentifyKey,
+
+                    // Lane構造廃止後は意味を持たない。
+                    // Form契約維持のため列だけ残す。
+                    string.Empty,
+
+                    node.ProductItemCode,
+                    node.MasterKey);
+            }
+
+            return table;
+        }
     }
 }
