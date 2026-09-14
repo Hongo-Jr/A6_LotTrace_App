@@ -613,20 +613,19 @@ namespace LotTraceApp.Services
             ReportProgress(progress, "トレース結果を取得しています...", 25);
 
             //暫定処理（ここでリポジトリを呼ぶ）
-            var nodes = new List<Bottle_ProductionResultNode>();
-            //
+            
 
 
-            //var nodes = p.Direction switch
-            //{
-            //    TraceDirection.Forward =>
-            //        _repository.B_FindForwardNodes(p),
+            var nodes = p.Direction switch
+            {
+                TraceDirection.Forward =>
+                    _repo.B_FindForwardNodes(p),
 
-            //    TraceDirection.Backward =>
-            //        _repository.B_FindBackwardNodes(p),
+                TraceDirection.Backward =>
+                    _repo.B_FindBackwardNodes(p),
 
-            //    _ => new List<Bottle_ProductionResultNode>()
-            //};
+                _ => new List<Bottle_ProductionResultNode>()
+            };
 
 
             if (nodes == null || nodes.Count == 0)
