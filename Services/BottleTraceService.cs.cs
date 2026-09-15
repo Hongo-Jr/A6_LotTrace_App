@@ -273,6 +273,59 @@ namespace LotTraceApp.Services
             }
         }
 
+        private void ResolveBottleItemNames(
+    IEnumerable<Bottle_ProductionResultNode> nodes)
+        {
+            if (nodes == null || _customerItemMasterRepository == null)
+            {
+                return;
+            }
+
+            var nodeList = nodes
+                .OfType<Bottle_ProductionResultNode>()
+                .Where(node => !string.IsNullOrWhiteSpace(node.ProductItemCode))
+                .ToList();
+
+            if (nodeList.Count == 0)
+            {
+                return;
+            }
+
+            var itemCodes = nodeList
+                .Select(node => node.ProductItemCode!.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            Dictionary<string, string> itemNameMap;
+
+            try
+            {
+                itemNameMap =
+                    _customerItemMasterRepository.GetItemNamesByCodes(itemCodes);
+            }
+            catch
+            {
+                return;
+            }
+
+            foreach (var node in nodeList)
+            {
+                var itemCode = node.ProductItemCode;
+
+                if (string.IsNullOrWhiteSpace(itemCode))
+                {
+                    continue;
+                }
+
+                if (itemNameMap.TryGetValue(
+                    itemCode.Trim(),
+                    out var itemName))
+                {
+                    node.ProductItemName = itemName;
+                }
+            }
+        }
+
         private void ResolveLiquidStartDateLabels(IEnumerable<ProductionResultNode?> nodes)
         {
             if (nodes == null)
@@ -612,10 +665,7 @@ namespace LotTraceApp.Services
             cancellationToken.ThrowIfCancellationRequested();
             ReportProgress(progress, "トレース結果を取得しています...", 25);
 
-            //暫定処理（ここでリポジトリを呼ぶ）
-            
-
-
+           
             var nodes = p.Direction switch
             {
                 TraceDirection.Forward =>
@@ -634,6 +684,11 @@ namespace LotTraceApp.Services
             }
 
 
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, "品目名を解決しています...", 65);
+
+            ResolveBottleItemNames(nodes);
 
             cancellationToken.ThrowIfCancellationRequested();
             ReportProgress(progress, "グリッド用データを作成しています...", 78);

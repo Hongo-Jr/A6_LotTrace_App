@@ -1702,10 +1702,6 @@ namespace LotTraceApp
 
             BottleTraceResult traceResult = _service.BuildBottleTraceResult(p, progress, cancellationToken);
 
-            //BottleTraceResult traceResult = p != null && p.Direction == TraceDirection.Backward
-            //    ? _service.B_TraceBackwardResult(p, progress, cancellationToken)
-            //    : _service.B_TraceForwardResult(p, progress, cancellationToken);
-
             cancellationToken.ThrowIfCancellationRequested();
 
             return new BottleTraceSearchWorkResult

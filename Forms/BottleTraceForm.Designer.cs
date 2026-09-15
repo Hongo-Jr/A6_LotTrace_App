@@ -28,7 +28,7 @@ namespace LotTraceApp
             rdoForwardBottle_2 = new RadioButton();
             lblBottleOrderNo_2 = new Label();
             panelStartBottle_2 = new Panel();
-            panelEndBottle_2 = new Panel();
+            
             txtBottleOrderNo_2 = new TextBox();
             txtBottleItemName_2 = new TextBox();
             txtBottleItemCode_2 = new TextBox();
@@ -68,7 +68,7 @@ namespace LotTraceApp
             btnBottleTraceSearch = new Button();
             tabBottlePage3 = new TabPage();
             panelStartBottle_3 = new Panel();
-            panelEndBottle_3 = new Panel();
+            
             bottleGrid3 = new DataGridView();
             rdoBackwardBottle_3 = new RadioButton();
             rdoForwardBottle_3 = new RadioButton();
@@ -90,7 +90,7 @@ namespace LotTraceApp
             btnTraceSearch_3 = new Button();
             tabBottlePage4 = new TabPage();
             panelStartBottle_4 = new Panel();
-            panelEndBottle_4 = new Panel();
+            
             bottleGrid4 = new DataGridView();
             rdoBackwardBottle_4 = new RadioButton();
             rdoForwardBottle_4 = new RadioButton();
@@ -112,7 +112,7 @@ namespace LotTraceApp
             btnTraceSearch_4 = new Button();
             tabBottlePage5 = new TabPage();
             panelStartBottle_5 = new Panel();
-            panelEndBottle_5 = new Panel();
+            
             bottleGrid5 = new DataGridView();
             rdoBackwardBottle_5 = new RadioButton();
             rdoForwardBottle_5 = new RadioButton();
@@ -134,7 +134,7 @@ namespace LotTraceApp
             btnTraceSearch_5 = new Button();
             tabBottlePage6 = new TabPage();
             panelStartBottle_6 = new Panel();
-            panelEndBottle_6 = new Panel();
+            
             bottleGrid6 = new DataGridView();
             rdoBackwardBottle_6 = new RadioButton();
             rdoForwardBottle_6 = new RadioButton();
@@ -156,7 +156,7 @@ namespace LotTraceApp
             btnTraceSearch_6 = new Button();
             tabBottlePage7 = new TabPage();
             panelStartBottle_7 = new Panel();
-            panelEndBottle_7 = new Panel();
+            
             bottleGrid7 = new DataGridView();
             rdoBackwardBottle_7 = new RadioButton();
             rdoForwardBottle_7 = new RadioButton();
@@ -178,7 +178,7 @@ namespace LotTraceApp
             btnTraceSearch_7 = new Button();
             tabBottlePage8 = new TabPage();
             panelStartBottle_8 = new Panel();
-            panelEndBottle_8 = new Panel();
+            
             bottleGrid8 = new DataGridView();
             rdoBackwardBottle_8 = new RadioButton();
             rdoForwardBottle_8 = new RadioButton();
@@ -200,7 +200,7 @@ namespace LotTraceApp
             btnTraceSearch_8 = new Button();
             tabBottlePage9 = new TabPage();
             panelStartBottle_9 = new Panel();
-            panelEndBottle_9 = new Panel();
+            
             bottleGrid9 = new DataGridView();
             rdoBackwardBottle_9 = new RadioButton();
             rdoForwardBottle_9 = new RadioButton();
@@ -222,7 +222,7 @@ namespace LotTraceApp
             btnTraceSearch_9 = new Button();
             tabBottlePage10 = new TabPage();
             panelStartBottle_10 = new Panel();
-            panelEndBottle_10 = new Panel();
+            
             bottleGrid10 = new DataGridView();
             radioButton5 = new RadioButton();
             rdoForwardBottle_10 = new RadioButton();
@@ -323,7 +323,7 @@ namespace LotTraceApp
             tabBottlePage2.Controls.Add(rdoForwardBottle_2);
             tabBottlePage2.Controls.Add(lblBottleOrderNo_2);
             tabBottlePage2.Controls.Add(panelStartBottle_2);
-            tabBottlePage2.Controls.Add(panelEndBottle_2);
+            
             tabBottlePage2.Controls.Add(txtBottleOrderNo_2);
             tabBottlePage2.Controls.Add(txtBottleItemName_2);
             tabBottlePage2.Controls.Add(txtBottleItemCode_2);
@@ -351,12 +351,12 @@ namespace LotTraceApp
             // bottleGrid2
             // 
             bottleGrid2.ColumnHeadersHeight = 29;
-            bottleGrid2.Location = new Point(10, 222);
+            bottleGrid2.Location = new Point(110, 222);
             bottleGrid2.Name = "bottleGrid2";
             bottleGrid2.ReadOnly = true;
             bottleGrid2.RowHeadersWidth = 51;
             bottleGrid2.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid2.Size = new Size(920, 650);
+            bottleGrid2.Size = new Size(1350, 650);
             bottleGrid2.TabIndex = 29;
             // 
             // rdoBackwardBottle_2
@@ -393,19 +393,11 @@ namespace LotTraceApp
             // 
             panelStartBottle_2.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_2.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_2.Location = new Point(10, 194);
+            panelStartBottle_2.Location = new Point(110, 194);
             panelStartBottle_2.Name = "panelStartBottle_2";
-            panelStartBottle_2.Size = new Size(920, 28);
+            panelStartBottle_2.Size = new Size(1350, 28);
             panelStartBottle_2.TabIndex = 28;
-            // 
-            // panelEndBottle_2
-            // 
-            panelEndBottle_2.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_2.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_2.Location = new Point(966, 194);
-            panelEndBottle_2.Name = "panelEndBottle_2";
-            panelEndBottle_2.Size = new Size(920, 28);
-            panelEndBottle_2.TabIndex = 30;
+            
             // 
             // txtBottleOrderNo_2
             // 
@@ -777,7 +769,7 @@ namespace LotTraceApp
             // tabBottlePage3
             // 
             tabBottlePage3.Controls.Add(panelStartBottle_3);
-            tabBottlePage3.Controls.Add(panelEndBottle_3);
+            
             tabBottlePage3.Controls.Add(bottleGrid3);
             tabBottlePage3.Controls.Add(rdoBackwardBottle_3);
             tabBottlePage3.Controls.Add(rdoForwardBottle_3);
@@ -810,29 +802,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_3.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_3.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_3.Location = new Point(10, 194);
+            panelStartBottle_3.Location = new Point(110, 194);
             panelStartBottle_3.Name = "panelStartBottle_3";
-            panelStartBottle_3.Size = new Size(920, 28);
+            panelStartBottle_3.Size = new Size(1350, 28);
             panelStartBottle_3.TabIndex = 28;
-            // 
-            // panelEndBottle_3
-            // 
-            panelEndBottle_3.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_3.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_3.Location = new Point(966, 194);
-            panelEndBottle_3.Name = "panelEndBottle_3";
-            panelEndBottle_3.Size = new Size(920, 28);
-            panelEndBottle_3.TabIndex = 30;
+            
             // 
             // bottleGrid3
             // 
             bottleGrid3.ColumnHeadersHeight = 29;
-            bottleGrid3.Location = new Point(10, 222);
+            bottleGrid3.Location = new Point(110, 222);
             bottleGrid3.Name = "bottleGrid3";
             bottleGrid3.ReadOnly = true;
             bottleGrid3.RowHeadersWidth = 51;
             bottleGrid3.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid3.Size = new Size(920, 650);
+            bottleGrid3.Size = new Size(1350, 650);
             bottleGrid3.TabIndex = 29;
             // 
             // rdoBackwardBottle_3
@@ -1000,7 +984,7 @@ namespace LotTraceApp
             // tabBottlePage4
             // 
             tabBottlePage4.Controls.Add(panelStartBottle_4);
-            tabBottlePage4.Controls.Add(panelEndBottle_4);
+            
             tabBottlePage4.Controls.Add(bottleGrid4);
             tabBottlePage4.Controls.Add(rdoBackwardBottle_4);
             tabBottlePage4.Controls.Add(rdoForwardBottle_4);
@@ -1033,29 +1017,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_4.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_4.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_4.Location = new Point(10, 194);
+            panelStartBottle_4.Location = new Point(110, 194);
             panelStartBottle_4.Name = "panelStartBottle_4";
-            panelStartBottle_4.Size = new Size(920, 28);
+            panelStartBottle_4.Size = new Size(1350, 28);
             panelStartBottle_4.TabIndex = 28;
-            // 
-            // panelEndBottle_4
-            // 
-            panelEndBottle_4.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_4.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_4.Location = new Point(966, 194);
-            panelEndBottle_4.Name = "panelEndBottle_4";
-            panelEndBottle_4.Size = new Size(920, 28);
-            panelEndBottle_4.TabIndex = 30;
+           
             // 
             // bottleGrid4
             // 
             bottleGrid4.ColumnHeadersHeight = 29;
-            bottleGrid4.Location = new Point(10, 222);
+            bottleGrid4.Location = new Point(110, 222);
             bottleGrid4.Name = "bottleGrid4";
             bottleGrid4.ReadOnly = true;
             bottleGrid4.RowHeadersWidth = 51;
             bottleGrid4.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid4.Size = new Size(920, 650);
+            bottleGrid4.Size = new Size(1350, 650);
             bottleGrid4.TabIndex = 29;
             // 
             // rdoBackwardBottle_4
@@ -1223,7 +1199,7 @@ namespace LotTraceApp
             // tabBottlePage5
             // 
             tabBottlePage5.Controls.Add(panelStartBottle_5);
-            tabBottlePage5.Controls.Add(panelEndBottle_5);
+            
             tabBottlePage5.Controls.Add(bottleGrid5);
             tabBottlePage5.Controls.Add(rdoBackwardBottle_5);
             tabBottlePage5.Controls.Add(rdoForwardBottle_5);
@@ -1256,29 +1232,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_5.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_5.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_5.Location = new Point(10, 194);
+            panelStartBottle_5.Location = new Point(110, 194);
             panelStartBottle_5.Name = "panelStartBottle_5";
-            panelStartBottle_5.Size = new Size(920, 28);
+            panelStartBottle_5.Size = new Size(1350, 28);
             panelStartBottle_5.TabIndex = 28;
-            // 
-            // panelEndBottle_5
-            // 
-            panelEndBottle_5.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_5.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_5.Location = new Point(966, 194);
-            panelEndBottle_5.Name = "panelEndBottle_5";
-            panelEndBottle_5.Size = new Size(920, 28);
-            panelEndBottle_5.TabIndex = 30;
+          
             // 
             // bottleGrid5
             // 
             bottleGrid5.ColumnHeadersHeight = 29;
-            bottleGrid5.Location = new Point(10, 222);
+            bottleGrid5.Location = new Point(110, 222);
             bottleGrid5.Name = "bottleGrid5";
             bottleGrid5.ReadOnly = true;
             bottleGrid5.RowHeadersWidth = 51;
             bottleGrid5.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid5.Size = new Size(920, 650);
+            bottleGrid5.Size = new Size(1350, 650);
             bottleGrid5.TabIndex = 29;
             // 
             // rdoBackwardBottle_5
@@ -1446,7 +1414,7 @@ namespace LotTraceApp
             // tabBottlePage6
             // 
             tabBottlePage6.Controls.Add(panelStartBottle_6);
-            tabBottlePage6.Controls.Add(panelEndBottle_6);
+            
             tabBottlePage6.Controls.Add(bottleGrid6);
             tabBottlePage6.Controls.Add(rdoBackwardBottle_6);
             tabBottlePage6.Controls.Add(rdoForwardBottle_6);
@@ -1479,29 +1447,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_6.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_6.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_6.Location = new Point(10, 194);
+            panelStartBottle_6.Location = new Point(110, 194);
             panelStartBottle_6.Name = "panelStartBottle_6";
-            panelStartBottle_6.Size = new Size(920, 28);
+            panelStartBottle_6.Size = new Size(1350, 28);
             panelStartBottle_6.TabIndex = 28;
-            // 
-            // panelEndBottle_6
-            // 
-            panelEndBottle_6.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_6.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_6.Location = new Point(966, 194);
-            panelEndBottle_6.Name = "panelEndBottle_6";
-            panelEndBottle_6.Size = new Size(920, 28);
-            panelEndBottle_6.TabIndex = 30;
+            
             // 
             // bottleGrid6
             // 
             bottleGrid6.ColumnHeadersHeight = 29;
-            bottleGrid6.Location = new Point(10, 222);
+            bottleGrid6.Location = new Point(110, 222);
             bottleGrid6.Name = "bottleGrid6";
             bottleGrid6.ReadOnly = true;
             bottleGrid6.RowHeadersWidth = 51;
             bottleGrid6.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid6.Size = new Size(920, 650);
+            bottleGrid6.Size = new Size(1350, 650);
             bottleGrid6.TabIndex = 29;
             // 
             // rdoBackwardBottle_6
@@ -1669,7 +1629,7 @@ namespace LotTraceApp
             // tabBottlePage7
             // 
             tabBottlePage7.Controls.Add(panelStartBottle_7);
-            tabBottlePage7.Controls.Add(panelEndBottle_7);
+            
             tabBottlePage7.Controls.Add(bottleGrid7);
             tabBottlePage7.Controls.Add(rdoBackwardBottle_7);
             tabBottlePage7.Controls.Add(rdoForwardBottle_7);
@@ -1702,29 +1662,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_7.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_7.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_7.Location = new Point(10, 194);
+            panelStartBottle_7.Location = new Point(110, 194);
             panelStartBottle_7.Name = "panelStartBottle_7";
-            panelStartBottle_7.Size = new Size(920, 28);
+            panelStartBottle_7.Size = new Size(1350, 28);
             panelStartBottle_7.TabIndex = 28;
-            // 
-            // panelEndBottle_7
-            // 
-            panelEndBottle_7.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_7.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_7.Location = new Point(966, 194);
-            panelEndBottle_7.Name = "panelEndBottle_7";
-            panelEndBottle_7.Size = new Size(920, 28);
-            panelEndBottle_7.TabIndex = 30;
+          
             // 
             // bottleGrid7
             // 
             bottleGrid7.ColumnHeadersHeight = 29;
-            bottleGrid7.Location = new Point(10, 222);
+            bottleGrid7.Location = new Point(110, 222);
             bottleGrid7.Name = "bottleGrid7";
             bottleGrid7.ReadOnly = true;
             bottleGrid7.RowHeadersWidth = 51;
             bottleGrid7.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid7.Size = new Size(920, 650);
+            bottleGrid7.Size = new Size(1350, 650);
             bottleGrid7.TabIndex = 29;
             // 
             // rdoBackwardBottle_7
@@ -1892,7 +1844,7 @@ namespace LotTraceApp
             // tabBottlePage8
             // 
             tabBottlePage8.Controls.Add(panelStartBottle_8);
-            tabBottlePage8.Controls.Add(panelEndBottle_8);
+            
             tabBottlePage8.Controls.Add(bottleGrid8);
             tabBottlePage8.Controls.Add(rdoBackwardBottle_8);
             tabBottlePage8.Controls.Add(rdoForwardBottle_8);
@@ -1925,29 +1877,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_8.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_8.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_8.Location = new Point(10, 194);
+            panelStartBottle_8.Location = new Point(110, 194);
             panelStartBottle_8.Name = "panelStartBottle_8";
-            panelStartBottle_8.Size = new Size(920, 28);
+            panelStartBottle_8.Size = new Size(1350, 28);
             panelStartBottle_8.TabIndex = 28;
-            // 
-            // panelEndBottle_8
-            // 
-            panelEndBottle_8.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_8.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_8.Location = new Point(966, 194);
-            panelEndBottle_8.Name = "panelEndBottle_8";
-            panelEndBottle_8.Size = new Size(920, 28);
-            panelEndBottle_8.TabIndex = 30;
+            
             // 
             // bottleGrid8
             // 
             bottleGrid8.ColumnHeadersHeight = 29;
-            bottleGrid8.Location = new Point(10, 222);
+            bottleGrid8.Location = new Point(110, 222);
             bottleGrid8.Name = "bottleGrid8";
             bottleGrid8.ReadOnly = true;
             bottleGrid8.RowHeadersWidth = 51;
             bottleGrid8.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid8.Size = new Size(920, 650);
+            bottleGrid8.Size = new Size(1350, 650);
             bottleGrid8.TabIndex = 29;
             // 
             // rdoBackwardBottle_8
@@ -2115,7 +2059,7 @@ namespace LotTraceApp
             // tabBottlePage9
             // 
             tabBottlePage9.Controls.Add(panelStartBottle_9);
-            tabBottlePage9.Controls.Add(panelEndBottle_9);
+            
             tabBottlePage9.Controls.Add(bottleGrid9);
             tabBottlePage9.Controls.Add(rdoBackwardBottle_9);
             tabBottlePage9.Controls.Add(rdoForwardBottle_9);
@@ -2148,29 +2092,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_9.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_9.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_9.Location = new Point(10, 194);
+            panelStartBottle_9.Location = new Point(110, 194);
             panelStartBottle_9.Name = "panelStartBottle_9";
-            panelStartBottle_9.Size = new Size(920, 28);
+            panelStartBottle_9.Size = new Size(1350, 28);
             panelStartBottle_9.TabIndex = 28;
-            // 
-            // panelEndBottle_9
-            // 
-            panelEndBottle_9.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_9.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_9.Location = new Point(966, 194);
-            panelEndBottle_9.Name = "panelEndBottle_9";
-            panelEndBottle_9.Size = new Size(920, 28);
-            panelEndBottle_9.TabIndex = 30;
+          
             // 
             // bottleGrid9
             // 
             bottleGrid9.ColumnHeadersHeight = 29;
-            bottleGrid9.Location = new Point(10, 222);
+            bottleGrid9.Location = new Point(110, 222);
             bottleGrid9.Name = "bottleGrid9";
             bottleGrid9.ReadOnly = true;
             bottleGrid9.RowHeadersWidth = 51;
             bottleGrid9.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid9.Size = new Size(920, 650);
+            bottleGrid9.Size = new Size(1350, 650);
             bottleGrid9.TabIndex = 29;
             // 
             // rdoBackwardBottle_9
@@ -2338,7 +2274,7 @@ namespace LotTraceApp
             // tabBottlePage10
             // 
             tabBottlePage10.Controls.Add(panelStartBottle_10);
-            tabBottlePage10.Controls.Add(panelEndBottle_10);
+            
             tabBottlePage10.Controls.Add(bottleGrid10);
             tabBottlePage10.Controls.Add(radioButton5);
             tabBottlePage10.Controls.Add(rdoForwardBottle_10);
@@ -2371,29 +2307,21 @@ namespace LotTraceApp
             // 
             panelStartBottle_10.BackColor = Color.FromArgb(235, 242, 250);
             panelStartBottle_10.BorderStyle = BorderStyle.FixedSingle;
-            panelStartBottle_10.Location = new Point(10, 194);
+            panelStartBottle_10.Location = new Point(110, 194);
             panelStartBottle_10.Name = "panelStartBottle_10";
-            panelStartBottle_10.Size = new Size(920, 28);
+            panelStartBottle_10.Size = new Size(1350, 28);
             panelStartBottle_10.TabIndex = 28;
-            // 
-            // panelEndBottle_10
-            // 
-            panelEndBottle_10.BackColor = Color.FromArgb(250, 238, 238);
-            panelEndBottle_10.BorderStyle = BorderStyle.FixedSingle;
-            panelEndBottle_10.Location = new Point(966, 194);
-            panelEndBottle_10.Name = "panelEndBottle_10";
-            panelEndBottle_10.Size = new Size(920, 28);
-            panelEndBottle_10.TabIndex = 30;
+           
             // 
             // bottleGrid10
             // 
             bottleGrid10.ColumnHeadersHeight = 29;
-            bottleGrid10.Location = new Point(10, 222);
+            bottleGrid10.Location = new Point(110, 222);
             bottleGrid10.Name = "bottleGrid10";
             bottleGrid10.ReadOnly = true;
             bottleGrid10.RowHeadersWidth = 51;
             bottleGrid10.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            bottleGrid10.Size = new Size(920, 650);
+            bottleGrid10.Size = new Size(1350, 650);
             bottleGrid10.TabIndex = 29;
             // 
             // radioButton5
@@ -2782,7 +2710,8 @@ namespace LotTraceApp
         private RadioButton rdoForwardBottle_2;
         private Label lblBottleOrderNo_2;
         private Panel panelStartBottle_2;
-        private Panel panelEndBottle_2;
+        
+
         private TextBox txtBottleOrderNo_2;
         private TextBox txtBottleItemName_2;
         private TextBox txtBottleItemCode_2;
@@ -2822,7 +2751,7 @@ namespace LotTraceApp
         private Button btnBottleTraceSearch;
         private TabPage tabBottlePage3;
         private Panel panelStartBottle_3;
-        private Panel panelEndBottle_3;
+        
         private DataGridView bottleGrid3;
         private RadioButton rdoBackwardBottle_3;
         private RadioButton rdoForwardBottle_3;
@@ -2844,7 +2773,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_3;
         private TabPage tabBottlePage4;
         private Panel panelStartBottle_4;
-        private Panel panelEndBottle_4;
+        
         private DataGridView bottleGrid4;
         private RadioButton rdoBackwardBottle_4;
         private RadioButton rdoForwardBottle_4;
@@ -2866,7 +2795,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_4;
         private TabPage tabBottlePage5;
         private Panel panelStartBottle_5;
-        private Panel panelEndBottle_5;
+        
         private DataGridView bottleGrid5;
         private RadioButton rdoBackwardBottle_5;
         private RadioButton rdoForwardBottle_5;
@@ -2888,7 +2817,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_5;
         private TabPage tabBottlePage6;
         private Panel panelStartBottle_6;
-        private Panel panelEndBottle_6;
+        
         private DataGridView bottleGrid6;
         private RadioButton rdoBackwardBottle_6;
         private RadioButton rdoForwardBottle_6;
@@ -2910,7 +2839,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_6;
         private TabPage tabBottlePage7;
         private Panel panelStartBottle_7;
-        private Panel panelEndBottle_7;
+        
         private DataGridView bottleGrid7;
         private RadioButton rdoBackwardBottle_7;
         private RadioButton rdoForwardBottle_7;
@@ -2932,7 +2861,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_7;
         private TabPage tabBottlePage8;
         private Panel panelStartBottle_8;
-        private Panel panelEndBottle_8;
+        
         private DataGridView bottleGrid8;
         private RadioButton rdoBackwardBottle_8;
         private RadioButton rdoForwardBottle_8;
@@ -2954,7 +2883,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_8;
         private TabPage tabBottlePage9;
         private Panel panelStartBottle_9;
-        private Panel panelEndBottle_9;
+        
         private DataGridView bottleGrid9;
         private RadioButton rdoBackwardBottle_9;
         private RadioButton rdoForwardBottle_9;
@@ -2976,7 +2905,7 @@ namespace LotTraceApp
         private Button btnTraceSearch_9;
         private TabPage tabBottlePage10;
         private Panel panelStartBottle_10;
-        private Panel panelEndBottle_10;
+        
         private DataGridView bottleGrid10;
         private RadioButton radioButton5;
         private RadioButton rdoForwardBottle_10;

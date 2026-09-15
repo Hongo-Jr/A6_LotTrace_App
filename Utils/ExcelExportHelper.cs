@@ -588,27 +588,17 @@ namespace LotTraceApp.Utils
             xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(GetCrossPointNodeBackColor(uiKey));
         }
 
-        private static string? BuildBottleCrossPointUiKeyFromRow(DataGridViewRow row)
+        private static string? BuildBottleCrossPointUiKeyFromRow(
+    DataGridViewRow row)
         {
             if (row == null)
                 return null;
 
             string? masterKey = GetRowValue(row, "MasterKey");
-            string? nodeKey = GetRowValue(row, "NodeKey");
-            string? startDateLabel = GetRowValue(row, "StartDateLabel");
-            string? inputSourceType = GetRowValue(row, "InputSourceType");
 
-            bool isManual =
-                string.Equals(startDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(inputSourceType, "ManualInput", StringComparison.OrdinalIgnoreCase);
-
-            if (isManual)
-                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
-
-            if (!string.IsNullOrWhiteSpace(masterKey))
-                return "MK|" + masterKey.Trim();
-
-            return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey.Trim();
+            return string.IsNullOrWhiteSpace(masterKey)
+                ? null
+                : masterKey.Trim();
         }
 
         private static bool HasVisibleData(DataGridView? grid)
