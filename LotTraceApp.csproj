@@ -7,7 +7,7 @@
 	<PlatformTarget>x86</PlatformTarget>
 	<UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-
+	<SatelliteResourceLanguages>ja</SatelliteResourceLanguages>
     <RootNamespace>LotTraceApp</RootNamespace>
     <AssemblyName>LotTraceApp</AssemblyName>
   </PropertyGroup>
