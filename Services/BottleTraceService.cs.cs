@@ -48,48 +48,48 @@ namespace LotTraceApp.Services
         #region フォワード
 
         //削除
-        public BottleTraceResult B_TraceForwardResult(
-            TraceSearchParameters? p,
-            IProgress<TraceProgressState>? progress = null,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            //if (p == null) throw new ArgumentNullException("p");
+        //public BottleTraceResult B_TraceForwardResult(
+        //    TraceSearchParameters? p,
+        //    IProgress<TraceProgressState>? progress = null,
+        //    CancellationToken cancellationToken = default(CancellationToken))
+        //{
+        //    //if (p == null) throw new ArgumentNullException("p");
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "品目名条件を解決しています...", 12);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "品目名条件を解決しています...", 12);
 
-            //if (!ResolveItemNameCondition(p))
-            //{
-            //    return new BottleTraceResult();
-            //}
+        //    //if (!ResolveItemNameCondition(p))
+        //    //{
+        //    //    return new BottleTraceResult();
+        //    //}
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "液設備から瓶設備への候補を取得しています...", 25);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "液設備から瓶設備への候補を取得しています...", 25);
 
-            ////検索条件からCandidates作成
-            //var candidate = _repo.B_FindForwardCandidate(p);
+        //    ////検索条件からCandidates作成
+        //    //var candidate = _repo.B_FindForwardCandidate(p);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "表示レーンを構築しています...", 62);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "表示レーンを構築しています...", 62);
 
-            ////Candidateをグループ化したDisplayNodeにする。
-            //var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
+        //    ////Candidateをグループ化したDisplayNodeにする。
+        //    //var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "液設備情報を補完しています...", 70);
-            //ResolveLiquidNodeComplements(displayGroups);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "液設備情報を補完しています...", 70);
+        //    //ResolveLiquidNodeComplements(displayGroups);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "グリッド用データを作成しています...", 78);
-            //var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "グリッド用データを作成しています...", 78);
+        //    //var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
 
-            return new BottleTraceResult
-            {
-                //DisplayTables = result,
-                //DisplayGroups = displayGroups
-            };
+        //    return new BottleTraceResult
+        //    {
+        //        //DisplayTables = result,
+        //        //DisplayGroups = displayGroups
+        //    };
 
-        }
+        //}
 
         //新規
         public BottleTraceResult BottleTraceForwardResult(
@@ -130,49 +130,49 @@ namespace LotTraceApp.Services
         #region バック
 
         //削除
-        public BottleTraceResult B_TraceBackwardResult(
-            TraceSearchParameters? p,
-            IProgress<TraceProgressState>? progress = null,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
+        //public BottleTraceResult B_TraceBackwardResult(
+        //    TraceSearchParameters? p,
+        //    IProgress<TraceProgressState>? progress = null,
+        //    CancellationToken cancellationToken = default(CancellationToken))
+        //{
 
-            //if (p == null) throw new ArgumentNullException("p");
+        //    //if (p == null) throw new ArgumentNullException("p");
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "品目名条件を解決しています...", 12);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "品目名条件を解決しています...", 12);
 
-            //if (!ResolveItemNameCondition(p))
-            //{
-            //    return new BottleTraceResult();
-            //}
+        //    //if (!ResolveItemNameCondition(p))
+        //    //{
+        //    //    return new BottleTraceResult();
+        //    //}
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "瓶設備から液設備への候補を取得しています...", 25);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "瓶設備から液設備への候補を取得しています...", 25);
 
-            ////検索条件からCandidates作成
-            //var candidate = _repo.B_FindBackwardCandidate(p);
+        //    ////検索条件からCandidates作成
+        //    //var candidate = _repo.B_FindBackwardCandidate(p);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "表示レーンを構築しています...", 62);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "表示レーンを構築しています...", 62);
 
-            ////Candidateをグループ化したDisplayNodeにする。
-            //var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
+        //    ////Candidateをグループ化したDisplayNodeにする。
+        //    //var displayGroups = B_BuildDisplaylane(candidate, progress, cancellationToken);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "液設備情報を補完しています...", 70);
-            //ResolveLiquidNodeComplements(displayGroups);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "液設備情報を補完しています...", 70);
+        //    //ResolveLiquidNodeComplements(displayGroups);
 
-            //cancellationToken.ThrowIfCancellationRequested();
-            //ReportProgress(progress, "グリッド用データを作成しています...", 78);
-            //var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
+        //    //cancellationToken.ThrowIfCancellationRequested();
+        //    //ReportProgress(progress, "グリッド用データを作成しています...", 78);
+        //    //var result = B_BuildDisplayTable(displayGroups, progress, cancellationToken);
 
-            return new BottleTraceResult
-            {
-                //DisplayTables = result,
-                //DisplayGroups = displayGroups
-            };
+        //    return new BottleTraceResult
+        //    {
+        //        //DisplayTables = result,
+        //        //DisplayGroups = displayGroups
+        //    };
 
-        }
+        //}
 
         //新規
         public BottleTraceResult BottleTraceBackwardResult(
@@ -237,6 +237,7 @@ namespace LotTraceApp.Services
                     node.ProductLotNumber,
                     node.ProductItemCode,
                     node.MiddleProductLotNumber,
+                    node.StartDate,
                     node.FillingBottleNum_OK,
                     node.FillingBottleNum_NG,
                     node.FillingBottleNum_OK + node.FillingBottleNum_NG);
