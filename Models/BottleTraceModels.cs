@@ -38,7 +38,7 @@ namespace LotTraceApp.Models
         public string NodeIdentifyKey => MasterKey;
     }
 
-
+    //削除予定
     public class BottleCandidate
     {
         public bool TraceDirection {  get; set; }
@@ -53,6 +53,7 @@ namespace LotTraceApp.Models
         }
     }
 
+    //削除予定
     public class BottleDisplayLaneNode
     {
         public int NodeType {  get; set; }
@@ -65,6 +66,7 @@ namespace LotTraceApp.Models
         public int YLane { get; set; }
     }
 
+    //削除予定
     public class BottleDisplayGroup
     {
         public List<BottleDisplayLaneNode> LiquidNodes { get; set; }
@@ -81,6 +83,7 @@ namespace LotTraceApp.Models
 
     }
 
+    //削除予定
     public class BottleDisplayTables
     {
         public DataTable LiquidTable { get; set; }
@@ -109,6 +112,8 @@ namespace LotTraceApp.Models
     {
         public BottleDisplayTables? DisplayTables { get; set; }
         public List<BottleDisplayGroup> DisplayGroups { get; set; } = new List<BottleDisplayGroup>();
+        public DataTable BottleTable { get; set; } = new DataTable();
+        public List<Bottle_ProductionResultNode> BottleNodes { get; set; } = new List<Bottle_ProductionResultNode>();
 
         public BottleTraceResult()
         {

@@ -43,31 +43,31 @@ namespace LotTraceApp.Repositories
         #region トレースフォワード 液→瓶
 
         //削除
-        public List<BottleCandidate> B_FindForwardCandidate(TraceSearchParameters p)
-        {
-            var result = new List<BottleCandidate>();
-            //var starts = new List<ProductionResultNode>();
+        //public List<BottleCandidate> B_FindForwardCandidate(TraceSearchParameters p)
+        //{
+        //    var result = new List<BottleCandidate>();
+        //    //var starts = new List<ProductionResultNode>();
 
-            //var startA = B_GetStartNodesFromA(p);
-            //var startB = B_GetStartNodesFromB(p);
+        //    //var startA = B_GetStartNodesFromA(p);
+        //    //var startB = B_GetStartNodesFromB(p);
             
-            //if(startB != null && startB.Count != 0)
-            //{
-            //    starts.AddRange(startB);
-            //}
+        //    //if(startB != null && startB.Count != 0)
+        //    //{
+        //    //    starts.AddRange(startB);
+        //    //}
 
-            //if (startA != null && startA.Count != 0)
-            //{
-            //    starts.AddRange(startA);
-            //}
+        //    //if (startA != null && startA.Count != 0)
+        //    //{
+        //    //    starts.AddRange(startA);
+        //    //}
 
-            //if (starts != null && starts.Count != 0)
-            //{
-            //    result = B_GetForwardBottleCandidate(starts);
-            //}
+        //    //if (starts != null && starts.Count != 0)
+        //    //{
+        //    //    result = B_GetForwardBottleCandidate(starts);
+        //    //}
             
-            return result;
-        }
+        //    return result;
+        //}
 
         //新規
         public List<Bottle_ProductionResultNode> FindBottleNodeForward(TraceSearchParameters p)
@@ -735,32 +735,32 @@ namespace LotTraceApp.Repositories
 
         #region トレースバック 瓶→液
 
-        public List<BottleCandidate> B_FindBackwardCandidate(TraceSearchParameters p)
-        {
-            var result = new List<BottleCandidate>();
-            //var starts = new List<Bottle_ProductionResultNode>();
+        //public List<BottleCandidate> B_FindBackwardCandidate(TraceSearchParameters p)
+        //{
+        //    var result = new List<BottleCandidate>();
+        //    //var starts = new List<Bottle_ProductionResultNode>();
 
-            //var start_Bottle = B_FindBackwardStartBottleNodes(p);
-            //var start_Drum = B_FindBackwardStartDrumNodes(p);
+        //    //var start_Bottle = B_FindBackwardStartBottleNodes(p);
+        //    //var start_Drum = B_FindBackwardStartDrumNodes(p);
 
-            //if (start_Bottle != null && start_Bottle.Count != 0)
-            //{
-            //    starts.AddRange(start_Bottle);
-            //}
+        //    //if (start_Bottle != null && start_Bottle.Count != 0)
+        //    //{
+        //    //    starts.AddRange(start_Bottle);
+        //    //}
 
-            //if (start_Drum != null && start_Drum.Count != 0)
-            //{
-            //    starts.AddRange(start_Drum);
-            //}
+        //    //if (start_Drum != null && start_Drum.Count != 0)
+        //    //{
+        //    //    starts.AddRange(start_Drum);
+        //    //}
 
-            //if (starts != null && starts.Count != 0)
-            //{
-            //    result = B_GetBackwardBottleCandidate(starts);
-            //}
+        //    //if (starts != null && starts.Count != 0)
+        //    //{
+        //    //    result = B_GetBackwardBottleCandidate(starts);
+        //    //}
 
 
-            return result;
-        }
+        //    return result;
+        //}
 
         //private List<Bottle_ProductionResultNode> B_FindBackwardStartBottleNodes(TraceSearchParameters p)
         //{
