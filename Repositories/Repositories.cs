@@ -17,7 +17,7 @@ namespace LotTraceApp.Repositories
     /// </summary>
     public class LotTraceRepository
     {
-        private readonly string _connectionString;
+        public readonly string _connectionString;
         private const int MaxChildTableKeyIndex = 30;
 
 

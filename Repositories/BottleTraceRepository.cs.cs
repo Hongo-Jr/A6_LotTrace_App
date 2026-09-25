@@ -18,26 +18,37 @@ namespace LotTraceApp.Repositories
     public class BottleTraceRepository
     {
         private readonly string _connectionString;
+        private readonly string _liquidConnectionString;
 
         private LotTraceRepository _repo;
 
 
-        public BottleTraceRepository(string connectionString, LotTraceRepository repo)
+        public BottleTraceRepository(string connectionString, string liquidConnectionString, LotTraceRepository repo)
         {
             if (connectionString == null)
             {
                 throw new ArgumentNullException("connectionString");
             }
+            if(liquidConnectionString == null)
+            {
+                throw new ArgumentNullException("liquidConnectionString");
+            }
             if (repo == null)
                 throw new ArgumentNullException("repo");
 
             _connectionString = connectionString;
+            _liquidConnectionString = liquidConnectionString;
             _repo = repo;
         }
 
         private SqlConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
+        }
+
+        private SqlConnection CreateLiquidConnection()
+        {
+            return new SqlConnection(_liquidConnectionString);
         }
 
         #region トレースフォワード 液→瓶
@@ -106,7 +117,7 @@ namespace LotTraceApp.Repositories
             }
             
 
-            using (var conn = CreateConnection())
+            using (var conn = CreateLiquidConnection())
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
@@ -198,7 +209,7 @@ namespace LotTraceApp.Repositories
         {
             var result = new List<ProductionResultNode>();
 
-            using (var conn = CreateConnection())
+            using (var conn = CreateLiquidConnection())
             using (var cmd = conn.CreateCommand())
             {
                 conn.Open();
@@ -583,9 +594,13 @@ namespace LotTraceApp.Repositories
             sql.AppendLine("    fb.MiddleProductLotNumber               -- 10");
     
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
-            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode");
-            sql.AppendLine(" FROM FillingBottleTable WHERE MiddleProductLotNumber = @lotNo) fb");
-            sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber;");
+            //sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode,");
+            //sql.AppendLine(" MiddleProductItemCode,MiddleProductLotNumber");
+            //sql.AppendLine(" FROM FillingBottleTable WHERE MiddleProductLotNumber = @lotNo) fb");
+            //sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber;");
+            sql.AppendLine(" INNER JOIN MES33.dbo.FillingBottleTable fb");
+            sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber");
+            sql.AppendLine(" WHERE fb.MiddleProductLotNumber = @lotNo;");
 
             return sql.ToString();
         }
@@ -708,9 +723,13 @@ namespace LotTraceApp.Repositories
             sql.AppendLine("    fd.MiddleProductLotNumber              -- 10");
 
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
-            sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode");
-            sql.AppendLine(" FROM FillingDrumcanTable WHERE MiddleProductLotNumber = @lotNo) fd");
-            sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber;");
+            //sql.AppendLine(" INNER JOIN ( SELECT DISTINCT OrderNumber,ProductLotNumber,ProductItemCode");
+            //sql.AppendLine(" MiddleProductItemCode,MiddleProductLotNumber");
+            //sql.AppendLine(" FROM FillingDrumcanTable WHERE MiddleProductLotNumber = @lotNo) fd");
+            //sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber;");
+            sql.AppendLine(" INNER JOIN MES33.dbo.FillingDrumcanTable fd");
+            sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber");
+            sql.AppendLine(" WHERE fd.MiddleProductLotNumber = @lotNo;");
 
             return sql.ToString();
         }

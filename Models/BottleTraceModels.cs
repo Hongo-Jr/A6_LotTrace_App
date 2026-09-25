@@ -54,17 +54,17 @@ namespace LotTraceApp.Models
     //}
 
     //削除予定
-    public class BottleDisplayLaneNode
-    {
-        public int NodeType {  get; set; }
+    //public class BottleDisplayLaneNode
+    //{
+    //    public int NodeType {  get; set; }
 
-        //public string DisplayNodeKey { get; set; } = string.Empty;
+    //    //public string DisplayNodeKey { get; set; } = string.Empty;
 
-        public ProductionResultNode? SourceLiquidNode { get; set; }
-        public Bottle_ProductionResultNode? SourceBottleNode { get; set; }
+    //    public ProductionResultNode? SourceLiquidNode { get; set; }
+    //    public Bottle_ProductionResultNode? SourceBottleNode { get; set; }
 
-        //public int YLane { get; set; }
-    }
+    //    //public int YLane { get; set; }
+    //}
 
     //削除予定
     //public class BottleDisplayGroup

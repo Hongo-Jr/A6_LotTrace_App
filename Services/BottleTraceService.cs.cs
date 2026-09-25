@@ -228,6 +228,7 @@ namespace LotTraceApp.Services
             bottleTable.Columns.Add("OK_Num", typeof(int));
             bottleTable.Columns.Add("NG_Num", typeof(int));
             bottleTable.Columns.Add("Total_Num", typeof(int));
+            bottleTable.Columns.Add("NodeKey", typeof(string));
 
             foreach (var node in bottleNodes)
             {
@@ -240,7 +241,8 @@ namespace LotTraceApp.Services
                     node.StartDate,
                     node.FillingBottleNum_OK,
                     node.FillingBottleNum_NG,
-                    node.FillingBottleNum_OK + node.FillingBottleNum_NG);
+                    node.FillingBottleNum_OK + node.FillingBottleNum_NG,
+                    node.NodeIdentifyKey);
             }
 
             return bottleTable;
