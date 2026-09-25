@@ -38,97 +38,11 @@ namespace LotTraceApp.Models
         public string NodeIdentifyKey => MasterKey;
     }
 
-    //削除予定
-    //public class BottleCandidate
-    //{
-    //    public bool TraceDirection {  get; set; }
-
-    //    public List<ProductionResultNode> LiquidNodes {  get; set; }
-    //    public List<Bottle_ProductionResultNode> BottleNodes { get; set; }
-
-    //    //public BottleCandidate()
-    //    //{
-    //    //    LiquidNodes = new List<ProductionResultNode>();
-    //    //    BottleNodes = new List<Bottle_ProductionResultNode>();
-    //    //}
-    //}
-
-    //削除予定
-    //public class BottleDisplayLaneNode
-    //{
-    //    public int NodeType {  get; set; }
-
-    //    //public string DisplayNodeKey { get; set; } = string.Empty;
-
-    //    public ProductionResultNode? SourceLiquidNode { get; set; }
-    //    public Bottle_ProductionResultNode? SourceBottleNode { get; set; }
-
-    //    //public int YLane { get; set; }
-    //}
-
-    //削除予定
-    //public class BottleDisplayGroup
-    //{
-    //    public List<BottleDisplayLaneNode> LiquidNodes { get; set; }
-    //    public List<BottleDisplayLaneNode> BottleNodes { get; set; }
-
-    //    //public int StartY { get; set; }
-    //    //public int EndY { get; set; }
-
-    //    //public BottleDisplayGroup()
-    //    //{
-    //    //    LiquidNodes = new List<BottleDisplayLaneNode>();
-    //    //    BottleNodes = new List<BottleDisplayLaneNode>();
-    //    //}
-
-    //}
-
-    //削除予定
-    //public class BottleDisplayTables
-    //{
-    //    //public DataTable LiquidTable { get; set; }
-    //    //public DataTable BottleTable { get; set; }
-
-    //    //public List<BottleLineRanges> LineRanges { get; set; }
-
-    //    //public BottleDisplayTables(DataTable liqied, DataTable bottle)
-    //    //{
-    //    //    LiquidTable = liqied;
-    //    //    BottleTable = bottle; 
-    //    //    LineRanges = new List<BottleLineRanges>();
-    //    //}
-
-    //    //public bool IsEmpty
-    //    //{
-    //    //    get
-    //    //    {
-    //    //        return (LiquidTable?.Rows?.Count ?? 0) == 0
-    //    //            && (BottleTable?.Rows?.Count ?? 0) == 0;
-    //    //    }
-    //    //}
-    //}
-
     public class BottleTraceResult
     {
-        //public BottleDisplayTables? DisplayTables { get; set; }
-        //public List<BottleDisplayGroup> DisplayGroups { get; set; } = new List<BottleDisplayGroup>();
         public DataTable BottleTable { get; set; } = new DataTable();
         public List<Bottle_ProductionResultNode> BottleNodes { get; set; } = new List<Bottle_ProductionResultNode>();
         public List<BottleLineRanges>? LineRangesNew { get; set; }
-
-        //public BottleTraceResult()
-        //{
-        //    BottleNodes = new List<Bottle_ProductionResultNode>();
-        //    //DisplayGroups = new List<BottleDisplayGroup>();
-        //}
-
-        //public bool IsEmpty
-        //{
-        //    get
-        //    {
-        //        return DisplayTables == null || DisplayTables.IsEmpty;
-        //    }
-        //}
     }
    
     public class BottleLineRanges
