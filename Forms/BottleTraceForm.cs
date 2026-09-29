@@ -1263,7 +1263,7 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            RefreshBottleHeaderPanel(tab.BottleGrid, "検索");
+            RefreshBottleHeaderPanel(tab.BottleGrid, "検索結果");
         }
 
         private void RefreshBottleHeaderPanel(DataGridView grid, string title)
@@ -1611,7 +1611,7 @@ namespace LotTraceApp
                         showProgress ? progress : null,
                         cancellation == null ? CancellationToken.None : cancellation.Token));
 
-                if (workResult.TraceResult == null) // || workResult.TraceResult.BottleTable.Rows.Count == 0
+                if (workResult.TraceResult == null || workResult.TraceResult.BottleTable.Rows.Count == 0)
                 {
                     MessageBox.Show(
                         "検索結果は0件です。",
@@ -1721,6 +1721,8 @@ namespace LotTraceApp
             BuildBottleGridForeColorCaches(tab);
             ClearBottleCrossPointNodeKeysForTab(tab.TabNo);
             ClearBottleGridBackColorCachesForTab(tab.TabNo);
+
+            RefreshBottleHeaderPanels(tab);
         }
 
         private TraceSearchParameters CollectSearchParametersFromControls(BottleTraceTabContext tab)
@@ -2548,7 +2550,8 @@ namespace LotTraceApp
                     WorksheetName = BuildBottleTraceTabName(tab),
                     Grid = tab.BottleGrid,
                     LineRanges = tables.LineRangesNew,
-                    CrossPointNodeKeys = crossPointNodeKeys
+                    CrossPointNodeKeys = crossPointNodeKeys,
+                    SearchResultCount = GetDisplayedRowCount(tab.BottleGrid)
                 });
             }
 
@@ -3083,6 +3086,7 @@ namespace LotTraceApp
             table.Columns.Add("指図番号", typeof(string));
             table.Columns.Add("製品ロットNo.", typeof(string));
             table.Columns.Add("製品品目名", typeof(string));
+            table.Columns.Add("開始日時", typeof(string));
             table.Columns.Add("充填本数", typeof(float));
 
             if (targetTabs != null)

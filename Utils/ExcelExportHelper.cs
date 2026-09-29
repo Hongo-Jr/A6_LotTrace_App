@@ -70,11 +70,10 @@ namespace LotTraceApp.Utils
         public sealed class BottleTraceGridExcelExportRequest
         {
             public string? WorksheetName { get; set; }
-            //public DataGridView? LeftGrid { get; set; }
-            //public DataGridView? RightGrid { get; set; }
             public DataGridView? Grid {  get; set; }
             public IEnumerable<BottleLineRanges>? LineRanges { get; set; }
             public ISet<string>? CrossPointNodeKeys { get; set; }
+            public int SearchResultCount { get; set; }
         }
 
         public static void ExportCurrentGridsToExcel(
@@ -228,7 +227,6 @@ namespace LotTraceApp.Utils
                     foreach (var request in traceSheets)
                     {
                         if (request == null ||
-                            //(!HasVisibleData(request.LeftGrid) && !HasVisibleData(request.RightGrid)))
                             (!HasVisibleData(request.Grid)))
                             continue;
 
@@ -392,15 +390,9 @@ namespace LotTraceApp.Utils
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            //var leftColumns = GetVisibleColumns(request.LeftGrid);
-            //var rightColumns = GetVisibleColumns(request.RightGrid);
             var columns = GetVisibleColumns(request.Grid);
-            //var leftRows = GetVisibleRows(request.LeftGrid);
-            //var rightRows = GetVisibleRows(request.RightGrid);
             var rows = GetVisibleRows(request.Grid);
-            //int totalColumns = leftColumns.Count + rightColumns.Count;
             int totalColumns = columns.Count;
-            //int maxRows = Math.Max(leftRows.Count, rightRows.Count);
             int maxRows = rows.Count;
 
             if (totalColumns == 0)
@@ -409,33 +401,21 @@ namespace LotTraceApp.Utils
             var ws = wb.Worksheets.Add(GetUniqueWorksheetName(wb, request.WorksheetName));
             ws.SheetView.FreezeRows(2);
 
-            //WriteBottleGroupHeader(ws, 1, leftColumns.Count, "検索始点", StartHeaderBackColor, StartHeaderForeColor);
-            //WriteBottleGroupHeader(ws, leftColumns.Count + 1, rightColumns.Count, "検索終点", EndHeaderBackColor, EndHeaderForeColor);
-            WriteBottleGroupHeader(ws, 1, columns.Count, "検索", StartHeaderBackColor, StartHeaderForeColor);
-
-            //WriteBottleColumnHeaders(ws, request.LeftGrid, leftColumns, 1);
-            //WriteBottleColumnHeaders(ws, request.RightGrid, rightColumns, leftColumns.Count + 1);
+            WriteBottleGroupHeader(ws, 1, columns.Count, $"検索結果[{request.SearchResultCount}]", StartHeaderBackColor, StartHeaderForeColor);
             WriteBottleColumnHeaders(ws, request.Grid, columns, 1);
 
             for (int rowIndex = 0; rowIndex < maxRows; rowIndex++)
             {
                 int excelRow = FirstBodyExcelRow + rowIndex;
-                //DataGridViewRow? heightSource = rowIndex < leftRows.Count ? leftRows[rowIndex] :
-                //    (rowIndex < rightRows.Count ? rightRows[rowIndex] : null);
                 DataGridViewRow? heightSource = rowIndex < rows.Count ? rows[rowIndex] : null;
                 if (heightSource != null)
                     ws.Row(excelRow).Height = ConvertPixelToExcelRowHeight(heightSource.Height);
 
-                //WriteBottleBodyRow(ws, leftRows, leftColumns, rowIndex, 1, request.CrossPointNodeKeys);
-                //WriteBottleBodyRow(ws, rightRows, rightColumns, rowIndex, leftColumns.Count + 1, request.CrossPointNodeKeys);
                 WriteBottleBodyRow(ws, rows, columns, rowIndex, 1, request.CrossPointNodeKeys);
             }
 
-            //ApplyBottleColumnWidths(ws, leftColumns, 1);
-            //ApplyBottleColumnWidths(ws, rightColumns, leftColumns.Count + 1);
             ApplyBottleColumnWidths(ws, columns, 1);
             ApplyBottleTraceLines(ws, request.LineRanges, totalColumns, maxRows);
-            //ApplyBottleGridVerticalBoundary(ws, leftColumns.Count, rightColumns.Count, maxRows);
 
             ws.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
         }
@@ -534,31 +514,6 @@ namespace LotTraceApp.Utils
                 range.Style.Border.BottomBorderColor = XLColor.FromColor(Color.FromArgb(120, 72, 32));
             }
         }
-
-        //private static void ApplyBottleGridVerticalBoundary(
-        //    IXLWorksheet ws,
-        //    int leftColumnCount,
-        //    int rightColumnCount,
-        //    int visibleBodyRowCount)
-        //{
-        //    if (ws == null || leftColumnCount <= 0 || rightColumnCount <= 0)
-        //        return;
-
-        //    int leftEndCol = leftColumnCount;
-        //    int rightStartCol = leftColumnCount + 1;
-        //    int lastExcelRow = Math.Max(ColumnHeaderExcelRow, FirstBodyExcelRow + visibleBodyRowCount - 1);
-
-        //    for (int row = GroupHeaderExcelRow; row <= lastExcelRow; row++)
-        //    {
-        //        var leftCell = ws.Cell(row, leftEndCol);
-        //        leftCell.Style.Border.RightBorder = XLBorderStyleValues.Medium;
-        //        leftCell.Style.Border.RightBorderColor = XLColor.FromColor(LevelBoundaryColor);
-
-        //        var rightCell = ws.Cell(row, rightStartCol);
-        //        rightCell.Style.Border.LeftBorder = XLBorderStyleValues.Medium;
-        //        rightCell.Style.Border.LeftBorderColor = XLColor.FromColor(LevelBoundaryColor);
-        //    }
-        //}
 
         private static void ApplyBottleRuntimeForeColor(IXLCell? xlCell, DataGridViewRow? row)
         {
