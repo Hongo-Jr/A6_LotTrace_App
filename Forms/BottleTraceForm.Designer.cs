@@ -377,7 +377,7 @@ namespace LotTraceApp
             lblBottleOrderNo_2.Name = "lblBottleOrderNo_2";
             lblBottleOrderNo_2.Size = new Size(79, 16);
             lblBottleOrderNo_2.TabIndex = 1;
-            lblBottleOrderNo_2.Text = "製造指図番号";
+            lblBottleOrderNo_2.Text = "指図番号";
             // 
             // panelStartBottle_2
             // 
@@ -424,7 +424,7 @@ namespace LotTraceApp
             lblBottleItemName_2.Name = "lblBottleItemName_2";
             lblBottleItemName_2.Size = new Size(43, 16);
             lblBottleItemName_2.TabIndex = 3;
-            lblBottleItemName_2.Text = "品目名";
+            lblBottleItemName_2.Text = "製品品目名";
             // 
             // lblBottleItemCode_2
             // 
@@ -622,7 +622,7 @@ namespace LotTraceApp
             lblBottleOrderNo.Name = "lblBottleOrderNo";
             lblBottleOrderNo.Size = new Size(79, 16);
             lblBottleOrderNo.TabIndex = 1;
-            lblBottleOrderNo.Text = "製造指図番号";
+            lblBottleOrderNo.Text = "指図番号";
             // 
             // txtBottleOrderNo
             // 
@@ -660,7 +660,7 @@ namespace LotTraceApp
             lblBottleItemName.Name = "lblBottleItemName";
             lblBottleItemName.Size = new Size(43, 16);
             lblBottleItemName.TabIndex = 3;
-            lblBottleItemName.Text = "品目名";
+            lblBottleItemName.Text = "製品品目名";
             // 
             // lblBottleItemCode
             // 
@@ -835,7 +835,7 @@ namespace LotTraceApp
             lblBottleOrderNo_3.Name = "lblBottleOrderNo_3";
             lblBottleOrderNo_3.Size = new Size(79, 16);
             lblBottleOrderNo_3.TabIndex = 1;
-            lblBottleOrderNo_3.Text = "製造指図番号";
+            lblBottleOrderNo_3.Text = "指図番号";
             // 
             // txtBottleOrderNo_3
             // 
@@ -873,7 +873,7 @@ namespace LotTraceApp
             lblBottleItemName_3.Name = "lblBottleItemName_3";
             lblBottleItemName_3.Size = new Size(43, 16);
             lblBottleItemName_3.TabIndex = 3;
-            lblBottleItemName_3.Text = "品目名";
+            lblBottleItemName_3.Text = "製品品目名";
             // 
             // lblBottleItemCode_3
             // 
@@ -1048,7 +1048,7 @@ namespace LotTraceApp
             lblOrderNumber_4.Name = "lblOrderNumber_4";
             lblOrderNumber_4.Size = new Size(79, 16);
             lblOrderNumber_4.TabIndex = 1;
-            lblOrderNumber_4.Text = "製造指図番号";
+            lblOrderNumber_4.Text = "指図番号";
             // 
             // txtBottleOrderNo_4
             // 
@@ -1086,7 +1086,7 @@ namespace LotTraceApp
             lblBottleItemName_4.Name = "lblBottleItemName_4";
             lblBottleItemName_4.Size = new Size(43, 16);
             lblBottleItemName_4.TabIndex = 3;
-            lblBottleItemName_4.Text = "品目名";
+            lblBottleItemName_4.Text = "製品品目名";
             // 
             // lblBottleItemCode_4
             // 
@@ -1261,7 +1261,7 @@ namespace LotTraceApp
             lblBottleOrderNo_5.Name = "lblBottleOrderNo_5";
             lblBottleOrderNo_5.Size = new Size(79, 16);
             lblBottleOrderNo_5.TabIndex = 1;
-            lblBottleOrderNo_5.Text = "製造指図番号";
+            lblBottleOrderNo_5.Text = "指図番号";
             // 
             // txtBottleOrderNo_5
             // 
@@ -1299,7 +1299,7 @@ namespace LotTraceApp
             lblBottleItemName_5.Name = "lblBottleItemName_5";
             lblBottleItemName_5.Size = new Size(43, 16);
             lblBottleItemName_5.TabIndex = 3;
-            lblBottleItemName_5.Text = "品目名";
+            lblBottleItemName_5.Text = "製品品目名";
             // 
             // lblBottleItemCode_5
             // 
@@ -1474,7 +1474,7 @@ namespace LotTraceApp
             lblBottleOrderNo_6.Name = "lblBottleOrderNo_6";
             lblBottleOrderNo_6.Size = new Size(79, 16);
             lblBottleOrderNo_6.TabIndex = 1;
-            lblBottleOrderNo_6.Text = "製造指図番号";
+            lblBottleOrderNo_6.Text = "指図番号";
             // 
             // txtBottleOrderNo_6
             // 
@@ -1512,7 +1512,7 @@ namespace LotTraceApp
             lblBottleItemName_6.Name = "lblBottleItemName_6";
             lblBottleItemName_6.Size = new Size(43, 16);
             lblBottleItemName_6.TabIndex = 3;
-            lblBottleItemName_6.Text = "品目名";
+            lblBottleItemName_6.Text = "製品品目名";
             // 
             // lblBottleItemCode_6
             // 
@@ -1687,7 +1687,7 @@ namespace LotTraceApp
             lblBottleOrderNo_7.Name = "lblBottleOrderNo_7";
             lblBottleOrderNo_7.Size = new Size(79, 16);
             lblBottleOrderNo_7.TabIndex = 1;
-            lblBottleOrderNo_7.Text = "製造指図番号";
+            lblBottleOrderNo_7.Text = "指図番号";
             // 
             // txtBottleOrderNo_7
             // 
@@ -1725,7 +1725,7 @@ namespace LotTraceApp
             lblBottleItemName_7.Name = "lblBottleItemName_7";
             lblBottleItemName_7.Size = new Size(43, 16);
             lblBottleItemName_7.TabIndex = 3;
-            lblBottleItemName_7.Text = "品目名";
+            lblBottleItemName_7.Text = "製品品目名";
             // 
             // lblBottleItemCode_7
             // 
@@ -1900,7 +1900,7 @@ namespace LotTraceApp
             lblBottleOrderNo_8.Name = "lblBottleOrderNo_8";
             lblBottleOrderNo_8.Size = new Size(79, 16);
             lblBottleOrderNo_8.TabIndex = 1;
-            lblBottleOrderNo_8.Text = "製造指図番号";
+            lblBottleOrderNo_8.Text = "指図番号";
             // 
             // txtBottleOrderNo_8
             // 
@@ -1938,7 +1938,7 @@ namespace LotTraceApp
             lblBottleItemName_8.Name = "lblBottleItemName_8";
             lblBottleItemName_8.Size = new Size(43, 16);
             lblBottleItemName_8.TabIndex = 3;
-            lblBottleItemName_8.Text = "品目名";
+            lblBottleItemName_8.Text = "製品品目名";
             // 
             // lblBottleItemCode_8
             // 
@@ -2113,7 +2113,7 @@ namespace LotTraceApp
             lblBottleOrderNo_9.Name = "lblBottleOrderNo_9";
             lblBottleOrderNo_9.Size = new Size(79, 16);
             lblBottleOrderNo_9.TabIndex = 1;
-            lblBottleOrderNo_9.Text = "製造指図番号";
+            lblBottleOrderNo_9.Text = "指図番号";
             // 
             // txtBottleOrderNo_9
             // 
@@ -2151,7 +2151,7 @@ namespace LotTraceApp
             lblBottleItemName_9.Name = "lblBottleItemName_9";
             lblBottleItemName_9.Size = new Size(43, 16);
             lblBottleItemName_9.TabIndex = 3;
-            lblBottleItemName_9.Text = "品目名";
+            lblBottleItemName_9.Text = "製品品目名";
             // 
             // lblBottleItemCode_9
             // 
@@ -2326,7 +2326,7 @@ namespace LotTraceApp
             lblBottleOrderNo_10.Name = "lblBottleOrderNo_10";
             lblBottleOrderNo_10.Size = new Size(79, 16);
             lblBottleOrderNo_10.TabIndex = 1;
-            lblBottleOrderNo_10.Text = "製造指図番号";
+            lblBottleOrderNo_10.Text = "指図番号";
             // 
             // textBox10
             // 
@@ -2364,7 +2364,7 @@ namespace LotTraceApp
             lblBottleItemName_10.Name = "lblBottleItemName_10";
             lblBottleItemName_10.Size = new Size(43, 16);
             lblBottleItemName_10.TabIndex = 3;
-            lblBottleItemName_10.Text = "品目名";
+            lblBottleItemName_10.Text = "製品品目名";
             // 
             // lblBottleItemCode_10
             // 

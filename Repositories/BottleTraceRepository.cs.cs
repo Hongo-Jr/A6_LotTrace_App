@@ -1,11 +1,12 @@
 ﻿
+using DocumentFormat.OpenXml.Office.Word;
 using LotTraceApp.Forms;
 using LotTraceApp.Models;
 using LotTraceApp.Services;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
@@ -73,8 +74,8 @@ namespace LotTraceApp.Repositories
 
             foreach (var node in starts.GroupBy(x => x.LotNumber))
             {
-                result.AddRange(GetBottleNodesForward(node.Key));
-                result.AddRange(GetDrumNodesForward(node.Key));
+                result.AddRange(GetBottleNodesForward(node.Key,p));
+                result.AddRange(GetDrumNodesForward(node.Key,p));
             }
 
             return result;
@@ -83,7 +84,8 @@ namespace LotTraceApp.Repositories
         public List<ProductionResultNode> B_GetStartNodesFromA(TraceSearchParameters p)
         {
             var result = new List<ProductionResultNode>();
-            if(string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode))
+            if(string.IsNullOrWhiteSpace(p.ProductionOrderNumber) && string.IsNullOrWhiteSpace(p.LotNumber) && 
+                string.IsNullOrWhiteSpace(p.ItemName) && string.IsNullOrWhiteSpace(p.ItemCode) && p.From == null && p.To == null)
             {
                 return result;
             }
@@ -377,7 +379,7 @@ namespace LotTraceApp.Repositories
             B_AppendSearchParameterCondition(p.ItemCode, cmd, sql, alias, columnName, parameterName);
         }
 
-        private List<Bottle_ProductionResultNode> GetBottleNodesForward(string? midLot)
+        private List<Bottle_ProductionResultNode> GetBottleNodesForward(string? midLot,TraceSearchParameters p)
         {
             var result = new List<Bottle_ProductionResultNode>();
 
@@ -391,7 +393,7 @@ namespace LotTraceApp.Repositories
             {
                 conn.Open();
 
-                cmd.CommandText = BuildBottleForwardSQL();
+                cmd.CommandText = BuildBottleForwardSQL(p,cmd);
                 cmd.Parameters.AddWithValue("@lotNo", midLot);
 
                 using (var reader = cmd.ExecuteReader())
@@ -420,7 +422,7 @@ namespace LotTraceApp.Repositories
             }
         }
 
-        private string BuildBottleForwardSQL()
+        private string BuildBottleForwardSQL(TraceSearchParameters p,SqlCommand cmd)
         {
             var sql = new StringBuilder();
 
@@ -441,12 +443,26 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
             sql.AppendLine(" INNER JOIN MES33.dbo.FillingBottleTable fb");
             sql.AppendLine(" ON fb.OrderNumber = fo.OrderNumber");
-            sql.AppendLine(" WHERE fb.MiddleProductLotNumber = @lotNo;");
+            sql.AppendLine(" WHERE fb.MiddleProductLotNumber = @lotNo");
+
+            if (p != null && p.From.HasValue)
+            {
+                sql.AppendLine("  AND fo.StartDate >= @From");
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+            }
+
+            if (p != null && p.To.HasValue)
+            {
+                sql.AppendLine("  AND fo.StartDate <= @To;");
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+            }
 
             return sql.ToString();
         }
 
-        private List<Bottle_ProductionResultNode> GetDrumNodesForward(string? midLot)
+        private List<Bottle_ProductionResultNode> GetDrumNodesForward(string? midLot,TraceSearchParameters p)
         {
             var result = new List<Bottle_ProductionResultNode>();
 
@@ -460,7 +476,7 @@ namespace LotTraceApp.Repositories
             {
                 conn.Open();
 
-                cmd.CommandText = BuildDrumForwardSQL();
+                cmd.CommandText = BuildDrumForwardSQL(p,cmd);
                 cmd.Parameters.AddWithValue("@lotNo", midLot);
 
                 using (var reader = cmd.ExecuteReader())
@@ -489,7 +505,7 @@ namespace LotTraceApp.Repositories
             }
         }
 
-        private string BuildDrumForwardSQL()
+        private string BuildDrumForwardSQL(TraceSearchParameters p, SqlCommand cmd)
         {
             var sql = new StringBuilder();
 
@@ -510,7 +526,21 @@ namespace LotTraceApp.Repositories
             sql.AppendLine(" FROM [MES33].[dbo].[FillingOrderResultTable] fo");
             sql.AppendLine(" INNER JOIN MES33.dbo.FillingDrumcanTable fd");
             sql.AppendLine(" ON fd.OrderNumber = fo.OrderNumber");
-            sql.AppendLine(" WHERE fd.MiddleProductLotNumber = @lotNo;");
+            sql.AppendLine(" WHERE fd.MiddleProductLotNumber = @lotNo");
+
+            if (p != null && p.From.HasValue)
+            {
+                sql.AppendLine("  AND fo.StartDate >= @From");
+                if (!cmd.Parameters.Contains("@From"))
+                    cmd.Parameters.Add("@From", SqlDbType.DateTime).Value = p.From.Value;
+            }
+
+            if (p != null && p.To.HasValue)
+            {
+                sql.AppendLine("  AND fo.StartDate <= @To;");
+                if (!cmd.Parameters.Contains("@To"))
+                    cmd.Parameters.Add("@To", SqlDbType.DateTime).Value = p.To.Value;
+            }
 
             return sql.ToString();
         }
