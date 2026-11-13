@@ -113,13 +113,13 @@ namespace LotTraceApp.Models
         public string? BottleID { get; set; }
 
         public string? SamplingGroup { get; set; }
-        public int? BottleINumber { get; set; }
+        public int? BottleNumber { get; set; }
         public int? FillingNozzleNumber { get; set; }
         public int? CapTighteningTorqueValue { get; set; }
         public int? CapTighteningTorqueJudgment { get; set; }
         public int? CapTiltDetectionJudgment { get; set; }
         public int? FillingMachineNumber { get; set; }
-        public int? TotalCahckJudgment { get; set; }
+        public int? TotalCheckJudgment { get; set; }
         public int? BottleLocation { get; set; }
         public long? FillingWeight { get; set; }
         public TimeSpan? FillingTime { get; set; }
@@ -142,7 +142,7 @@ namespace LotTraceApp.Models
         public int? CapTighteningTorqueValue_Big { get; set; }
         public int? CapTighteningTorqueJudgment { get; set; }
         public int? CapTiltDetectionJudgment { get; set; }
-        public int? TotalCahckJudgment { get; set; }
+        public int? TotalCheckJudgment { get; set; }
         public int? CapTighteningTorqueValue_Small { get; set; }
         public int? FillingWeightJudgment { get; set; }
         public int? BottleLocation { get; set; }

@@ -1182,7 +1182,7 @@ public class ChildCandidate
 
         public string? SourceTankName { get; set; }
         public decimal? SourceTankPumpStartupSpeed { get; set; }
-        public decimal? SourceTankPump1tageFrequency { get; set; }
+        public decimal? SourceTankPump1stageFrequency { get; set; }
         public decimal? SourceTankPump2stageFrequency { get; set; }
         public decimal? SourceTankPump2stageFrequencySwitchingWeight { get; set; }
         public decimal? AmountOfStock { get; set; }
@@ -1224,7 +1224,7 @@ public class ChildCandidate
         public decimal? CirculationPumpFrequencySetting_L { get; set; }
         public decimal? WasteVolume { get; set; }
 
-        public decimal? AmountOfExtrction { get; set; }
+        public decimal? AmountOfExtraction { get; set; }
         public decimal? TotalDischargePumpStopDelayTime { get; set; }
 
         public string? WasteLiquidTypeFlag { get; set; }

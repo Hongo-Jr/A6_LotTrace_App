@@ -23,7 +23,7 @@
 23,SingleControlProcessTable,MixerOperationTime,撹拌機運転時間
 24,SingleControlProcessTable,MixerStopWeight,撹拌機停止重量
 25,SingleControlProcessTable,SourceTankPumpStartupSpeed,送液元タンクポンプ立上速度
-26,SingleControlProcessTable,SourceTankPump1tageFrequency,送液元タンクポンプ1段周波数
+26,SingleControlProcessTable,SourceTankPump1stageFrequency,送液元タンクポンプ1段周波数
 27,SingleControlProcessTable,SourceTankPump2stageFrequency,送液元タンクポンプ2段周波数
 28,SingleControlProcessTable,SourceTankPump2stageFrequencySwitchingWeight,送液元タンクポンプ2段周波数切替重量
 29,SingleControlProcessTable,SurfacePumpStartupSpeed,液上ポンプ立上速度
@@ -33,7 +33,7 @@
 33,SingleControlProcessTable,CorrectionSpeed,補正速度
 34,SingleControlProcessTable,Timer,タイマー
 35,SingleControlProcessTable,AmountOfStock,仕込量
-36,SingleControlProcessTable,AmountOfExtrction,抜出量
+36,SingleControlProcessTable,AmountOfExtraction,抜出量
 37,SingleControlProcessTable,WasteVolume,廃棄量
 38,SingleControlProcessTable,ValveHalfopenWeight,バルブ半開重量
 39,SingleControlProcessTable,DroopAmountSettingValue,垂れ量設定値
@@ -84,7 +84,7 @@
 84,SingleControlProcessTable,ValveDelayTime1,バルブディレイタイム(PM仕込)
 85,SingleControlProcessTable,PreparationOrder1,仕込順(PM仕込)
 86,SingleControlProcessTable,SourceTankPumpStartupSpeed1,送液元タンクポンプ立上速度(PM仕込)
-87,SingleControlProcessTable,SourceTankPump1tageFrequency1,送液元タンクポンプ1段周波数(PM仕込)
+87,SingleControlProcessTable,SourceTankPump1stageFrequency1,送液元タンクポンプ1段周波数(PM仕込)
 88,SingleControlProcessTable,SourceTankPump2stageFrequency1,送液元タンクポンプ2段周波数(PM仕込)
 89,SingleControlProcessTable,SourceTankPump2stageFrequencySwitchingWeight1,送液元タンクポンプ2段周波数切替重量(PM仕込)
 90,SingleControlProcessTable,AmountOfStock1,仕込量(PM仕込)
@@ -93,7 +93,7 @@
 93,SingleControlProcessTable,ValveDelayTime2,バルブディレイタイム(EL仕込)
 94,SingleControlProcessTable,PreparationOrder2,仕込順(EL仕込)
 95,SingleControlProcessTable,SourceTankPumpStartupSpeed2,送液元タンクポンプ立上速度(EL仕込)
-96,SingleControlProcessTable,SourceTankPump1tageFrequency2,送液元タンクポンプ1段周波数(EL仕込)
+96,SingleControlProcessTable,SourceTankPump1stageFrequency2,送液元タンクポンプ1段周波数(EL仕込)
 97,SingleControlProcessTable,SourceTankPump2stageFrequency2,送液元タンクポンプ2段周波数(EL仕込)
 98,SingleControlProcessTable,SourceTankPump2stageFrequencySwitchingWeight2,送液元タンクポンプ2段周波数切替重量(EL仕込)
 99,SingleControlProcessTable,AmountOfStock2,仕込量(EL仕込)
@@ -102,7 +102,7 @@
 102,SingleControlProcessTable,ValveDelayTime3,バルブディレイタイム　(AC仕込)
 103,SingleControlProcessTable,PreparationOrder3,仕込順(AC仕込)
 104,SingleControlProcessTable,SourceTankPumpStartupSpeed3,送液元タンクポンプ立上速度(AC仕込)
-105,SingleControlProcessTable,SourceTankPump1tageFrequency3,送液元タンクポンプ1段周波数(AC仕込)
+105,SingleControlProcessTable,SourceTankPump1stageFrequency3,送液元タンクポンプ1段周波数(AC仕込)
 106,SingleControlProcessTable,SourceTankPump2stageFrequency3,送液元タンクポンプ2段周波数(AC仕込)
 107,SingleControlProcessTable,SourceTankPump2stageFrequencySwitchingWeight3,送液元タンクポンプ2段周波数切替重量(AC仕込)
 108,SingleControlProcessTable,AmountOfStock3,仕込量(AC仕込)

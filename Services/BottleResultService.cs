@@ -78,13 +78,13 @@ namespace LotTraceApp.Services
 
             foreach (var row in page.BottleRows)
             {
-                table.BottleTable.Rows.Add(row.OrderNumber, row.ProductLotNumber, row.ProductItemCode, row.MiddleProductLotNumber, row.MiddleProductItemCode, row.BottleID, row.SamplingGroup, row.BottleINumber, row.FillingNozzleNumber, row.CapTighteningTorqueValue, row.CapTighteningTorqueJudgment, row.CapTiltDetectionJudgment, row.FillingMachineNumber, row.TotalCahckJudgment, row.BottleLocation, row.FillingWeight, row.FillingTime, row.FillingStartDate, row.FillingEndDate, row.ProcessType);
+                table.BottleTable.Rows.Add(row.OrderNumber, row.ProductLotNumber, row.ProductItemCode, row.MiddleProductLotNumber, row.MiddleProductItemCode, row.BottleID, row.SamplingGroup, row.BottleNumber, row.FillingNozzleNumber, row.CapTighteningTorqueValue, row.CapTighteningTorqueJudgment, row.CapTiltDetectionJudgment, row.FillingMachineNumber, row.TotalCheckJudgment, row.BottleLocation, row.FillingWeight, row.FillingTime, row.FillingStartDate, row.FillingEndDate, row.ProcessType);
 
             }
 
             foreach (var row in page.DrumRows)
             {
-                table.DrumTable.Rows.Add(row.OrderNumber, row.ProcessType, row.ProductLotNumber, row.ProductItemCode, row.MiddleProductLotNumber, row.MiddleProductItemCode, row.DrumcanNumber, row.FillingNozzleNumber, row.CapTighteningTorqueValue_Big, row.CapTighteningTorqueJudgment, row.CapTiltDetectionJudgment, row.TotalCahckJudgment, row.CapTighteningTorqueValue_Small, row.FillingWeightJudgment, row.BottleLocation, row.FillingWeight, row.FillingTime, row.FillingStartDate, row.FillingEndDate);
+                table.DrumTable.Rows.Add(row.OrderNumber, row.ProcessType, row.ProductLotNumber, row.ProductItemCode, row.MiddleProductLotNumber, row.MiddleProductItemCode, row.DrumcanNumber, row.FillingNozzleNumber, row.CapTighteningTorqueValue_Big, row.CapTighteningTorqueJudgment, row.CapTiltDetectionJudgment, row.TotalCheckJudgment, row.CapTighteningTorqueValue_Small, row.FillingWeightJudgment, row.BottleLocation, row.FillingWeight, row.FillingTime, row.FillingStartDate, row.FillingEndDate);
 
             }
 
@@ -104,13 +104,13 @@ namespace LotTraceApp.Services
             result.Columns.Add("MiddleProductItemCode");
             result.Columns.Add("BottleID");
             result.Columns.Add("SamplingGroup");
-            result.Columns.Add("BottleINumber");
+            result.Columns.Add("BottleNumber");
             result.Columns.Add("FillingNozzleNumber");
             result.Columns.Add("CapTighteningTorqueValue");
             result.Columns.Add("CapTighteningTorqueJudgment");
             result.Columns.Add("CapTiltDetectionJudgment");
             result.Columns.Add("FillingMachineNumber");
-            result.Columns.Add("TotalCahckJudgment");
+            result.Columns.Add("TotalCheckJudgment");
             result.Columns.Add("BottleLocation");
             result.Columns.Add("FillingWeight");
             result.Columns.Add("FillingTime");
@@ -125,13 +125,13 @@ namespace LotTraceApp.Services
             result.Columns["MiddleProductItemCode"]!.Caption = "中間品品目コード";
             result.Columns["BottleID"]!.Caption = "瓶ID";
             result.Columns["SamplingGroup"]!.Caption = "サンプリンググループ";
-            result.Columns["BottleINumber"]!.Caption = "瓶番号";
+            result.Columns["BottleNumber"]!.Caption = "瓶番号";
             result.Columns["FillingNozzleNumber"]!.Caption = "充填ノズルNo";
             result.Columns["CapTighteningTorqueValue"]!.Caption = "キャップ締付トルク値";
             result.Columns["CapTighteningTorqueJudgment"]!.Caption = "キャップ締付トルク判定";
             result.Columns["CapTiltDetectionJudgment"]!.Caption = "キャップ締付方向判定";
             result.Columns["FillingMachineNumber"]!.Caption = "充填機番号";
-            result.Columns["TotalCahckJudgment"]!.Caption = "総合判定";
+            result.Columns["TotalCheckJudgment"]!.Caption = "総合判定";
             result.Columns["BottleLocation"]!.Caption = "瓶ロケーション";
             result.Columns["FillingWeight"]!.Caption = "充填重量";
             result.Columns["FillingTime"]!.Caption = "充填時間";
@@ -160,7 +160,7 @@ namespace LotTraceApp.Services
             result.Columns.Add("CapTighteningTorqueValue_Big");
             result.Columns.Add("CapTighteningTorqueJudgment");
             result.Columns.Add("CapTiltDetectionJudgment");
-            result.Columns.Add("TotalCahckJudgment");
+            result.Columns.Add("TotalCheckJudgment");
             result.Columns.Add("CapTighteningTorqueValue_Small");
             result.Columns.Add("FillingWeightJudgment");
             result.Columns.Add("BottleLocation");
@@ -180,7 +180,7 @@ namespace LotTraceApp.Services
             result.Columns["CapTighteningTorqueValue_Big"]!.Caption = "キャップ締付トルク値(大)";
             result.Columns["CapTighteningTorqueJudgment"]!.Caption = "キャップ締付トルク判定";
             result.Columns["CapTiltDetectionJudgment"]!.Caption = "キャップ締付方向判定";
-            result.Columns["TotalCahckJudgment"]!.Caption = "総合判定";
+            result.Columns["TotalCheckJudgment"]!.Caption = "総合判定";
             result.Columns["CapTighteningTorqueValue_Small"]!.Caption = "キャップ締付トルク値(小)";
             result.Columns["FillingWeightJudgment"]!.Caption = "充填重量判定";
             result.Columns["BottleLocation"]!.Caption = "瓶ロケーション";
