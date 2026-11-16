@@ -109,8 +109,8 @@ namespace LotTraceApp.Repositories
             result.Columns["MiddleProductItemCode"]!.Caption = "中間品品目コード";
             result.Columns.Add("ProductLotNumber", typeof(string));
             result.Columns["ProductLotNumber"]!.Caption = "製品ロットNo.";
-            result.Columns.Add("OutWashBotteLotNumber", typeof(string));
-            result.Columns["OutWashBotteLotNumber"]!.Caption = "出庫洗瓶ロットNo.";
+            result.Columns.Add("OutWashBottleLotNumber", typeof(string));
+            result.Columns["OutWashBottleLotNumber"]!.Caption = "出庫洗瓶ロットNo.";
             result.Columns.Add("MiddleProductLotNumber", typeof(string));
             result.Columns["MiddleProductLotNumber"]!.Caption = "中間品ロットNo.";
             result.Columns.Add("AuxiliaryLabelID", typeof(string));
@@ -175,7 +175,7 @@ namespace LotTraceApp.Repositories
             sql.AppendLine("    [ProductItemCode],");         
             sql.AppendLine("    [MiddleProductItemCode],");   
             sql.AppendLine("    [ProductLotNumber],");        
-            sql.AppendLine("    [OutWashBotteLotNumber],");  
+            sql.AppendLine("    [OutWashBottleLotNumber],");  
             sql.AppendLine("    [MiddleProductLotNumber],");  
             sql.AppendLine("    [AuxiliaryLabelID],");        
             sql.AppendLine("    [NumberOfBottleIndicated],"); 
