@@ -11,6 +11,7 @@ namespace LotTraceApp.Models
     /// </summary>
     public class Bottle_ProductionResultNode
     {
+        public string MasterKey { get; set; } = string.Empty;
         public string? ProcessType { get; set; }
         public string? OrderNumber { get; set; }
         public string? ProductItemName { get; set; }
@@ -27,111 +28,21 @@ namespace LotTraceApp.Models
             get { return FillingBottleNum_OK + FillingBottleNum_NG; }
         }
 
+        /// <summary>
+        /// 不要。後で削除
+        /// </summary>
         public string? RouteSystem { get; set; }
 
-        public int Depth { get; set; }
-        public string? NodeType { get; set; }
-
-        public string NodeIdentifyKey
-        {
-            get
-            {
-                string orderNumber = string.IsNullOrWhiteSpace(OrderNumber) ? "" : OrderNumber.Trim().ToUpperInvariant();
-                string lotNumber = string.IsNullOrWhiteSpace(ProductLotNumber) ? "" : ProductLotNumber.Trim().ToUpperInvariant();
-                string itemcode = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
-                string routeSystem = string.IsNullOrWhiteSpace(RouteSystem) ? "" : RouteSystem.Trim().ToUpperInvariant();
-                string processType = string.IsNullOrWhiteSpace(ProcessType) ? "" : ProcessType.Trim().ToUpperInvariant();
-
-                return string.Join("|", routeSystem, orderNumber);
-            }
-        }
-    }
-
-
-    public class BottleCandidate
-    {
-        public bool TraceDirection {  get; set; }
-
-        public List<ProductionResultNode> LiquidNodes {  get; set; }
-        public List<Bottle_ProductionResultNode> BottleNodes { get; set; }
-
-        public BottleCandidate()
-        {
-            LiquidNodes = new List<ProductionResultNode>();
-            BottleNodes = new List<Bottle_ProductionResultNode>();
-        }
-    }
-
-    public class BottleDisplayLaneNode
-    {
-        public int NodeType {  get; set; }
-
-        public string DisplayNodeKey { get; set; } = string.Empty;
-
-        public ProductionResultNode? SourceLiquidNode { get; set; }
-        public Bottle_ProductionResultNode? SourceBottleNode { get; set; }
-
-        public int YLane { get; set; }
-    }
-
-    public class BottleDisplayGroup
-    {
-        public List<BottleDisplayLaneNode> LiquidNodes { get; set; }
-        public List<BottleDisplayLaneNode> BottleNodes { get; set; }
-
-        public int StartY { get; set; }
-        public int EndY { get; set; }
-
-        public BottleDisplayGroup()
-        {
-            LiquidNodes = new List<BottleDisplayLaneNode>();
-            BottleNodes = new List<BottleDisplayLaneNode>();
-        }
-
-    }
-
-    public class BottleDisplayTables
-    {
-        public DataTable LiquidTable { get; set; }
-        public DataTable BottleTable { get; set; }
-
-        public List<BottleLineRanges> LineRanges { get; set; }
-
-        public BottleDisplayTables(DataTable liqied, DataTable bottle)
-        {
-            LiquidTable = liqied;
-            BottleTable = bottle; 
-            LineRanges = new List<BottleLineRanges>();
-        }
-
-        public bool IsEmpty
-        {
-            get
-            {
-                return (LiquidTable?.Rows?.Count ?? 0) == 0
-                    && (BottleTable?.Rows?.Count ?? 0) == 0;
-            }
-        }
+        //public int Depth { get; set; }
+        //public string? NodeType { get; set; }
+        public string NodeIdentifyKey => MasterKey;
     }
 
     public class BottleTraceResult
     {
-        public BottleDisplayTables? DisplayTables { get; set; }
-        public List<BottleDisplayGroup> DisplayGroups { get; set; } = new List<BottleDisplayGroup>();
-
-        public BottleTraceResult()
-        {
-            
-            DisplayGroups = new List<BottleDisplayGroup>();
-        }
-
-        public bool IsEmpty
-        {
-            get
-            {
-                return DisplayTables == null || DisplayTables.IsEmpty;
-            }
-        }
+        public DataTable BottleTable { get; set; } = new DataTable();
+        public List<Bottle_ProductionResultNode> BottleNodes { get; set; } = new List<Bottle_ProductionResultNode>();
+        public List<BottleLineRanges>? LineRangesNew { get; set; }
     }
    
     public class BottleLineRanges
@@ -202,13 +113,13 @@ namespace LotTraceApp.Models
         public string? BottleID { get; set; }
 
         public string? SamplingGroup { get; set; }
-        public int? BottleINumber { get; set; }
+        public int? BottleNumber { get; set; }
         public int? FillingNozzleNumber { get; set; }
         public int? CapTighteningTorqueValue { get; set; }
         public int? CapTighteningTorqueJudgment { get; set; }
         public int? CapTiltDetectionJudgment { get; set; }
         public int? FillingMachineNumber { get; set; }
-        public int? TotalCahckJudgment { get; set; }
+        public int? TotalCheckJudgment { get; set; }
         public int? BottleLocation { get; set; }
         public long? FillingWeight { get; set; }
         public TimeSpan? FillingTime { get; set; }
@@ -231,7 +142,7 @@ namespace LotTraceApp.Models
         public int? CapTighteningTorqueValue_Big { get; set; }
         public int? CapTighteningTorqueJudgment { get; set; }
         public int? CapTiltDetectionJudgment { get; set; }
-        public int? TotalCahckJudgment { get; set; }
+        public int? TotalCheckJudgment { get; set; }
         public int? CapTighteningTorqueValue_Small { get; set; }
         public int? FillingWeightJudgment { get; set; }
         public int? BottleLocation { get; set; }

@@ -211,7 +211,7 @@ scp.ManufacturingProcessName;";
                     AppendColumn("scp.PumpDelayTime");
                     AppendColumn("scp.ValveDelayTime");
                     AppendColumn("scp.SourceTankPumpStartupSpeed");
-                    AppendColumn("scp.SourceTankPump1tageFrequency");
+                    AppendColumn("scp.SourceTankPump1stageFrequency");
                     AppendColumn("scp.SourceTankPump2stageFrequency");
                     AppendColumn("scp.SourceTankPump2stageFrequencySwitchingWeight");
                     AppendColumn("scp.AmountOfStock");
@@ -307,7 +307,7 @@ scp.ManufacturingProcessName;";
                     AppendColumn("scp.CirculationPumpStartupSpeed");
                     AppendColumn("scp.CirculationPumpFrequency");
                     AppendColumn("scp.CirculationPumpStopWeight");
-                    AppendColumn("scp.AmountOfExtrction");
+                    AppendColumn("scp.AmountOfExtraction");
                     AppendColumn("scp.DroopAmountSettingValue");
                     AppendColumn("scp.TotalDischargePumpStopDelayTime");
                     break;
@@ -502,7 +502,7 @@ ORDER BY
 
                     SourceTankName = ToNullableString(row, "SourceTankName"),
                     SourceTankPumpStartupSpeed = ToNullableDecimal(row, "SourceTankPumpStartupSpeed"),
-                    SourceTankPump1tageFrequency = ToNullableDecimal(row, "SourceTankPump1tageFrequency"),
+                    SourceTankPump1stageFrequency = ToNullableDecimal(row, "SourceTankPump1stageFrequency"),
                     SourceTankPump2stageFrequency = ToNullableDecimal(row, "SourceTankPump2stageFrequency"),
                     SourceTankPump2stageFrequencySwitchingWeight = ToNullableDecimal(row, "SourceTankPump2stageFrequencySwitchingWeight"),
                     AmountOfStock = ToNullableDecimal(row, "AmountOfStock"),
@@ -544,7 +544,7 @@ ORDER BY
                     CirculationPumpFrequencySetting_L = ToNullableDecimal(row, "CirculationPumpFrequencySetting_L"),
                     WasteVolume = ToNullableDecimal(row, "WasteVolume"),
 
-                    AmountOfExtrction = ToNullableDecimal(row, "AmountOfExtrction"),
+                    AmountOfExtraction = ToNullableDecimal(row, "AmountOfExtraction"),
                     TotalDischargePumpStopDelayTime = ToNullableDecimal(row, "TotalDischargePumpStopDelayTime"),
 
                     WasteLiquidTypeFlag = ToNullableString(row, "WasteLiquidTypeFlag"),

@@ -27,8 +27,6 @@ namespace LotTraceApp
             new Dictionary<int, TraceSearchParameters>();
 
         // タブ番号 → 表示テーブル。サービス実装接続後、タブ切替時の再表示に使う。
-        private readonly Dictionary<int, BottleDisplayTables?> _tabDisplayTables =
-            new Dictionary<int, BottleDisplayTables?>();
         private readonly Dictionary<int, BottleTraceResult?> _tabBottleTraceResults =
             new Dictionary<int, BottleTraceResult?>();
 
@@ -46,13 +44,13 @@ namespace LotTraceApp
         private const string DefaultExcelDirectoryIniKey = "DefaultExcelDirectory";
         private const string DefaultCsvDirectoryIniKey = "DefaultCsvDirectory";
 
-        
+
 
 
         private sealed class LineCache
         {
-            public int RowIndex {  get; set; }
-            public Color Color {  get; set; }
+            public int RowIndex { get; set; }
+            public Color Color { get; set; }
 
         }
 
@@ -132,7 +130,6 @@ namespace LotTraceApp
         private sealed class BottleTraceSearchWorkResult
         {
             public BottleTraceResult? TraceResult { get; set; }
-            public BottleDisplayTables? DisplayTables { get; set; }
         }
 
         private readonly HeaderVisualStyle _middleHeaderStyle = new HeaderVisualStyle
@@ -189,7 +186,7 @@ namespace LotTraceApp
         private readonly BottleResultService _bottleResultService;
 
 
-        private Button? _btnIntersectionCsv ;
+        private Button? _btnIntersectionCsv;
         private Button? _btnIntersectionClear;
         // タブ番号 → 交点検出などの対象タブ
         private readonly HashSet<int> _selectedTraceTargetTabs =
@@ -246,16 +243,17 @@ namespace LotTraceApp
 
         private void InitializeBottleTraceTabs()
         {
+            SetGrid();
+
             for (int tabNo = 1; tabNo <= 10; tabNo++)
             {
                 var tab = GetTabContext(tabNo);
                 if (tab == null) continue;
 
                 InitializeGrid(tab.BottleGrid);
-                SetGrid();
                 ApplyGridColumnHeaderStyle(tab.BottleGrid, _bottleHeaderStyle);
-                tab.BottleGrid.ScrollBars = ScrollBars.None;
-                InitializeBottleHeaderPanel(tab.BottleGrid, "検索", _bottleHeaderStyle);
+                tab.BottleGrid.ScrollBars = ScrollBars.Vertical;
+                InitializeBottleHeaderPanel(tab.BottleGrid, "検索結果", _bottleHeaderStyle);
 
                 RegisterTraceGridEvents(tab);
 
@@ -278,7 +276,7 @@ namespace LotTraceApp
             btnBottleDetectCrossPoints.Click += btnBottleDetectCrossPoints_Click;
 
 
-          
+
         }
 
         private void InitializeBottleIntersectionTab()
@@ -393,7 +391,7 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            grid.AutoGenerateColumns = true;
+            grid.AutoGenerateColumns = false;
             grid.ReadOnly = true;
             grid.MultiSelect = false;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -416,7 +414,6 @@ namespace LotTraceApp
             grid.DefaultCellStyle.WrapMode = DataGridViewTriState.False;
             grid.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
-            //grid.BackgroundColor = Color.FromArgb(96, 100, 105);
             grid.GridColor = Color.FromArgb(176, 180, 184);
             grid.BorderStyle = BorderStyle.FixedSingle;
             grid.CellBorderStyle = DataGridViewCellBorderStyle.Single;
@@ -480,20 +477,9 @@ namespace LotTraceApp
 
             UnregisterTraceGridBorderPaint(tab.BottleGrid);
 
-            
+
             if (!_tabSearchParameters.TryGetValue(tab.TabNo, out var p))
                 return;
-
-            //if (p.Direction == TraceDirection.Forward)
-            //{
-            //    RegisterTraceGridEvents(tab.GridStart, LiquidTableBorderPaint);
-            //    RegisterTraceGridEvents(tab.GridEnd, BottleTableBorderPaint);
-            //}
-            //if (p.Direction == TraceDirection.Backward)
-            //{
-            //    RegisterTraceGridEvents(tab.GridEnd, LiquidTableBorderPaint);
-            //    RegisterTraceGridEvents(tab.GridStart, BottleTableBorderPaint);
-            //}
 
             RegisterTraceGridEvents(tab.BottleGrid, BottleTableBorderPaint);
 
@@ -529,10 +515,10 @@ namespace LotTraceApp
             grid.MouseLeave -= Grid_MouseLeave_Hover;
             grid.MouseLeave += Grid_MouseLeave_Hover;
 
-            
-                grid.CellMouseClick -= dataGrid_CellMouseClick;
-                grid.CellMouseClick += dataGrid_CellMouseClick;
-            
+
+            grid.CellMouseClick -= dataGrid_CellMouseClick;
+            grid.CellMouseClick += dataGrid_CellMouseClick;
+
         }
 
         private void RegisterGridSelectionVisualEvents(DataGridView grid)
@@ -851,8 +837,7 @@ namespace LotTraceApp
             var tab = GetTabContext(tabNo);
             if (tab == null) return;
 
-            
-            if (!_tabDisplayTables.TryGetValue(tabNo, out var tables) || tables == null)
+            if (!_tabBottleTraceResults.TryGetValue(tabNo, out var tables) || tables == null)
             {
                 _gridForeColorCaches.Remove(tab.BottleGrid);
                 _gridBackColorCaches.Remove(tab.BottleGrid);
@@ -868,13 +853,8 @@ namespace LotTraceApp
             if (!_tabSearchParameters.TryGetValue(tabNo, out var p))
                 return;
 
-            //if (p.Direction == TraceDirection.Forward) { SetForwardGrid(tab, tables); }
-
-            //if (p.Direction == TraceDirection.Backward) { SetBackwardGrid(tab, tables); }
-
             BuildBottleGridForeColorCaches(tab);
             BuildBottleGridBackColorCache(tab, tab.BottleGrid);
-            //RegisterTraceGridEvents(tab);
             RefreshBottleHeaderPanels(tab);
         }
 
@@ -931,7 +911,7 @@ namespace LotTraceApp
 
         private BottleTraceTabContext? GetTabContext(int tabNo)
         {
-            
+
             return _bottleTraceTabContexts.TryGetValue(tabNo, out var tab) ? tab : null;
         }
 
@@ -1140,7 +1120,7 @@ namespace LotTraceApp
             }
         }
 
-        
+
 
         private void BottleTraceTabNameSourceChanged(object? sender, EventArgs e)
         {
@@ -1247,27 +1227,35 @@ namespace LotTraceApp
 
         private void AddTextColumn(string name, bool visible, string headerText, int width)
         {
-            var column = new DataGridViewTextBoxColumn
+            var grids = new[]
             {
-                Name = name,
-                HeaderText = headerText,
-                DataPropertyName = name,
-                Width = width,
-                SortMode = DataGridViewColumnSortMode.NotSortable,
-                Visible = visible,
-                ReadOnly = true
+                bottleGrid1,
+                bottleGrid2,
+                bottleGrid3,
+                bottleGrid4,
+                bottleGrid5,
+                bottleGrid6,
+                bottleGrid7,
+                bottleGrid8,
+                bottleGrid9,
+                bottleGrid10,
             };
 
-            bottleGrid1.Columns.Add(column);
-            bottleGrid2.Columns.Add(column);
-            bottleGrid3.Columns.Add(column);
-            bottleGrid4.Columns.Add(column);
-            bottleGrid5.Columns.Add(column);
-            bottleGrid6.Columns.Add(column);
-            bottleGrid7.Columns.Add(column);
-            bottleGrid8.Columns.Add(column);
-            bottleGrid9.Columns.Add(column);
-            bottleGrid10.Columns.Add(column);
+            foreach (var grid in grids)
+            {
+                var column = new DataGridViewTextBoxColumn
+                {
+                    Name = name,
+                    HeaderText = headerText,
+                    DataPropertyName = name,
+                    Width = width,
+                    SortMode = DataGridViewColumnSortMode.NotSortable,
+                    Visible = visible,
+                    ReadOnly = true
+                };
+
+                grid.Columns.Add(column);
+            }
         }
 
         private void RefreshBottleHeaderPanels(BottleTraceTabContext tab)
@@ -1275,7 +1263,7 @@ namespace LotTraceApp
             if (tab == null)
                 return;
 
-            RefreshBottleHeaderPanel(tab.BottleGrid, "検索");
+            RefreshBottleHeaderPanel(tab.BottleGrid, "検索結果");
         }
 
         private void RefreshBottleHeaderPanel(DataGridView grid, string title)
@@ -1623,7 +1611,7 @@ namespace LotTraceApp
                         showProgress ? progress : null,
                         cancellation == null ? CancellationToken.None : cancellation.Token));
 
-                if (workResult.DisplayTables == null || workResult.TraceResult!.IsEmpty)
+                if (workResult.TraceResult == null || workResult.TraceResult.BottleTable.Rows.Count == 0)
                 {
                     MessageBox.Show(
                         "検索結果は0件です。",
@@ -1696,15 +1684,14 @@ namespace LotTraceApp
                 progress.Report(new TraceProgressState("瓶トレース候補を取得しています...", 10));
 
             BottleTraceResult traceResult = p != null && p.Direction == TraceDirection.Backward
-                ? _service.B_TraceBackwardResult(p, progress, cancellationToken)
-                : _service.B_TraceForwardResult(p, progress, cancellationToken);
+                ? _service.BottleTraceBackwardResult(p, progress, cancellationToken)
+                : _service.BottleTraceForwardResult(p, progress, cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();
 
             return new BottleTraceSearchWorkResult
             {
                 TraceResult = traceResult,
-                DisplayTables = traceResult == null ? null : traceResult.DisplayTables
             };
         }
 
@@ -1719,20 +1706,23 @@ namespace LotTraceApp
             _tabSearchParameters[tab.TabNo] = p;
 
             RegisterTraceGridEvents(tab);
+            tab.BottleGrid.DataSource = workResult.TraceResult!.BottleTable;
 
-            //if (p.Direction == TraceDirection.Backward)
-            //    SetBackwardGrid(tab, workResult.DisplayTables!);
-            //else
-            //    SetForwardGrid(tab, workResult.DisplayTables!);
+            var grid = tab.BottleGrid;
+            int targetWidth = 1020;
+            if (BottleGridScrollBarVisible(grid))
+                targetWidth += SystemInformation.VerticalScrollBarWidth;
+            grid.Width = targetWidth;
+            if (FindHeaderPanelForGrid(grid) is Panel panel)
+                panel.Width = targetWidth;
 
-            tab.BottleGrid.DataSource = workResult.DisplayTables!.BottleTable;
-
-            _tabDisplayTables[tab.TabNo] = workResult.DisplayTables;
             _tabBottleTraceResults[tab.TabNo] = workResult.TraceResult;
-            BuildLineColorCache(tab.TabNo, workResult.DisplayTables);
+            BuildLineColorCacheNew(tab.TabNo, workResult.TraceResult);
             BuildBottleGridForeColorCaches(tab);
             ClearBottleCrossPointNodeKeysForTab(tab.TabNo);
             ClearBottleGridBackColorCachesForTab(tab.TabNo);
+
+            RefreshBottleHeaderPanels(tab);
         }
 
         private TraceSearchParameters CollectSearchParametersFromControls(BottleTraceTabContext tab)
@@ -1986,7 +1976,7 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            
+
             if (!_gridForeColorCaches.TryGetValue(grid, out var cache))
                 return;
 
@@ -2101,7 +2091,7 @@ namespace LotTraceApp
             if (tab == null || grid == null)
                 return;
 
-            
+
             if (!_crossPointNodeKeysByTab.TryGetValue(tab.TabNo, out var crossPointNodeKeys) ||
                 crossPointNodeKeys == null || crossPointNodeKeys.Count == 0)
             {
@@ -2154,7 +2144,7 @@ namespace LotTraceApp
                     if (string.IsNullOrWhiteSpace(key) || !crossPointNodeKeys.Contains(key))
                         continue;
 
-                    
+
                     if (!colorByNodeKey.TryGetValue(key, out var colors))
                     {
                         colors = GetCrossPointNodeColors(key);
@@ -2211,7 +2201,7 @@ namespace LotTraceApp
             if (grid == null)
                 return;
 
-            
+
             if (!_gridBackColorCaches.TryGetValue(grid, out var cache))
                 return;
 
@@ -2287,7 +2277,7 @@ namespace LotTraceApp
             if (string.IsNullOrWhiteSpace(nodeKey))
                 return Tuple.Create(Color.Empty, Color.Empty);
 
-            
+
             if (_crossPointColorsByNodeKey.TryGetValue(nodeKey, out var colors))
                 return colors;
 
@@ -2338,13 +2328,13 @@ namespace LotTraceApp
 
         #region 罫線描画系
 
-        private void BuildLineColorCache(int tabNo, BottleDisplayTables? tableSource)
+        private void BuildLineColorCacheNew(int tabNo, BottleTraceResult? tableSource)
         {
             var cacheList = new List<LineCache>();
 
-            if (tableSource != null && tableSource.LineRanges != null)
+            if (tableSource != null && tableSource.LineRangesNew != null)
             {
-                foreach (var line in tableSource.LineRanges)
+                foreach (var line in tableSource.LineRangesNew)
                 {
                     cacheList.Add(new LineCache
                     {
@@ -2361,67 +2351,14 @@ namespace LotTraceApp
         {
             int tabNo = GetCurrentBottleTraceTabNo();
 
-            
+
             if (_lineCache.TryGetValue(tabNo, out var cache))
                 return cache;
 
             return null;
         }
 
-
-        //private void LiquidTableBorderPaint(object? sender, PaintEventArgs e)
-        //{
-        //    var grid = sender as DataGridView;
-        //    if (grid == null || e == null)
-        //        return;
-
-        //    int firstRowIndex = grid.FirstDisplayedScrollingRowIndex;
-        //    if (firstRowIndex < 0)
-        //        return;
-
-        //    int displayedRowCount = grid.DisplayedRowCount(true);
-        //    if (displayedRowCount <= 0)
-        //        return;
-
-        //    int lastRowIndex = firstRowIndex + displayedRowCount - 1;
-        //    if (lastRowIndex >= grid.Rows.Count)
-        //        lastRowIndex = grid.Rows.Count - 1;
-
-        //    var caches = GetCurrentLineCache();
-        //    if (caches == null) return;
-
-        //    foreach (var cache in caches)
-        //    {
-        //        if (cache == null)
-        //            continue;
-
-        //        int rowIndex = cache.RowIndex - 1;
-        //        if (rowIndex < firstRowIndex || rowIndex > lastRowIndex)
-        //            continue;
-
-        //        Rectangle rect = grid.GetRowDisplayRectangle(rowIndex, true);
-        //        if (rect.Height <= 0)
-        //            continue;
-
-
-        //        int y = rect.Bottom - 1;
-        //        int left = grid.DisplayRectangle.Left;
-        //        int right = grid.DisplayRectangle.Right;
-
-        //        using (var pen = new Pen(cache.Color, 2))
-        //        {
-        //            e.Graphics.DrawLine(
-        //                pen,
-        //                left,
-        //                y,
-        //                right,
-        //                y);
-        //        }
-        //    }
-
-        //}
-
-        private void BottleTableBorderPaint(object? sender, PaintEventArgs e)
+     private void BottleTableBorderPaint(object? sender, PaintEventArgs e)
         {
             var grid = sender as DataGridView;
             if (grid == null || e == null)
@@ -2471,7 +2408,6 @@ namespace LotTraceApp
                         y);
                 }
             }
-
         }
 
 
@@ -2484,18 +2420,17 @@ namespace LotTraceApp
             var tab = GetCurrentTabContext();
             if (tab == null) return;
 
-            
-            if (!_tabDisplayTables.TryGetValue(tab.TabNo, out var tables) || tables == null)
+            if (!_tabBottleTraceResults.TryGetValue(tab.TabNo, out var tables) || tables == null)
             {
                 MessageBox.Show("出力する検索結果がありません。", "瓶設備ロットトレース",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            ExportCsvForTab(tab, tables);
+            ExportCsvForTab(tab);
         }
 
-        private void ExportCsvForTab(BottleTraceTabContext tab, BottleDisplayTables tables)
+        private void ExportCsvForTab(BottleTraceTabContext tab) //, BottleTraceResult tables)
         {
             using (var dlg = new SaveFileDialog())
             {
@@ -2599,23 +2534,24 @@ namespace LotTraceApp
 
             foreach (int tabNo in _selectedTraceTargetTabs.OrderBy(x => x))
             {
-                
-                if (!_tabDisplayTables.TryGetValue(tabNo, out var tables) || tables == null)
+
+                if (!_tabBottleTraceResults.TryGetValue(tabNo, out var tables) || tables == null)
                     continue;
 
                 var tab = GetTabContext(tabNo);
                 if (tab == null || !HasAnyVisibleDataForBottleExcelExport(tab))
                     continue;
 
-                
+
                 _crossPointNodeKeysByTab.TryGetValue(tabNo, out var crossPointNodeKeys);
 
                 requests.Add(new ExcelExportHelper.BottleTraceGridExcelExportRequest
                 {
                     WorksheetName = BuildBottleTraceTabName(tab),
                     Grid = tab.BottleGrid,
-                    LineRanges = tables.LineRanges,
-                    CrossPointNodeKeys = crossPointNodeKeys
+                    LineRanges = tables.LineRangesNew,
+                    CrossPointNodeKeys = crossPointNodeKeys,
+                    SearchResultCount = GetDisplayedRowCount(tab.BottleGrid)
                 });
             }
 
@@ -2723,7 +2659,6 @@ namespace LotTraceApp
             tab.ChkUsePeriod.Checked = false;
 
             _tabSearchParameters.Remove(tab.TabNo);
-            _tabDisplayTables.Remove(tab.TabNo);
             _tabBottleTraceResults.Remove(tab.TabNo);
             _lineCache.Remove(tab.TabNo);
             _gridForeColorCaches.Remove(tab.BottleGrid);
@@ -2748,8 +2683,8 @@ namespace LotTraceApp
 
             grid.DataSource = null;
             grid.Rows.Clear();
-            grid.Columns.Clear();
             grid.ClearSelection();
+            grid.Width = 1020;
             _gridForeColorCaches.Remove(grid);
             _gridBackColorCaches.Remove(grid);
         }
@@ -2812,7 +2747,7 @@ namespace LotTraceApp
             var targets = new Dictionary<int, BottleTraceResult>();
             foreach (int tabNo in _selectedTraceTargetTabs)
             {
-                
+
                 if (_tabBottleTraceResults.TryGetValue(tabNo, out var result) && result != null)
                     targets[tabNo] = result;
             }
@@ -2859,7 +2794,7 @@ namespace LotTraceApp
             {
                 int tabNo = kv.Key;
                 var result = kv.Value;
-                B_CollectCrossPointNodes(tabNo, result, tabsByKey, repByKey);
+                B_CollectCrossPointNodesNew(tabNo, result, tabsByKey, repByKey);
             }
 
             var allTabs = tabResults.Keys.OrderBy(x => x).ToList();
@@ -2869,7 +2804,7 @@ namespace LotTraceApp
             {
                 string key = kv.Key;
                 var tabs = kv.Value;
-                
+
                 if (!repByKey.TryGetValue(key, out var record) || record == null)
                     continue;
 
@@ -2889,131 +2824,73 @@ namespace LotTraceApp
                 .ToList();
         }
 
-        private void B_CollectCrossPointNodes(
+        private void B_CollectCrossPointNodesNew(
             int tabNo,
             BottleTraceResult traceResult,
             Dictionary<string, HashSet<int>> tabsByKey,
             Dictionary<string, B_CrossPointRecord> repByKey)
         {
-            if (traceResult == null || traceResult.DisplayGroups == null ||
+            if (traceResult == null || traceResult.BottleNodes == null ||
                 tabsByKey == null || repByKey == null)
                 return;
 
-            foreach (var group in traceResult.DisplayGroups)
+            foreach (var node in traceResult.BottleNodes)
             {
-                if (group == null)
+                if (node == null)
                     continue;
 
-                if (group.LiquidNodes != null)
-                {
-                    foreach (var laneNode in group.LiquidNodes)
-                        B_AddCrossPointNode(tabNo, laneNode, tabsByKey, repByKey);
-                }
-
-                if (group.BottleNodes != null)
-                {
-                    foreach (var laneNode in group.BottleNodes)
-                        B_AddCrossPointNode(tabNo, laneNode, tabsByKey, repByKey);
-                }
+                B_AddCrossPointNodeNew(tabNo, node, tabsByKey, repByKey);
             }
         }
 
-        private void B_AddCrossPointNode(
+        private void B_AddCrossPointNodeNew(
             int tabNo,
-            BottleDisplayLaneNode laneNode,
+            Bottle_ProductionResultNode node,
             Dictionary<string, HashSet<int>> tabsByKey,
             Dictionary<string, B_CrossPointRecord> repByKey)
         {
-            if (laneNode == null || tabsByKey == null || repByKey == null)
+            if (node == null || tabsByKey == null || repByKey == null)
                 return;
 
-            string? key = B_BuildCrossPointUiKey(laneNode);
+            string? key = B_BuildCrossPointUiKeyNew(node);
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
-            
+
             if (!tabsByKey.TryGetValue(key, out var tabs))
             {
                 tabs = new HashSet<int>();
                 tabsByKey[key] = tabs;
-                repByKey[key] = B_CreateCrossPointRecordFromNode(key, laneNode);
+                repByKey[key] = B_CreateCrossPointRecordFromNodeNew(key, node);
             }
 
             tabs.Add(tabNo);
         }
 
-        private B_CrossPointRecord B_CreateCrossPointRecordFromNode(
+        private B_CrossPointRecord B_CreateCrossPointRecordFromNodeNew(
             string key,
-            BottleDisplayLaneNode laneNode)
+            Bottle_ProductionResultNode node)
         {
             var record = new B_CrossPointRecord
             {
                 NodeKey = key,
-                NodeType = laneNode == null ? 0 : laneNode.NodeType
+                ProductionOrderNumber = node.OrderNumber,
+                LotNumber = node.ProductLotNumber,
+                ItemName = node.ProductItemName,
+                StartDateText = node.StartDate.HasValue
+                ? node.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss") : string.Empty,
+                FillingBottleNum_Total = node.FillingBottleNum_Total
             };
-
-            if (laneNode != null && laneNode.SourceLiquidNode != null)
-            {
-                var node = laneNode.SourceLiquidNode;
-                record.ProductionOrderNumber = node.ProductionOrderNumber;
-                record.LotNumber = node.LotNumber;
-                record.ItemName = node.ItemName;
-                record.StartDateText = node.StartDate.HasValue
-                    ? node.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
-                    : node.StartDateLabel;
-                record.Weight = node.Weight.HasValue ? (float?)Convert.ToSingle(node.Weight.Value) : null;
-            }
-
-            if (laneNode != null && laneNode.SourceBottleNode != null)
-            {
-                var node = laneNode.SourceBottleNode;
-                record.ProductionOrderNumber = node.OrderNumber;
-                record.LotNumber = node.ProductLotNumber;
-                record.ItemName = node.ProductItemName;
-                record.StartDateText = node.StartDate.HasValue
-                    ? node.StartDate.Value.ToString("yyyy/MM/dd HH:mm:ss")
-                    : string.Empty;
-                record.FillingBottleNum_Total = node.FillingBottleNum_Total;
-            }
 
             return record;
         }
 
-        private string? B_BuildCrossPointUiKey(BottleDisplayLaneNode laneNode)
-        {
-            if (laneNode == null)
-                return null;
-
-            if (laneNode.SourceLiquidNode != null)
-                return B_BuildCrossPointUiKey(laneNode.SourceLiquidNode);
-
-            if (laneNode.SourceBottleNode != null)
-            {
-                string nodeKey = (laneNode.SourceBottleNode.NodeIdentifyKey ?? string.Empty).Trim();
-                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey;
-            }
-
-            return null;
-        }
-
-        private string? B_BuildCrossPointUiKey(ProductionResultNode node)
+        private string? B_BuildCrossPointUiKeyNew(Bottle_ProductionResultNode node)
         {
             if (node == null)
                 return null;
 
-            bool isManual =
-                string.Equals(node.StartDateLabel, "手投入", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(node.InputSourceType, "ManualInput", StringComparison.OrdinalIgnoreCase);
-
-            string masterKey = (node.ControlMasterKey ?? string.Empty).Trim();
-            string nodeKey = (node.NodeIdentityKey ?? string.Empty).Trim();
-
-            if (isManual)
-                return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey;
-
-            if (!string.IsNullOrWhiteSpace(masterKey))
-                return "MK|" + masterKey;
-
+            string nodeKey = (node.NodeIdentifyKey ?? string.Empty).Trim();
             return string.IsNullOrWhiteSpace(nodeKey) ? null : "NK|" + nodeKey;
         }
 
@@ -3161,7 +3038,7 @@ namespace LotTraceApp
                 TabPresence = new Dictionary<int, int>();
             }
 
-            public int NodeType {  get; set; }
+            public int NodeType { get; set; }
 
             /// <summary>
             /// NodeIdentityKey 由来のNode識別子。
@@ -3206,11 +3083,10 @@ namespace LotTraceApp
 
             table.Columns.Add("NodeKey", typeof(string));
             table.Columns.Add("交点", typeof(int));
-            table.Columns.Add("製造指図番号", typeof(string));
-            table.Columns.Add("ロットNo.", typeof(string));
-            table.Columns.Add("品目名", typeof(string));
+            table.Columns.Add("指図番号", typeof(string));
+            table.Columns.Add("製品ロットNo.", typeof(string));
+            table.Columns.Add("製品品目名", typeof(string));
             table.Columns.Add("開始日時", typeof(string));
-            table.Columns.Add("重量", typeof(float));
             table.Columns.Add("充填本数", typeof(float));
 
             if (targetTabs != null)
@@ -3238,12 +3114,11 @@ namespace LotTraceApp
                     var row = table.NewRow();
                     row["NodeKey"] = record.NodeKey ?? string.Empty;
                     row["交点"] = record.CrossPointFlag;
-                    row["製造指図番号"] = record.ProductionOrderNumber ?? string.Empty;
-                    row["ロットNo."] = record.LotNumber ?? string.Empty;
-                    row["品目名"] = record.ItemName ?? string.Empty;
+                    row["指図番号"] = record.ProductionOrderNumber ?? string.Empty;
+                    row["製品ロットNo."] = record.LotNumber ?? string.Empty;
+                    row["製品品目名"] = record.ItemName ?? string.Empty;
                     row["開始日時"] = record.StartDateText ?? string.Empty;
-                    row["重量"] = record.Weight.HasValue ? (object)record.Weight.Value : DBNull.Value;
-                    row["充填本数"] = record.FillingBottleNum_Total.HasValue ? (object)record.FillingBottleNum_Total:DBNull.Value;
+                    row["充填本数"] = record.FillingBottleNum_Total.HasValue ? (object)record.FillingBottleNum_Total : DBNull.Value;
 
                     foreach (int tabNo in tabs)
                         row["タブ" + tabNo] = record.GetTabPresence(tabNo);
@@ -3286,31 +3161,28 @@ namespace LotTraceApp
                         break;
                     case "製品品目名":
                         itemNameColumn = col;
-                        col.Width = 400;
+                        col.Width = 300;
                         break;
                     case "中間品ロットNo":
                         col.Width = 150;
-                        break; 
+                        break;
                     case "開始日時":
-                            col.Width = 180;
-                            break;
-                        //case "重量":
-                        //    col.Width = 100;
-                        //    break;
-                        case "充填本数(OK)":
-                            col.Width = 100;
-                            break;
-                        case "充填本数(NG)":
-                            col.Width = 100;
-                            break;
-                        case "充填本数":
-                            col.Width = 100;
-                            break;
-                        default:
-                            if (col.Name.StartsWith("タブ", StringComparison.OrdinalIgnoreCase))
-                                col.Width = 70;
-                            break;
-                        }
+                        col.Width = 180;
+                        break;
+                    case "充填本数(OK)":
+                        col.Width = 100;
+                        break;
+                    case "充填本数(NG)":
+                        col.Width = 100;
+                        break;
+                    case "充填本数":
+                        col.Width = 100;
+                        break;
+                    default:
+                        if (col.Name.StartsWith("タブ", StringComparison.OrdinalIgnoreCase))
+                            col.Width = 70;
+                        break;
+                }
 
                 col.MinimumWidth = col.Width;
                 B_ApplyCrossPointGridSortMode(col);
@@ -3383,6 +3255,16 @@ namespace LotTraceApp
             return width;
         }
 
+        private bool BottleGridScrollBarVisible(DataGridView grid)
+        {
+            if (grid == null)
+                return false;
+
+            return grid.Controls
+                .OfType<VScrollBar>()
+                .Any(scrollBar => scrollBar.Visible);
+        }
+
         private void B_FitBottleIntersectionGridWidthToColumns()
         {
             if (dataGridIntersection == null)
@@ -3392,7 +3274,12 @@ namespace LotTraceApp
             if (columnsWidth <= 0)
                 return;
 
-            int targetWidth = columnsWidth + SystemInformation.VerticalScrollBarWidth + 4;
+            int targetWidth = columnsWidth;
+            if (BottleGridScrollBarVisible(dataGridIntersection))
+            {
+                targetWidth += SystemInformation.VerticalScrollBarWidth+4;
+            }
+
             int maxWidth = B_GetBottleIntersectionGridMaxWidth();
             if (targetWidth > maxWidth)
                 targetWidth = maxWidth;
@@ -3479,7 +3366,7 @@ namespace LotTraceApp
         {
             var grid = sender as DataGridView;
 
-            if (grid == null) {return; }
+            if (grid == null) { return; }
 
             DataGridBottle_CellMouseClick(grid, e);
         }
@@ -3521,10 +3408,13 @@ namespace LotTraceApp
 
             using (var f = new BottleResult(_bottleResultService, node))
             {
-                f.ShowDialog (this);
+                f.ShowDialog(this);
             }
-            
         }
 
+        private void tabBottlePage1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
